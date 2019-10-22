@@ -1,8 +1,6 @@
 package com.polygloat.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
@@ -12,8 +10,10 @@ public class Language extends AuditModel {
     @GeneratedValue
     private Long id;
 
+    @OneToMany
     private List<Translation> traslations;
 
+    @ManyToOne
     private Repository repository;
 
     private String abbreviation;
