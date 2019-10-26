@@ -6,20 +6,18 @@ import javax.validation.constraints.Size;
 import java.util.List;
 
 @Entity
-public class Repository {
-
+public class Folder extends AuditModel {
     @Id
     @GeneratedValue
     private Long id;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    private List<Language> languages;
+    @OneToMany
+    private List<Source> sourceTexts;
 
     @NotBlank
-    @Size(min = 3, max = 500)
+    @Size(min = 1, max = 200)
     private String name;
 
-    private String description;
 
     public Long getId() {
         return id;
@@ -29,12 +27,12 @@ public class Repository {
         this.id = id;
     }
 
-    public List<Language> getLanguages() {
-        return languages;
+    public List<Source> getSourceTexts() {
+        return sourceTexts;
     }
 
-    public void setLanguages(List<Language> languages) {
-        this.languages = languages;
+    public void setSourceTexts(List<Source> sourceTexts) {
+        this.sourceTexts = sourceTexts;
     }
 
     public String getName() {
@@ -43,13 +41,5 @@ public class Repository {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 }

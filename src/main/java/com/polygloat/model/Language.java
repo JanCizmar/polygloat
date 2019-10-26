@@ -1,5 +1,7 @@
 package com.polygloat.model;
 
+import org.hibernate.annotations.Fetch;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -10,8 +12,8 @@ public class Language extends AuditModel {
     @GeneratedValue
     private Long id;
 
-    @OneToMany
-    private List<Translation> traslations;
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<Translation> translations;
 
     @ManyToOne
     private Repository repository;
@@ -28,12 +30,12 @@ public class Language extends AuditModel {
         this.id = id;
     }
 
-    public List<Translation> getTraslations() {
-        return traslations;
+    public List<Translation> getTranslations() {
+        return translations;
     }
 
-    public void setTraslations(List<Translation> traslations) {
-        this.traslations = traslations;
+    public void setTranslations(List<Translation> translations) {
+        this.translations = translations;
     }
 
     public Repository getRepository() {

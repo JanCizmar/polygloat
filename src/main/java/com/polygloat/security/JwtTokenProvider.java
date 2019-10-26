@@ -1,0 +1,78 @@
+package com.polygloat.security;
+
+import com.polygloat.model.User;
+import io.jsonwebtoken.*;
+
+import io.jsonwebtoken.security.SignatureException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.ldap.userdetails.LdapUserDetailsImpl;
+import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+
+@Component
+public class JwtTokenProvider {
+
+    @Autowired
+    private JwtProperties properties;
+
+    private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
+
+    public JwtToken generateToken(Authentication authentication) {
+        LdapUserDetailsImpl userPrincipal = (LdapUserDetailsImpl) authentication.getPrincipal();
+        Date now = new Date();
+
+        return new JwtToken(Jwts.builder()
+                .setSubject(userPrincipal.getUsername())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(now.getTime() + properties.getJwtExpirationInMs()))
+                .signWith(properties.getKey())
+                .compact(), properties.getKey());
+    }
+
+    public boolean validateToken(JwtToken authToken) {
+        try {
+            Jwts.parser().setSigningKey(properties.getKey()).parseClaimsJws(authToken.toString());
+            return true;
+        } catch (SignatureException ex) {
+            logger.error("Invalid JWT signature");
+        } catch (MalformedJwtException ex) {
+            logger.error("Invalid JWT token");
+        } catch (ExpiredJwtException ex) {
+            logger.error("Expired JWT token");
+        } catch (UnsupportedJwtException ex) {
+            logger.error("Unsupported JWT token");
+        } catch (IllegalArgumentException ex) {
+            logger.error("JWT claims string is empty.");
+        }
+        return false;
+    }
+
+    public Authentication getAuthentication(JwtToken token) {
+        User userDetails = new User();
+        userDetails.setUsername(token.getUsername());
+        List<GrantedAuthority> authorities = new LinkedList();
+
+        GrantedAuthority grantedAuthority = (GrantedAuthority) () -> "user";
+
+        authorities.add(grantedAuthority);
+
+        return new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
+    }
+
+    public JwtToken resolveToken(HttpServletRequest req) {
+        String bearerToken = req.getHeader("Authorization");
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return new JwtToken(bearerToken.substring(7), properties.getKey());
+        }
+        return null;
+    }
+}
