@@ -1,12 +1,14 @@
 package com.polygloat.model;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 @Entity
 class Source extends AuditModel {
     @Id
+    @GeneratedValue
     private int id;
 
     @ManyToOne

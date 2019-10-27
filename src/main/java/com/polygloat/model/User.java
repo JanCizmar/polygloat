@@ -1,14 +1,12 @@
 package com.polygloat.model;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
 public class User {
     @Id
+    @GeneratedValue
     private int id;
 
     private String username;

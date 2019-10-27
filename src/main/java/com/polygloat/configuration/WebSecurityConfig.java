@@ -2,8 +2,8 @@ package com.polygloat.configuration;
 
 import com.polygloat.security.JwtAuthenticationEntryPoint;
 import com.polygloat.security.JwtTokenFilter;
-import com.polygloat.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,6 +27,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         this.jwtTokenFilter = jwtTokenFilter;
     }
 
+    @Value("${spring.ldap.embedded.port}")
+    private String ldapPort;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -47,7 +50,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .userDnPatterns("uid={0},ou=people")
                 .groupSearchBase("ou=groups")
                 .contextSource()
-                .url("ldap://localhost:8389/dc=springframework,dc=org")
+                .url("ldap://localhost:" + ldapPort + "/dc=springframework,dc=org")
                 .and()
                 .passwordCompare()
                 .passwordEncoder(new LdapShaPasswordEncoder())
