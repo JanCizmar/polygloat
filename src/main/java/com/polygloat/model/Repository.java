@@ -12,12 +12,27 @@ public class Repository {
     @GeneratedValue
     private Long id;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "repository")
     private List<Language> languages;
+
+    @ManyToOne
+    private UserAccount createdBy;
+
+    @OneToMany(mappedBy = "repository")
+    private List<Permission> permissions;
 
     @NotBlank
     @Size(min = 3, max = 500)
     private String name;
+
+    public Repository() {
+    }
+
+    public Repository(UserAccount createdBy, @NotBlank @Size(min = 3, max = 500) String name, String description) {
+        this.createdBy = createdBy;
+        this.name = name;
+        this.description = description;
+    }
 
     private String description;
 
@@ -51,5 +66,21 @@ public class Repository {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public UserAccount getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(UserAccount createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public List<Permission> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(List<Permission> permissions) {
+        this.permissions = permissions;
     }
 }

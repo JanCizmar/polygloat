@@ -1,8 +1,10 @@
 package com.polygloat.security;
 
-import com.polygloat.model.User;
-import io.jsonwebtoken.*;
-
+import com.polygloat.model.UserAccount;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,8 +59,8 @@ public class JwtTokenProvider {
     }
 
     public Authentication getAuthentication(JwtToken token) {
-        User userDetails = new User();
-        userDetails.setUsername(token.getUsername());
+        UserAccount userDetails = new UserAccount(token.getUsername());
+
         List<GrantedAuthority> authorities = new LinkedList();
 
         GrantedAuthority grantedAuthority = (GrantedAuthority) () -> "user";

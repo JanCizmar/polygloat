@@ -1,26 +1,28 @@
 package com.polygloat.controllers;
 
-import com.polygloat.model.Translation;
-import com.polygloat.repository.TranslationRepository;
+import com.polygloat.DTOs.TranslationDTO;
+import com.polygloat.service.TranslationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/translations")
+@CrossOrigin(origins = "http://localhost:4200")
+@RequestMapping("/api/public/repository/{repositoryId}/translations")
 public class TranslationController {
 
-    private TranslationRepository translationRepository;
+    private TranslationService translationService;
 
     @Autowired
-    public TranslationController(TranslationRepository translationRepository) {
-        this.translationRepository = translationRepository;
+    public TranslationController(TranslationService translationService) {
+
+        this.translationService = translationService;
     }
 
-    @RequestMapping("")
-    public List<Translation> getTranslations(){
-        return translationRepository.findAll();
+    @RequestMapping(value = "/{language}", method = RequestMethod.GET)
+    public List<TranslationDTO> getTranslations(@PathVariable("repositoryId") Long repositoryId,
+                                                @PathVariable("language") String language) {
+        return translationService.getTranslations(language, repositoryId);
     }
 }

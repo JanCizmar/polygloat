@@ -1,6 +1,9 @@
 package com.polygloat.model;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.List;
@@ -11,13 +14,12 @@ public class Folder extends AuditModel {
     @GeneratedValue
     private Long id;
 
-    @OneToMany
+    @OneToMany(mappedBy = "folder")
     private List<Source> sourceTexts;
 
     @NotBlank
     @Size(min = 1, max = 200)
     private String name;
-
 
     public Long getId() {
         return id;

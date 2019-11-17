@@ -6,13 +6,16 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 @Entity
-class Source extends AuditModel {
+public class Source extends AuditModel {
     @Id
     @GeneratedValue
-    private int id;
+    private Long id;
 
     @ManyToOne
     private Repository repository;
+
+    @ManyToOne
+    private Folder folder;
 
     private String text;
 
@@ -32,11 +35,11 @@ class Source extends AuditModel {
         this.text = text;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 }
