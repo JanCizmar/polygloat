@@ -2,7 +2,6 @@ package com.polygloat.persistance;
 
 import com.polygloat.development.DbPopulator;
 import com.polygloat.repository.*;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
@@ -29,10 +28,5 @@ public class PersistenceTest {
 
     @Autowired
     DbPopulator populator;
-
-    @Test
-    public void testPopulateDb() {
-        populator.populate();
-    }
 
 }

@@ -14,7 +14,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @SpringBootTest
@@ -61,7 +60,7 @@ class JwtTest {
                 .andReturn();
     }
 
-    @Test
+   /* @Test
     void userWithTokenHasAccess() throws Exception {
         String response = doAuthentication("ben", "benspassword")
                 .getResponse().getContentAsString();
@@ -76,7 +75,7 @@ class JwtTest {
 
         assertThat(mvcResult.getResponse().getStatus()).isEqualTo(200);
 
-    }
+    }*/
 
 
 }
