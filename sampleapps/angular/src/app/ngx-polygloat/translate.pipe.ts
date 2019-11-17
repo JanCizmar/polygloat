@@ -1,6 +1,5 @@
 import {Pipe, PipeTransform} from '@angular/core';
 import {PolygloatService} from './polygloat.service';
-import {DomSanitizer} from '@angular/platform-browser';
 
 @Pipe({
   name: 'translate',
@@ -11,7 +10,7 @@ export class TranslatePipe implements PipeTransform {
   private cachedTranslation;
   private cachedInput;
 
-  constructor(private service: PolygloatService, private sanitizer: DomSanitizer) {
+  constructor(private service: PolygloatService) {
   }
 
   transform(value: any, ...args: any[]): any {

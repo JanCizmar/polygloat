@@ -1,5 +1,7 @@
 // Select the node that will be observed for mutations
 import {PolygloatService} from './polygloatService';
+import * as ReactDOM from 'react-dom';
+import {PolygloatViewer} from './PolygloatViewer';
 
 const nodeListToArray = (nodeList: XPathResult): Element[] => {
   let node: Element;
@@ -27,17 +29,20 @@ export class TranslationManager {
   public manage = async () => {
     this.observer.observe(document.body, {attributes: true, childList: true, subtree: true});
     await this.service.fetchTranslations();
+    let polygloatModal = document.createElement('div');
+    document.body.append(polygloatModal);
+    ReactDOM.render(PolygloatViewer({show: true}), polygloatModal);
   };
 
   private onNewNodes = async (nodes: Element[]) => {
     for (const node of nodes) {
       node.innerHTML = node.innerHTML.replace(
-        /%-%polygloat:(.*)%-%/gm,
-        "<span data-polygloat-input='$1'>$1</span>");
+        /%-%polygloat:(.*?)%-%/gm,
+        '<span data-polygloat-input=\'$1\'>$1</span>');
 
-      let nodeList = document.evaluate("./span[@data-polygloat-input]", node);
+      let nodeList = document.evaluate('./span[@data-polygloat-input]', node);
       for (const span of nodeListToArray(nodeList)) {
-        let input = span.getAttribute("data-polygloat-input");
+        let input = span.getAttribute('data-polygloat-input');
         span.innerHTML = await this.service.getTranslation(input);
       }
     }
@@ -48,7 +53,7 @@ export class TranslationManager {
       for (let mutation of mutationsList) {
         console.log(mutation);
         if (mutation.type === 'childList') {
-          let nodes: XPathResult = document.evaluate(".//*[contains(text(), '%-%polygloat:')]", mutation.target);
+          let nodes: XPathResult = document.evaluate('.//*[contains(text(), \'%-%polygloat:\')]', mutation.target);
           await this.onNewNodes(nodeListToArray(nodes));
         }
       }
