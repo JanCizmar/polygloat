@@ -31,7 +31,7 @@ export class TranslationManager {
     await this.service.fetchTranslations();
     let polygloatModal = document.createElement('div');
     document.body.append(polygloatModal);
-    ReactDOM.render(PolygloatViewer({show: true}), polygloatModal);
+    ReactDOM.render(<PolygloatViewer />), polygloatModal);
   };
 
   private onNewNodes = async (nodes: Element[]) => {
