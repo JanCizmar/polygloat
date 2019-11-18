@@ -2,11 +2,13 @@
   "name": "polygloat",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/polygloat.bundle.js",
+  "main": "dist/polygloat.umd.js",
   "types": "lib/index.d.ts",
   "declaration": true,
   "directories": {
-    "lib": "lib"
+    "lib": "lib",
+    "dist": "dist"
+
   },
   "scripts": {
     "build": "tsc",

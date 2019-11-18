@@ -1,8 +1,17 @@
 import * as React from 'react';
 
 export interface ViewerProps {
-    show: boolean
+
 }
 
-export const PolygloatViewer = (props: ViewerProps) => props.show && <div>Hello world!</div>;
+export class PolygloatViewer extends React.Component{
+    public show = true;
 
+    constructor(props){
+        super(props);
+    }
+
+    public render = () => {
+        return this.show && <div>Hello world!</div>;
+    };
+};

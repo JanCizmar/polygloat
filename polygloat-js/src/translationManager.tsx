@@ -2,6 +2,7 @@
 import {PolygloatService} from './polygloatService';
 import * as ReactDOM from 'react-dom';
 import {PolygloatViewer} from './PolygloatViewer';
+import {createElement} from 'react';
 
 const nodeListToArray = (nodeList: XPathResult): Element[] => {
   let node: Element;
@@ -12,9 +13,10 @@ const nodeListToArray = (nodeList: XPathResult): Element[] => {
   }
   return nodeArray;
 };
-
 // Start observing the target node for configured mutations
 export class TranslationManager {
+
+  polygloatModalContainer: Element;
 
   private static instance: TranslationManager;
   private service = new PolygloatService();
@@ -26,12 +28,17 @@ export class TranslationManager {
     return this.instance;
   }
 
+  private renderMoal = (translation) => {
+    let element = createElement(PolygloatViewer);
+    ReactDOM.render(element, this.polygloatModalContainer);
+  };
+
+
   public manage = async () => {
     this.observer.observe(document.body, {attributes: true, childList: true, subtree: true});
     await this.service.fetchTranslations();
-    let polygloatModal = document.createElement('div');
-    document.body.append(polygloatModal);
-    ReactDOM.render(<PolygloatViewer />), polygloatModal);
+    this.polygloatModalContainer = document.createElement('div');
+    document.body.append(this.polygloatModalContainer);
   };
 
   private onNewNodes = async (nodes: Element[]) => {
