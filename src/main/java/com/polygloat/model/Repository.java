@@ -12,8 +12,11 @@ public class Repository {
     @GeneratedValue
     private Long id;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "repository")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "repository")
     private List<Language> languages;
+
+    @OneToMany(mappedBy = "repository", fetch = FetchType.EAGER)
+    private List<Source> sources;
 
     @ManyToOne
     private UserAccount createdBy;
@@ -82,5 +85,13 @@ public class Repository {
 
     public void setPermissions(List<Permission> permissions) {
         this.permissions = permissions;
+    }
+
+    public List<Source> getSources() {
+        return sources;
+    }
+
+    public void setSources(List<Source> sources) {
+        this.sources = sources;
     }
 }
