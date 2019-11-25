@@ -13,7 +13,7 @@ export class Polygloat {
         return TranslationManager.getInstance(lang).manage();
     };
 
-    static translate = (inputText: string) => {
-        return TranslationManager.getInstance().service.getTranslation(inputText);
+    static translate = (inputText: string): Promise<string> => {
+        return TranslationManager.getInstance().service.getTranslation(inputText, Polygloat.lang);
     };
 }

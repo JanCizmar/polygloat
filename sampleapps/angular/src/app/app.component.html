@@ -17,5 +17,23 @@
   {{ 'The_Dude_abides.' | translate }}
 </div>
 
+<div>{{text1}}</div>
+
+<label>
+  <textarea>{{ 'The_Dude_abides.' | translate }}</textarea>
+</label>
+
+<label>
+  <textarea>
+    {{ 'Mr._Treehorn_treats_objects_like_women,_man.' | translate }}
+    {{ 'Yeah,_well,_that\"s_just,_like,_your_opinion,_man.' | translate }},
+  </textarea>
+</label>
+
+
+<br/>
+<input placeholder="{{ 'The_Dude_abides.' | translate }}" type="text"/>
+<br/>
+
 <button (click)="setLang('en')">en</button>
 <button (click)="setLang('de')">de</button>

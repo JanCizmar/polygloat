@@ -22,13 +22,21 @@ export class PolygloatService {
     }
 
     async fetchTranslations(lang: string) {
-        console.log('fetch called');
         let requestResult = await fetch(`${SERVER_URL}api/public/repository/${REPOSITORY_ID}/translations/${lang}`);
         this.translationsCache.set(lang, await requestResult.json());
     }
 
     async getTranslation(name: String, lang: string) {
         let translations = await this.getTranslations(lang);
+        let filtered = translations.filter(t => t.source === name);
+        if (filtered.length > 0) {
+            return filtered[0].translatedText;
+        }
+        return null;
+    }
+
+    instant(name: String, lang: string) {
+        let translations = this.translationsCache.get(lang);
         let filtered = translations.filter(t => t.source === name);
         if (filtered.length > 0) {
             return filtered[0].translatedText;
@@ -57,4 +65,6 @@ export class PolygloatService {
             },
         });
     }
+
+
 }
