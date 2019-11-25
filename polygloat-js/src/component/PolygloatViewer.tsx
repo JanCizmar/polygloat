@@ -1,17 +1,20 @@
 import * as React from 'react';
-import TranslationDialog from './Dialog';
+import TranslationDialog from './TranslatonDialog';
+import {PolygloatService} from '../polygloatService';
+import {TranslationManager} from '../translationManager';
 
-export interface ViewerProps {
-
+type ViewerProps = {
+    service: PolygloatService,
+    manager: TranslationManager
 }
 
-export class PolygloatViewer extends React.Component {
+export class PolygloatViewer extends React.Component<ViewerProps> {
     state = {
         translationInput: null,
         dialogOpened: false
     };
 
-    constructor(props) {
+    constructor(props: ViewerProps) {
         super(props);
     }
 
@@ -19,9 +22,10 @@ export class PolygloatViewer extends React.Component {
         this.setState({...this.state, dialogOpened: true, translationInput: input});
     }
 
-    public render = () => {
-        return <div><TranslationDialog open={this.state.dialogOpened} input={this.state.translationInput} onClose={this.onClose}/></div>;
-    };
+    public render = () =>
+        <div>
+            <TranslationDialog {...this.props} open={this.state.dialogOpened} input={this.state.translationInput} onClose={this.onClose}/>
+        </div>;
 
     private onClose = () => {
         this.setState({...this.state, dialogOpened: false});

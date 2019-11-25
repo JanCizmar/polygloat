@@ -1,5 +1,7 @@
 package com.polygloat.DTOs;
 
+import com.polygloat.model.Translation;
+
 public class TranslationDTO {
 
     private String source;
@@ -39,5 +41,9 @@ public class TranslationDTO {
 
     public void setLanguageAbbr(String languageAbbr) {
         this.languageAbbr = languageAbbr;
+    }
+
+    public static TranslationDTO fromEntity(Translation t) {
+        return new TranslationDTO(t.getSource().getText(), t.getText(), t.getLanguage().getAbbreviation());
     }
 }

@@ -2,7 +2,9 @@
 import {PolygloatService} from './polygloatService';
 import * as ReactDOM from 'react-dom';
 import {PolygloatViewer} from './component/PolygloatViewer';
+import * as React from 'react';
 import {createElement} from 'react';
+import {TranslationData} from './DTOs/TranslationData';
 
 const nodeListToArray = (nodeList: XPathResult): Element[] => {
     let node: Element;
@@ -16,13 +18,12 @@ const nodeListToArray = (nodeList: XPathResult): Element[] => {
 
 // Start observing the target node for configured mutations
 export class TranslationManager {
-
     private static instance: TranslationManager;
-    polygloatModalContainer: Element;
-    private service = new PolygloatService();
+    private polygloatModalContainer: Element;
+    private _service: PolygloatService;
     private viewerComponent: PolygloatViewer;
-
-    private is_key_down = (() => {
+    private _lang;
+    private isKeyDown = (() => {
         let state = {};
 
         window.addEventListener('keyup', (e) => state[e.key] = false);
@@ -31,25 +32,65 @@ export class TranslationManager {
         return (key) => state.hasOwnProperty(key) && state[key] || false;
     })();
 
-    public static getInstance(): TranslationManager {
+    constructor(lang: string) {
+        this._lang = lang;
+    }
+
+    public get lang() {
+        return this._lang;
+    }
+
+    public set lang(value) {
+        this._lang = value;
+        this.renderTranslations(document.body, false, './');
+    }
+
+    public get service() {
+        if (this._service == null) {
+            this._service = new PolygloatService();
+        }
+        return this._service;
+    }
+
+    public static getInstance(lang?: string): TranslationManager {
         if (this.instance == null) {
-            this.instance = new TranslationManager();
+            this.instance = new TranslationManager(lang);
         }
         return this.instance;
     }
 
+    // noinspection JSUnusedGlobalSymbols
     public manage = async () => {
         this.observer.observe(document.body, {attributes: true, childList: true, subtree: true});
-        await this.service.fetchTranslations();
+        await this.service.getTranslations(this.lang);
         this.polygloatModalContainer = document.createElement('div');
         document.body.append(this.polygloatModalContainer);
-        let element = createElement(PolygloatViewer);
+        let element = createElement(PolygloatViewer, {service: this.service, manager: this});
         this.viewerComponent = ReactDOM.render(element, this.polygloatModalContainer);
     };
 
     private translationEdit = (input) => {
         this.viewerComponent.translationEdit(input);
     };
+
+
+    public onTranslationChange = (data: TranslationData) => {
+        let nodeList = document.evaluate(`//span[@data-polygloat-input='${data.input}']`, document.body);
+        for (const span of nodeListToArray(nodeList)) {
+            span.innerHTML = data.translations.get(this.lang);
+        }
+    };
+
+    async renderTranslations(node: Element, addListener: boolean, xPathPrefix: string) {
+        let nodeList = document.evaluate(`${xPathPrefix}/span[@data-polygloat-input]`, node);
+        for (const span of nodeListToArray(nodeList)) {
+            let input = span.getAttribute('data-polygloat-input');
+            if (addListener) {
+                span.addEventListener('mouseenter', () => this.translationHighlight(span, input));
+            }
+            span.innerHTML = await this.service.getTranslation(input, this.lang);
+        }
+    }
 
     private translationHighlight = (span, input) => {
         const clickListener = () => this.translationEdit(input);
@@ -66,7 +107,7 @@ export class TranslationManager {
         const altDownListener = () => {
             console.log('altdown');
 
-            if (this.is_key_down('Alt')) {
+            if (this.isKeyDown('Alt')) {
                 doHighlight();
                 window.addEventListener('keyup', altUpListener);
             }
@@ -89,7 +130,7 @@ export class TranslationManager {
         window.addEventListener('keyup', altUpListener);
 
 
-        if (this.is_key_down('Alt')) {
+        if (this.isKeyDown('Alt')) {
             doHighlight();
         } else {
             window.addEventListener('keydown', altDownListener);
@@ -100,18 +141,15 @@ export class TranslationManager {
 
     private onNewNodes = async (nodes: Element[]) => {
         for (const node of nodes) {
-            node.innerHTML = node.innerHTML.replace(
-                /%-%polygloat:(.*?)%-%/gm,
-                '<span data-polygloat-input=\'$1\'>$1</span>');
+            node.innerHTML = node.innerHTML.replace(/%-%polygloat:(.*?)%-%/gm, (_, g1) => {
+                let escaped = g1.replace('"', '&quot;');
+                return '<span data-polygloat-input="' + escaped + '">' + escaped + '</span>';
+            });
 
-            let nodeList = document.evaluate('./span[@data-polygloat-input]', node);
-            for (const span of nodeListToArray(nodeList)) {
-                let input = span.getAttribute('data-polygloat-input');
-                span.addEventListener('mouseenter', () => this.translationHighlight(span, input));
-                span.innerHTML = await this.service.getTranslation(input);
-            }
+            await this.renderTranslations(node, true, '.');
         }
     };
+
 
     private observer = new MutationObserver(
         async (mutationsList: MutationRecord[]) => {

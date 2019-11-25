@@ -1,11 +1,11 @@
 import {Injectable} from '@angular/core';
-import {TranslationManager} from 'polygloat';
+import {Polygloat} from 'polygloat';
 
 @Injectable()
 export class TranslationsProvider {
 
   load() {
-    return TranslationManager.getInstance().manage();
+    return Polygloat.run('en');
   }
 }
 

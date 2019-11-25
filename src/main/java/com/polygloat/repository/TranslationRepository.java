@@ -4,6 +4,7 @@ import com.polygloat.model.Translation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -14,7 +15,7 @@ public interface TranslationRepository extends JpaRepository<Translation, Long> 
 
     List<Translation> getAllByLanguageAbbreviationAndSourceRepositoryId(String language_abbreviation, Long repository_id);
 
+    List<Translation> getAllBySourceRepositoryIdAndSourceText(Long source_repository_id, String source_text);
 
-
-
+    List<Translation> getAllBySourceRepositoryIdAndSourceTextIn(Long source_repository_id, Collection<String> source_text);
 }

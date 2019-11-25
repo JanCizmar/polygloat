@@ -1,6 +1,5 @@
 import {APP_INITIALIZER, NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {TranslateModule} from '@ngx-translate/core';
 import {TranslatePipe} from './translate.pipe';
 import {HttpClientModule} from '@angular/common/http';
 import {TranslationsProvider} from './translations-provider';
@@ -15,11 +14,10 @@ export function translationsProviderFactory(provider: TranslationsProvider) {
   ],
   imports: [
     CommonModule,
-    TranslateModule,
     HttpClientModule
   ],
   exports: [
-    TranslatePipe
+    TranslatePipe,
   ],
   providers: [
     TranslationsProvider, {

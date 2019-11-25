@@ -1,3 +1,3 @@
-import {TranslationManager} from './translationManager';
+import {Polygloat} from './Polygloat';
 
-export {TranslationManager};
+export {Polygloat};

@@ -25,4 +25,16 @@ public class TranslationController {
                                                 @PathVariable("language") String language) {
         return translationService.getTranslations(language, repositoryId);
     }
+
+    @RequestMapping(value = "/source/{sourceText}", method = RequestMethod.GET)
+    public List<TranslationDTO> getSourceTranslations(@PathVariable("repositoryId") Long repositoryId,
+                                                      @PathVariable("sourceText") String sourceText) {
+        return translationService.getSourceTranslations(repositoryId, sourceText);
+    }
+
+    @RequestMapping(value = "", method = RequestMethod.POST)
+    public List<TranslationDTO> setTranslations(@RequestBody List<TranslationDTO> translations,
+                                                @PathVariable("repositoryId") Long repositoryId) {
+        return translationService.setTranslations(repositoryId, translations);
+    }
 }
