@@ -1,12 +1,17 @@
 import {PolygloatViewer} from './component/PolygloatViewer';
 import {createElement} from 'react';
 import * as ReactDOM from 'react-dom';
-import {PolygloatService} from './polygloatService';
-import {TranslationManager} from './translationManager';
-import {PolygloatSimpleSpanElement, PolygloatTextAreaElement} from './Types';
+import {PolygloatService} from './services/polygloatService';
+import {PolygloatSimpleSpanElement, PolygloatTextInputElement} from './Types';
+import {container, singleton} from 'tsyringe';
+import {Properties} from './Properties';
 
+@singleton()
 export class TranslationHighlighter {
     private viewerComponent: PolygloatViewer;
+    private service: PolygloatService = container.resolve(PolygloatService);
+    private properties: Properties = container.resolve(Properties);
+
     private isKeyDown = (() => {
         let state = {};
 
@@ -16,10 +21,10 @@ export class TranslationHighlighter {
         return (key) => state.hasOwnProperty(key) && state[key] || false;
     })();
 
-    constructor(private service: PolygloatService, private manager: TranslationManager) {
+    constructor() {
         let polygloatModalContainer = document.createElement('div');
         document.body.append(polygloatModalContainer);
-        let element = createElement(PolygloatViewer, {service: this.service, manager: this.manager});
+        let element = createElement(PolygloatViewer);
         this.viewerComponent = ReactDOM.render(element, polygloatModalContainer);
     }
 
@@ -77,19 +82,25 @@ export class TranslationHighlighter {
                 return;
             }
 
-            if (node instanceof HTMLTextAreaElement) {
-                let textArea: PolygloatTextAreaElement = node as PolygloatTextAreaElement;
-                textArea.addEventListener('blur', () => {
-                    let position = textArea.selectionStart;
-                    let nearest = textArea.__polygloat.valueInputs[0];
+            if (node instanceof HTMLTextAreaElement || node instanceof HTMLInputElement) {
+                let textInputElement: PolygloatTextInputElement = (node as any) as PolygloatTextInputElement;
+
+                if (textInputElement.__polygloat.valueInputs.length < 1 && textInputElement.__polygloat.placeholderInputs.length > 0) {
+                    resolve(textInputElement.__polygloat.placeholderInputs[0]);
+                    return;
+                }
+
+                textInputElement.addEventListener('blur', () => {
+                    let position = textInputElement.selectionStart;
+                    let nearest = textInputElement.__polygloat.valueInputs[0];
                     let nearestDistance;
 
-                    for (const input of textArea.__polygloat.valueInputs) {
-                        let translation = this.service.instant(input, this.manager.lang);
+                    for (const input of textInputElement.__polygloat.valueInputs) {
+                        let translation = this.service.instant(input, this.properties.currentLanguage);
                         let index = 0;
                         let end = 0;
                         do {
-                            index = textArea.value.indexOf(translation, end);
+                            index = textInputElement.value.indexOf(translation, end);
                             let start = index;
 
                             end = index + translation.length;
@@ -108,7 +119,7 @@ export class TranslationHighlighter {
                     resolve(nearest);
                     return;
                 });
-                textArea.blur();
+                textInputElement.blur();
             }
         });
     }

@@ -9,6 +9,8 @@
       "es2018",
       "dom"
     ],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "jsx": "react"
   },
   "include": [

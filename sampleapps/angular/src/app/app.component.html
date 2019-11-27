@@ -1,15 +1,23 @@
+<button (click)="setLang('en')">en</button>
+<button (click)="setLang('de')">de</button>
+
+<h1>Angular sample app translation using polygloat JS</h1>
+
+<h2>Some basic translations</h2>
 <div>
   There are 3 translations:
   {{ 'The_Dude_abides.' | translate }},
   {{ 'V.I._Lenin._Vladimir!_Ilyich!_Ulyanov!' | translate }},
   {{ 'Forget_it,_Donny,_you\'re_out_of_your_element!' | translate }}
 </div>
+
 <div>
   There are 3 translations:
   {{ 'Yeah,_well,_that\"s_just,_like,_your_opinion,_man.' | translate }},
   {{ 'Mr._Treehorn_treats_objects_like_women,_man.' | translate }},
   {{ 'The_Dude_abides.' | translate }}
 </div>
+
 <div>
   There are 3 translations:
   {{ 'The_Dude_abides.' | translate }},
@@ -17,11 +25,17 @@
   {{ 'The_Dude_abides.' | translate }}
 </div>
 
+<h2>Service defined translation</h2>
 <div>{{text1}}</div>
 
+<h2>Advanced input translations</h2>
+
+<h3>Textarea with placeholder and value in inner HTML</h3>
 <label>
-  <textarea>{{ 'The_Dude_abides.' | translate }}</textarea>
+  <textarea placeholder="{{ 'The_Dude_abides.' | translate }}">{{ 'The_Dude_abides.' | translate }}</textarea>
 </label>
+
+<h3>Textarea with translated value in inner HTML</h3>
 
 <label>
   <textarea>
@@ -30,10 +44,17 @@
   </textarea>
 </label>
 
+<h3>Empty textarea with placeholder</h3>
 
-<br/>
+<label>
+  <textarea placeholder="{{ 'The_Dude_abides.' | translate }}"></textarea>
+</label>
+
+<h3>Input with initial value</h3>
+
+<input type="text" value="{{ 'The_Dude_abides.' | translate }}"/>
+
+
+<h3>Empty input with placeholder</h3>
+
 <input placeholder="{{ 'The_Dude_abides.' | translate }}" type="text"/>
-<br/>
-
-<button (click)="setLang('en')">en</button>
-<button (click)="setLang('de')">de</button>

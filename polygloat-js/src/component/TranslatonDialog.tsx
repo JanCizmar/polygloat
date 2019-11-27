@@ -7,18 +7,16 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import {CircularProgress, createStyles, makeStyles, Theme} from '@material-ui/core';
-import {TranslationManager} from '../translationManager';
 import {TranslationData} from '../DTOs/TranslationData';
-import {PolygloatService} from '../polygloatService';
+import {PolygloatService} from '../services/polygloatService';
 import {green} from '@material-ui/core/colors';
 import clsx from 'clsx';
+import {container} from 'tsyringe';
+import {EventService, EventType} from '../services/EventService';
 
 interface DialogProps {
     open: boolean;
     input: string;
-    service: PolygloatService,
-    manager: TranslationManager
-
     onClose(): void;
 }
 
@@ -42,18 +40,14 @@ const useStyles = makeStyles((theme: Theme) =>
             marginTop: -12,
             marginLeft: -12,
         },
-    }),
-);
-
+    }));
 
 export default function TranslationDialog(props: DialogProps) {
     const [loading, setLoading] = useState<boolean>(true);
     const [saving, setSaving] = useState<boolean>(false);
     const [success, setSuccess] = useState<boolean>(false);
-
-
     const [translationData, setTranslationData] = useState<TranslationData>(null);
-
+    const service = container.resolve(PolygloatService);
     const handleChange = (abbr) => (event: React.ChangeEvent<HTMLInputElement>) => {
         setSuccess(false);
         translationData.translations.set(abbr, event.target.value);
@@ -64,7 +58,7 @@ export default function TranslationDialog(props: DialogProps) {
         if (props.open) {
             setLoading(true);
             setSuccess(false);
-            props.service.getSourceTranslations(props.input).then(result => {
+            service.getSourceTranslations(props.input).then(result => {
                 setTranslationData(result);
                 setLoading(false);
             });
@@ -73,8 +67,8 @@ export default function TranslationDialog(props: DialogProps) {
 
     const onSave = async () => {
         setSaving(true);
-        await props.service.setTranslations(translationData);
-        props.manager.onTranslationChange(translationData);
+        await service.setTranslations(translationData);
+        container.resolve(EventService).publish(EventType.TRANSLATION_CHANGED, translationData);
         setSaving(false);
         setSuccess(true);
         props.onClose();
@@ -85,6 +79,7 @@ export default function TranslationDialog(props: DialogProps) {
     const buttonClassname = clsx({
         [classes.buttonSuccess]: success,
     });
+
 
     return (
         <div>

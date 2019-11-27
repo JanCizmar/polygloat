@@ -4,8 +4,8 @@ import {Polygloat} from 'polygloat';
 @Injectable()
 export class TranslationsProvider {
 
-  load() {
-    return Polygloat.run('en');
+  async load() {
+    return await Polygloat.run('en');
   }
 }
 

@@ -1,11 +1,7 @@
 import * as React from 'react';
 import TranslationDialog from './TranslatonDialog';
-import {PolygloatService} from '../polygloatService';
-import {TranslationManager} from '../translationManager';
 
 type ViewerProps = {
-    service: PolygloatService,
-    manager: TranslationManager
 }
 
 export class PolygloatViewer extends React.Component<ViewerProps> {
@@ -24,7 +20,7 @@ export class PolygloatViewer extends React.Component<ViewerProps> {
 
     public render = () =>
         <div>
-            <TranslationDialog {...this.props} open={this.state.dialogOpened} input={this.state.translationInput} onClose={this.onClose}/>
+            <TranslationDialog open={this.state.dialogOpened} input={this.state.translationInput} onClose={this.onClose}/>
         </div>;
 
     private onClose = () => {
