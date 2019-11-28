@@ -1,15 +1,17 @@
 package com.polygloat.service;
 
-import com.polygloat.DTOs.TranslationDTO;
-import com.polygloat.Exceptions.NotFoundException;
+import com.polygloat.DTOs.SourceTranslations;
+import com.polygloat.model.Folder;
+import com.polygloat.model.Source;
 import com.polygloat.model.Translation;
 import com.polygloat.repository.RepositoryRepository;
 import com.polygloat.repository.TranslationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class TranslationService {
@@ -24,41 +26,89 @@ public class TranslationService {
         this.repositoryRepository = repositoryRepository;
     }
 
-    public List<TranslationDTO> getTranslations(String abbr, Long repositoryId) {
+    private List<String> getPath(Source source) {
+        ArrayList<String> path = new ArrayList<>();
+        Folder parent = source.getFolder();
+        int nesting = 0;
+        while (parent != null) {
+            if (nesting >= 1000) {
+                throw new RuntimeException("Nesting limit exceeded.");
+            }
+            path.add(parent.getName());
+            parent = parent.getParent();
+            nesting++;
+        }
+        Collections.reverse(path);
+        return path;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void addToMap(Translation translation, Map<String, Object> map) {
+        for (String folderName : getPath(translation.getSource())) {
+            Object childMap = map.computeIfAbsent(folderName, k -> new HashMap<String, Object>());
+            if (childMap instanceof Map) {
+                map = (Map<String, Object>) childMap;
+                continue;
+            }
+            throw new RuntimeException("Translation source collapsing with folder name");
+        }
+
+        map.put(translation.getSource().getText(), translation.getText());
+    }
+
+    public Map<String, Object> getTranslations(String abbr, Long repositoryId) {
         List<Translation> allByLanguage = translationRepository
                 .getAllByLanguageAbbreviationAndSourceRepositoryId(abbr, repositoryId);
 
-        return allByLanguage.stream()
-                .map(t -> TranslationDTO.fromEntity(t))
-                .collect(Collectors.toList());
+        Map<String, Object> folders = new HashMap<>();
+
+        for (Translation translation : allByLanguage) {
+            addToMap(translation, folders);
+        }
+
+        return folders;
     }
 
-    public List<TranslationDTO> getSourceTranslations(Long repositoryId, String sourceText) {
+    private Stream<Translation> getTranslationEntityStream(Long repositoryId, String path) {
+        LinkedList<String> pathList = new LinkedList<>(Arrays.asList(path.split("\\.")));
+        String sourceText = pathList.removeLast();
+
         List<Translation> translations = translationRepository
                 .getAllBySourceRepositoryIdAndSourceText(repositoryId, sourceText);
 
         return translations.stream()
-                .map(t -> new TranslationDTO(t.getSource().getText(), t.getText(), t.getLanguage().getAbbreviation()))
-                .collect(Collectors.toList());
+                .filter(t -> getPath(t.getSource()).equals(pathList));
     }
 
-    public List<TranslationDTO> setTranslations(Long repositoryId, List<TranslationDTO> translationDTOs) {
-        //get translation entities from db and iterate
-        List<Translation> translationEntities = this.translationRepository.getAllBySourceRepositoryIdAndSourceTextIn(
-                repositoryId,
-                translationDTOs.stream().map(TranslationDTO::getSource).collect(Collectors.toList()));
-        for (Translation translation : translationEntities) {
-            //find corresponding translation in send array
-            TranslationDTO translationDTO = translationDTOs.stream()
-                    .filter(t -> t.getSource().equals(translation.getSource().getText()) &&
-                            t.getLanguageAbbr().equals(translation.getLanguage().getAbbreviation()))
-                    .findFirst()
-                    .orElseThrow(NotFoundException::new);
-            //set the new text
-            translation.setText(translationDTO.getTranslatedText());
-            //save
-            translationRepository.save(translation);
+    public Map<String, String> getSourceTranslations(Long repositoryId, String path) {
+        return getTranslationEntityStream(repositoryId, path)
+                .collect(Collectors.toMap(t -> t.getLanguage().getAbbreviation(), Translation::getText));
+    }
+
+    private Folder createPath() {
+        return null;
+    }
+
+    private Translation createTranslation(Long repositoryId,
+                                          String languageAbbr,
+                                          String sourceText,
+                                          String translatedText) {
+        return null;
+    }
+
+    public SourceTranslations setTranslations(Long repositoryId, SourceTranslations data) {
+        Map<String, Translation> entityMap = this.getTranslationEntityStream(repositoryId, data.getSource())
+                .collect(Collectors.toMap(t -> t.getLanguage().getAbbreviation(), t -> t));
+        for (String lang : data.getTranslations().keySet()) {
+            Translation translation = entityMap.get(lang);
+            if (translation == null) {
+                //createTranslation();
+            } else {
+                translation.setText(data.getTranslations().get(lang));
+                translationRepository.save(translation);
+            }
         }
-        return translationEntities.stream().map(TranslationDTO::fromEntity).collect(Collectors.toList());
+
+        return data;
     }
 }

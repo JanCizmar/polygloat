@@ -5,11 +5,12 @@ import {singleton} from 'tsyringe';
 const REPOSITORY_ID = 2;
 const SERVER_URL = 'http://localhost:8080/';
 
+type Translations = { [key: string]: string | Translations };
 
 @singleton()
 export class PolygloatService {
 
-    private translationsCache: Map<string, any[]> = new Map<string, any[]>();
+    private translationsCache: Map<string, Translations> = new Map<string, Translations>();
     private fetchPromise: Promise<any>;
 
     constructor(private properties: Properties) {
@@ -32,47 +33,49 @@ export class PolygloatService {
         this.translationsCache.set(lang, await requestResult.json());
     }
 
-    async getTranslation(name: String, lang: string = this.properties.currentLanguage) {
-        let translations = await this.getTranslations(lang);
-        let filtered = translations.filter(t => t.source === name);
-        if (filtered.length > 0) {
-            return filtered[0].translatedText;
-        }
-        return null;
+    async getTranslation(name: string, lang: string = this.properties.currentLanguage): Promise<string> {
+        await this.getTranslations(lang);
+        return this.instant(name, lang);
     }
 
-    instant(name: String, lang: string) {
-        let translations = this.translationsCache.get(lang);
-        let filtered = translations.filter(t => t.source === name);
-        if (filtered.length > 0) {
-            return filtered[0].translatedText;
+    instant(name: string, lang: string): string {
+        const path = name.split('.');
+        let root: string | Translations = this.translationsCache.get(lang);
+        for (const item of path) {
+            if (root[item] === undefined) {
+                return name;
+            }
+            root = root[item];
         }
-        return null;
+        return root as string;
     }
 
     getSourceTranslations = async (sourceText: string): Promise<TranslationData> => {
-        let result = new TranslationData(sourceText, new Map<string, string>());
-        let data: any[] = await (await fetch(`${SERVER_URL}api/public/repository/${REPOSITORY_ID}/translations/source/${sourceText}`))
+        let data = await (await fetch(`${SERVER_URL}api/public/repository/${REPOSITORY_ID}/translations/source/${sourceText}`))
             .json();
-        data.forEach(t => result.translations.set(t.languageAbbr, t.translatedText));
-        return result;
+        return new TranslationData(sourceText, data);
     };
 
     async setTranslations(translationData: TranslationData) {
-        let data = Array.from(translationData.translations, ([key, value]) => ({
-            languageAbbr: key,
-            translatedText: value,
-            source: translationData.input
-        }));
-
-        data.forEach(t => {
-            if (this.translationsCache.get(t.languageAbbr)) {
-                this.translationsCache.get(t.languageAbbr).filter(ct => ct.source === t.source)[0].translatedText = t.translatedText;
+        Object.keys(translationData.translations).forEach(lang => {
+            if (this.translationsCache.get(lang)) {
+                const path = translationData.source.split('.');
+                let root: string | Translations = this.translationsCache.get(lang);
+                for (const item of path) {
+                    if (root[item] === undefined) {
+                        return;
+                    }
+                    if (typeof root[item] === 'string') {
+                        root[item] = translationData.translations[lang];
+                        return;
+                    }
+                    root = root[item];
+                }
             }
         });
 
         return await fetch(`${SERVER_URL}api/public/repository/${REPOSITORY_ID}/translations`, {
-            body: JSON.stringify(data),
+            body: JSON.stringify(translationData),
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

@@ -5,24 +5,8 @@
 
 <h2>Some basic translations</h2>
 <div>
-  There are 3 translations:
-  {{ 'The_Dude_abides.' | translate }},
-  {{ 'V.I._Lenin._Vladimir!_Ilyich!_Ulyanov!' | translate }},
-  {{ 'Forget_it,_Donny,_you\'re_out_of_your_element!' | translate }}
-</div>
-
-<div>
-  There are 3 translations:
-  {{ 'Yeah,_well,_that\"s_just,_like,_your_opinion,_man.' | translate }},
-  {{ 'Mr._Treehorn_treats_objects_like_women,_man.' | translate }},
-  {{ 'The_Dude_abides.' | translate }}
-</div>
-
-<div>
-  There are 3 translations:
-  {{ 'The_Dude_abides.' | translate }},
-  {{ 'Mark_it_zero!' | translate }},
-  {{ 'The_Dude_abides.' | translate }}
+  {{ 'sampleApp.This_is_standard_text_somewhere_in_DOM' | translate }}<br/>
+  {{ 'sampleApp.This_is_another_standard_text_somewhere_in_DOM' | translate }}
 </div>
 
 <h2>Service defined translation</h2>
@@ -32,29 +16,27 @@
 
 <h3>Textarea with placeholder and value in inner HTML</h3>
 <label>
-  <textarea placeholder="{{ 'The_Dude_abides.' | translate }}">{{ 'The_Dude_abides.' | translate }}</textarea>
+  <textarea
+    placeholder="{{ 'sampleApp.This_is_textarea_with_placeholder_and_value' | translate }}">{{ 'sampleApp.This_is_textarea_with_placeholder_and_value' | translate }}</textarea>
 </label>
 
 <h3>Textarea with translated value in inner HTML</h3>
 
 <label>
-  <textarea>
-    {{ 'Mr._Treehorn_treats_objects_like_women,_man.' | translate }}
-    {{ 'Yeah,_well,_that\"s_just,_like,_your_opinion,_man.' | translate }},
-  </textarea>
+  <textarea>{{ 'sampleApp.This_is_textarea_with_placeholder_and_value' | translate }}</textarea>
 </label>
 
 <h3>Empty textarea with placeholder</h3>
 
 <label>
-  <textarea placeholder="{{ 'The_Dude_abides.' | translate }}"></textarea>
+  <textarea placeholder="{{ 'sampleApp.This_is_textarea_with_placeholder' | translate }}"></textarea>
 </label>
 
 <h3>Input with initial value</h3>
 
-<input type="text" value="{{ 'The_Dude_abides.' | translate }}"/>
+<input type="text" value="{{ 'sampleApp.This_is_input_with_value' | translate }}"/>
 
 
 <h3>Empty input with placeholder</h3>
 
-<input placeholder="{{ 'The_Dude_abides.' | translate }}" type="text"/>
+<input placeholder="{{ 'sampleApp.This_is_input_with_placeholder' | translate }}" type="text"/>

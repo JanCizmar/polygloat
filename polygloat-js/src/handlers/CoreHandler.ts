@@ -23,14 +23,15 @@ export class CoreHandler {
     onNewNodes = async (nodes: Element[]): Promise<void> => {
         for (const node of nodes) {
             //texts inside newValue areas can not be replaced with spans, because it is not going to be rendered properly
-            let textAreaParentList = NodeHelper.nodeListToArray(
+            let textInputParent = NodeHelper.nodeListToArray(
                 document.evaluate('./ancestor-or-self::*[name() = \'textarea\' or name() = \'input\']', node));
-            if (textAreaParentList.length < 1) {
+            if (textInputParent.length < 1) {
                 await this.basicTextHandler.handleNewNode(node);
                 continue;
             }
             if (node instanceof HTMLTextAreaElement) {
                 await this.textAreaHandler.handleNewNode(node as HTMLTextAreaElement);
+                continue;
             }
             if (node instanceof HTMLInputElement) {
                 await this.inputHandler.handleNewNode(node as HTMLInputElement);

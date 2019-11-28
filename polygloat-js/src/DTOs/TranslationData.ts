@@ -1,6 +1,6 @@
 export class TranslationData {
     constructor(
-        public input: string,
-        public translations: Map<string, string>) {
+        public source: string,
+        public translations: { [key: string]: string }) {
     }
 }

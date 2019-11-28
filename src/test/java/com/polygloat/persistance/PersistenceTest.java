@@ -1,32 +1,53 @@
 package com.polygloat.persistance;
 
-import com.polygloat.development.DbPopulator;
-import com.polygloat.repository.*;
+import com.polygloat.development.DbPopulatorReal;
+import com.polygloat.model.UserAccount;
+import com.polygloat.repository.RepositoryRepository;
+import com.polygloat.repository.UserRepository;
+import org.hibernate.Hibernate;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Transactional;
 
-@DataJpaTest
-public class PersistenceTest {
+import javax.persistence.EntityManager;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@SpringBootTest
+class PersistenceTest {
+
+    @Autowired
+    DbPopulatorReal populator;
 
     @Autowired
     UserRepository userRepository;
 
     @Autowired
-    TranslationRepository translationRepository;
-
-    @Autowired
-    SourceRepository sourceRepository;
-
-    @Autowired
     RepositoryRepository repositoryRepository;
 
     @Autowired
-    LanguageRepository languageRepository;
+    PlatformTransactionManager transactionManager;
 
     @Autowired
-    FolderRepository folderRepository;
+    EntityManager entityManager;
 
-    @Autowired
-    DbPopulator populator;
+    @Test
+    @Transactional
+    void testPopulator() {
+        populator.populate();
+
+        List<UserAccount> all = userRepository.findAll();
+
+        assertThat(all.size()).isGreaterThan(0);
+
+        entityManager.refresh(all.get(0));
+
+        Hibernate.initialize(all.get(0).getCreatedRepositories());
+
+        assertThat(all.get(0).getCreatedRepositories().size()).isGreaterThan(0);
+    }
 
 }

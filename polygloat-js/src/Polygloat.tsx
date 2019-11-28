@@ -23,6 +23,7 @@ export class Polygloat {
                     let nodes: XPathResult =
                         document.evaluate(`.//*[contains(text(), \'${this.properties.config.inputPrefix}\')]`, mutation.target);
                     let inputNodes = document.evaluate('.//input', mutation.target);
+
                     let polygloatInputs = NodeHelper.nodeListToArray(inputNodes)
                         .filter(i => (i as HTMLInputElement).value.indexOf(this.properties.config.inputPrefix) > -1);
 

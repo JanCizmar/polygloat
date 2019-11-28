@@ -42,4 +42,12 @@ public class Source extends AuditModel {
     public void setId(Long id) {
         this.id = id;
     }
+
+    public Folder getFolder() {
+        return folder;
+    }
+
+    public void setFolder(Folder folder) {
+        this.folder = folder;
+    }
 }

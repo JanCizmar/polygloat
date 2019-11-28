@@ -24,6 +24,9 @@ public class Repository {
     @OneToMany(mappedBy = "repository")
     private List<Permission> permissions;
 
+    @OneToMany(mappedBy = "repository")
+    private List<Folder> folders;
+
     @NotBlank
     @Size(min = 3, max = 500)
     private String name;
@@ -93,5 +96,13 @@ public class Repository {
 
     public void setSources(List<Source> sources) {
         this.sources = sources;
+    }
+
+    public List<Folder> getFolders() {
+        return folders;
+    }
+
+    public void setFolders(List<Folder> folders) {
+        this.folders = folders;
     }
 }

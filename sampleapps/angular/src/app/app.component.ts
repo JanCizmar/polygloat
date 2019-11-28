@@ -9,13 +9,9 @@ import {Polygloat} from 'polygloat';
 export class AppComponent implements OnInit {
 
   text1: string;
-  text2: string;
-  text3: string;
 
   async setTexts() {
-    Polygloat.translate('V.I._Lenin._Vladimir!_Ilyich!_Ulyanov!').then(r => this.text1 = r);
-    Polygloat.translate('Mind_if_I_do_a_J?').then(r => this.text1 = r);
-    Polygloat.translate('Calmer_than_you_are.').then(r => this.text1 = r);
+    this.text1 = await Polygloat.translate('sampleApp.This_is_translation_retrieved_by_service');
   }
 
   async ngOnInit(): Promise<void> {

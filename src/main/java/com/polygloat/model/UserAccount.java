@@ -4,7 +4,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 public class UserAccount {
@@ -15,7 +17,7 @@ public class UserAccount {
     private String username;
 
     @OneToMany(mappedBy = "createdBy")
-    private List<Repository> createdRepositories;
+    private Set<Repository> createdRepositories = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
     private List<Permission> permissions;
@@ -43,11 +45,11 @@ public class UserAccount {
         this.id = id;
     }
 
-    public List<Repository> getCreatedRepositories() {
+    public Set<Repository> getCreatedRepositories() {
         return createdRepositories;
     }
 
-    public void setCreatedRepositories(List<Repository> createdRepositories) {
+    public void setCreatedRepositories(Set<Repository> createdRepositories) {
         this.createdRepositories = createdRepositories;
     }
 

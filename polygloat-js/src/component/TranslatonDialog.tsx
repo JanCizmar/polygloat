@@ -50,7 +50,7 @@ export default function TranslationDialog(props: DialogProps) {
     const service = container.resolve(PolygloatService);
     const handleChange = (abbr) => (event: React.ChangeEvent<HTMLInputElement>) => {
         setSuccess(false);
-        translationData.translations.set(abbr, event.target.value);
+        translationData.translations[abbr] = event.target.value;
         setTranslationData({...translationData});
     };
 
@@ -87,14 +87,14 @@ export default function TranslationDialog(props: DialogProps) {
                 <DialogTitle id="form-dialog-title">Translate text "{props.input}"</DialogTitle>
                 <DialogContent>
                     {loading ? <div style={{textAlign: 'center'}}><CircularProgress/></div> :
-                        Array.from(translationData.translations, ([key, value]) =>
+                        Object.keys(translationData.translations).map(key =>
                             <TextField
                                 key={key}
                                 id="filled-multiline-flexible"
                                 label={key}
                                 multiline
                                 rowsMax="4"
-                                value={value}
+                                value={translationData.translations[key]}
                                 onChange={handleChange(key)}
                                 style={{width: '100%'}}
                                 margin="normal"
