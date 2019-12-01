@@ -1,6 +1,7 @@
 package com.polygloat.controllers;
 
-import com.polygloat.DTOs.SourceTranslations;
+import com.polygloat.DTOs.SourceTranslationsDTO;
+import com.polygloat.service.SourceService;
 import com.polygloat.service.TranslationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -8,16 +9,18 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "*")
 @RequestMapping("/api/public/repository/{repositoryId}/translations")
 public class TranslationController {
 
     private TranslationService translationService;
+    private SourceService sourceService;
 
     @Autowired
-    public TranslationController(TranslationService translationService) {
+    public TranslationController(TranslationService translationService, SourceService sourceService) {
 
         this.translationService = translationService;
+        this.sourceService = sourceService;
     }
 
     @RequestMapping(value = "/{language}", method = RequestMethod.GET)
@@ -33,8 +36,14 @@ public class TranslationController {
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public SourceTranslations setTranslations(@RequestBody SourceTranslations data,
-                                              @PathVariable("repositoryId") Long repositoryId) {
-        return translationService.setTranslations(repositoryId, data);
+    public void setTranslations(@RequestBody SourceTranslationsDTO data,
+                                @PathVariable("repositoryId") Long repositoryId) {
+        translationService.setTranslations(repositoryId, data);
+    }
+
+    @RequestMapping(value = "/{sourcePath}", method = RequestMethod.DELETE)
+    public void deleteTranslation(@PathVariable("repositoryId") Long repositoryId,
+                                  @PathVariable("sourcePath") String sourcePath) {
+        sourceService.deleteSource(repositoryId, sourcePath);
     }
 }

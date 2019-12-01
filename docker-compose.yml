@@ -8,9 +8,9 @@ services:
       - POSTGRES_PASSWORD=postgres
     ports:
       - "5432:5432"
-  #app:
-  #  image: polygloat
-  #  ports:
-  #    - "8080:8080"
+  app:
+    image: polygloat
+    ports:
+      - "8090:8080"
 volumes:
   db-data:

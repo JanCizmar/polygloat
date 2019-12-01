@@ -22,28 +22,31 @@ export abstract class TextInputHandler {
 
     async handleNewNode(node: Element): Promise<void> {
 
-        let {inputs: valueInputs, oldValue, newValue} = await this.replace(this.getValue(node as HTMLElement));
-        this.setValue(node as HTMLElement, newValue);
+        if (node.getAttribute('_polygloat') === null) {
+            //todo: make node handling fully synchronous to avoid multiple handling of the same node
+            node.setAttribute('_polygloat', '');
 
-        let {inputs: placeholderInputs, oldValue: oldPlaceholder, newValue: newPlaceholder}
-            = await this.replace(node.getAttribute('placeholder'));
-        node.setAttribute('placeholder', newPlaceholder);
+            let {inputs: valueInputs, oldValue, newValue} = await this.replace(this.getValue(node as HTMLElement));
+            this.setValue(node as HTMLElement, newValue);
 
-        this.addPolygloatToPrototype(node);
+            let {inputs: placeholderInputs, oldValue: oldPlaceholder, newValue: newPlaceholder}
+                = await this.replace(node.getAttribute('placeholder'));
+            node.setAttribute('placeholder', newPlaceholder);
 
-        let textInputElement: PolygloatTextInputElement = node as PolygloatTextInputElement;
-        textInputElement.__polygloat = {
-            ...textInputElement.__polygloat,
-            oldValue,
-            valueInputs,
-            oldPlaceholder,
-            placeholderInputs,
-            touched: !!textInputElement.__polygloat.touched
-        };
+            this.addPolygloatToPrototype(node);
 
-        textInputElement.setAttribute('_polygloat', '');
+            let textInputElement: PolygloatTextInputElement = node as PolygloatTextInputElement;
+            textInputElement.__polygloat = {
+                ...textInputElement.__polygloat,
+                oldValue,
+                valueInputs,
+                oldPlaceholder,
+                placeholderInputs,
+                touched: !!textInputElement.__polygloat.touched
+            };
 
-        this.highlighter.listen(node);
+            this.highlighter.listen(node);
+        }
     }
 
     async replace(oldValue: string): Promise<{ inputs: string[], newValue: string, oldValue: string }> {

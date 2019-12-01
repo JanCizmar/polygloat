@@ -26,6 +26,11 @@ public class DbPopulatorReal {
 
     @Transactional
     public void populate() {
+        //do not populate if db is not empty
+        if (userRepository.count() > 0) {
+            return;
+        }
+
         UserAccount userAccount = new UserAccount();
         userAccount.setUsername("user");
         userRepository.save(userAccount);

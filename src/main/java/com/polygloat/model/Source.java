@@ -1,9 +1,9 @@
 package com.polygloat.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.util.*;
 
 @Entity
 public class Source extends AuditModel {
@@ -17,6 +17,11 @@ public class Source extends AuditModel {
     @ManyToOne
     private Folder folder;
 
+    @OneToMany(mappedBy = "source", cascade = CascadeType.REMOVE)
+    private Set<Translation> translations = new HashSet<>();
+
+    @NotNull
+    @NotBlank
     private String text;
 
     public Repository getRepository() {
@@ -49,5 +54,33 @@ public class Source extends AuditModel {
 
     public void setFolder(Folder folder) {
         this.folder = folder;
+    }
+
+    public Optional<Translation> getTranslation(String abbr) {
+        return this.getTranslations().stream().filter(t -> t.getLanguage().getAbbreviation().equals(abbr)).findFirst();
+    }
+
+    public Set<Translation> getTranslations() {
+        return translations;
+    }
+
+    public void setTranslations(Set<Translation> translations) {
+        this.translations = translations;
+    }
+
+    public List<String> getPath() {
+        ArrayList<String> path = new ArrayList<>();
+        Folder parent = this.getFolder();
+        int nesting = 0;
+        while (parent != null) {
+            if (nesting >= 1000) {
+                throw new RuntimeException("Nesting limit exceeded.");
+            }
+            path.add(parent.getName());
+            parent = parent.getParent();
+            nesting++;
+        }
+        Collections.reverse(path);
+        return path;
     }
 }

@@ -1,16 +1,12 @@
 const path = require('path');
-
-const WebpackBundleAnalyzer = require("webpack-bundle-analyzer")
-    .BundleAnalyzerPlugin;
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-    entry: "./src/index.ts",
+    entry: "./src/index.tsx",
     devtool: 'inline-source-map',
     output: {
-        filename: "polygloat.umd.js",
+        filename: "app.js",
         path: path.resolve(__dirname, 'dist'),
-        library: 'polygloat-js',
-        libraryTarget: 'umd'
     },
     resolve: {
         extensions: [".webpack.js", ".web.js", ".ts", ".js", ".tsx"]
@@ -18,13 +14,15 @@ module.exports = {
     module: {
         rules: [{
             test: /\.tsx?$/,
-            loader: "babel-loader",
+            loader: "ts-loader",
             exclude: [/node_modules/, /lib/],
         },
         ]
     },
     mode: 'production',
     plugins: [
-        new WebpackBundleAnalyzer()
+        new HtmlWebpackPlugin({
+            template: './src/index.html'
+        })
     ]
 };

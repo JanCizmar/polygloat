@@ -4,6 +4,8 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Entity
 public class Repository {
@@ -98,11 +100,27 @@ public class Repository {
         this.sources = sources;
     }
 
+    /**
+     * !! this returns all folders of repository, not just child folders
+     *
+     * @return All repository folders
+     */
     public List<Folder> getFolders() {
         return folders;
     }
 
+    public List<Folder> getChildFolders() {
+        return folders.stream().filter(f -> f.getParent() == null).collect(Collectors.toList());
+    }
+
     public void setFolders(List<Folder> folders) {
         this.folders = folders;
+    }
+
+    public Optional<Language> getLanguage(String abbreviation) {
+        return this.getLanguages().stream()
+                .filter(l -> l.getAbbreviation()
+                        .equals(abbreviation))
+                .findFirst();
     }
 }

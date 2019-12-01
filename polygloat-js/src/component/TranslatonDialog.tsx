@@ -6,7 +6,8 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import {CircularProgress, createStyles, makeStyles, Theme} from '@material-ui/core';
+import {CircularProgress, Theme} from '@material-ui/core';
+import {createStyles, makeStyles} from '@material-ui/core/styles';
 import {TranslationData} from '../DTOs/TranslationData';
 import {PolygloatService} from '../services/polygloatService';
 import {green} from '@material-ui/core/colors';
@@ -17,6 +18,7 @@ import {EventService, EventType} from '../services/EventService';
 interface DialogProps {
     open: boolean;
     input: string;
+
     onClose(): void;
 }
 

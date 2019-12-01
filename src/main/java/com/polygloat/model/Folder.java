@@ -2,18 +2,26 @@ package com.polygloat.model;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Entity
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"name", "repository_id", "parent_id"})
+})
 public class Folder extends AuditModel {
     @Id
     @GeneratedValue
     private Long id;
 
     @OneToMany(mappedBy = "folder")
-    private List<Source> sourceTexts;
+    private Set<Source> sourceTexts = new HashSet<>();
 
+    @NotNull
     @NotBlank
     @Size(min = 1, max = 200)
     private String name;
@@ -24,7 +32,7 @@ public class Folder extends AuditModel {
     @ManyToOne
     private Folder parent;
 
-    @OneToMany(mappedBy = "parent")
+    @OneToMany(mappedBy = "parent", fetch = FetchType.EAGER)
     private List<Folder> childFolders;
 
     public Long getId() {
@@ -35,11 +43,11 @@ public class Folder extends AuditModel {
         this.id = id;
     }
 
-    public List<Source> getSourceTexts() {
+    public Set<Source> getSources() {
         return sourceTexts;
     }
 
-    public void setSourceTexts(List<Source> sourceTexts) {
+    public void setSourceTexts(Set<Source> sourceTexts) {
         this.sourceTexts = sourceTexts;
     }
 
@@ -73,5 +81,9 @@ public class Folder extends AuditModel {
 
     public void setChildFolders(List<Folder> childFolders) {
         this.childFolders = childFolders;
+    }
+
+    public Optional<Source> getSource(String name) {
+        return this.getSources().stream().filter(s -> s.getText().equals(name)).findFirst();
     }
 }

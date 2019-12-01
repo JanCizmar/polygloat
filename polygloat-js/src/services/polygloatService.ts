@@ -57,29 +57,31 @@ export class PolygloatService {
     };
 
     async setTranslations(translationData: TranslationData) {
+        await fetch(`${SERVER_URL}api/public/repository/${REPOSITORY_ID}/translations`, {
+            body: JSON.stringify(translationData),
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+
+
         Object.keys(translationData.translations).forEach(lang => {
             if (this.translationsCache.get(lang)) {
                 const path = translationData.source.split('.');
                 let root: string | Translations = this.translationsCache.get(lang);
-                for (const item of path) {
+                for (let i = 0; i < path.length; i++) {
+                    let item = path[i];
                     if (root[item] === undefined) {
-                        return;
+                        root[item] = {};
                     }
-                    if (typeof root[item] === 'string') {
+                    if (i === (path.length - 1)) {
                         root[item] = translationData.translations[lang];
                         return;
                     }
                     root = root[item];
                 }
             }
-        });
-
-        return await fetch(`${SERVER_URL}api/public/repository/${REPOSITORY_ID}/translations`, {
-            body: JSON.stringify(translationData),
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
         });
     }
 

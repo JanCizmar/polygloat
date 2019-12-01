@@ -16,7 +16,7 @@ public class Application {
 
     @Autowired
     public Application(DbPopulatorReal populator) {
-        //populator.populate();
+        populator.populate();
     }
 
     public static void main(String[] args) {
