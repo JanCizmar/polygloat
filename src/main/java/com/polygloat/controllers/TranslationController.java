@@ -31,8 +31,8 @@ public class TranslationController {
 
     @RequestMapping(value = "/source/{sourceText}", method = RequestMethod.GET)
     public Map<String, String> getSourceTranslations(@PathVariable("repositoryId") Long repositoryId,
-                                                     @PathVariable("sourceText") String sourceText) {
-        return translationService.getSourceTranslations(repositoryId, sourceText);
+                                                     @PathVariable("sourceText") String fullPath) {
+        return translationService.getSourceTranslations(repositoryId, fullPath);
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)

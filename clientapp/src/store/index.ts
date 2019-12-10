@@ -3,15 +3,18 @@ import thunkMiddleware from 'redux-thunk';
 import {composeWithDevTools} from 'redux-devtools-extension';
 import {translationReducer} from './translation/reducers';
 import promise from 'redux-promise-middleware';
+import {errorHandling} from './middlewares/errorHandling';
+import {globalReducer} from './global/reducers';
 
 const rootReducer = combineReducers({
-    translations: translationReducer
+    translations: translationReducer,
+    global: globalReducer
 });
 
 export type AppState = ReturnType<typeof rootReducer>;
 
 export default function configureStore() {
-    const middlewares = [thunkMiddleware, promise];
+    const middlewares = [thunkMiddleware, errorHandling, promise];
     const middleWareEnhancer = applyMiddleware(...middlewares);
 
     return createStore(

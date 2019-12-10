@@ -7,7 +7,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 
 import {AppState} from '../../store';
-import {connect, useDispatch} from 'react-redux';
+import {connect} from 'react-redux';
 
 import {Paper} from '@material-ui/core';
 import {Folder} from './Folder';
@@ -15,11 +15,11 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Box from '@material-ui/core/Box';
 import {Theme} from '@material-ui/core/styles/createMuiTheme';
 import {Actions} from '../../store/translation/actions';
-import {TranslationTableState} from '../../store/translation/reducers';
+import {TranslationsState} from '../../store/translation/DTOs/TrasnlationsState';
 
 
 interface TranslationsTableProps {
-    translations: TranslationTableState
+    translations: TranslationsState
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -40,17 +40,11 @@ const useStyles = makeStyles((theme: Theme) => ({
     }
 }));
 
-function createData(name: string, calories: number, fat: number, carbs: number, protein: number) {
-    return {name, calories, fat, carbs, protein};
-}
-
 function TranslationsTable(props: TranslationsTableProps) {
 
     useEffect(() => {
         Actions.loadTranslations.dispatch('en', 'de');
     }, []);
-
-    const dispatch = useDispatch();
 
     const classes = useStyles({});
 

@@ -16,8 +16,9 @@ public interface TranslationRepository extends JpaRepository<Translation, Long> 
     List<Translation> getAllByLanguageAbbreviationAndSourceRepositoryId(String language_abbreviation,
                                                                         Long repository_id);
 
-    List<Translation> getAllByLanguageAbbreviationInAndSourceRepositoryId(Collection<String> language_abbreviation,
-                                                                          Long source_repository_id);
+    List<Translation> getAllByLanguageAbbreviationInAndSourceRepositoryIdOrderBySourceText(
+            Collection<String> language_abbreviation,
+            Long source_repository_id);
 
     List<Translation> getAllBySourceRepositoryIdAndSourceText(Long source_repository_id, String source_text);
 

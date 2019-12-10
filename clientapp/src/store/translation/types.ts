@@ -7,20 +7,19 @@ export interface Message {
 }
 
 export class Translation {
-    constructor(public name: string, public translations: { [key: string]: string }, public parent: Folder = null) {
+
+    oldName = this.name;
+    isNew: boolean = false;
+
+    constructor(public name?: string, public translations?: { [key: string]: string }, public path?: string[]) {
     }
 
-    get path(): string[] {
-        let path = [];
-        if (this.parent !== null) {
-            path = this.parent.path;
-        }
-        path.push(this.name);
-        return path;
-    }
-
-    get pathString(): string {
+    get pathString() {
         return this.path.join('.');
+    }
+
+    get clone(): Translation {
+        return Object.assign(new Translation(), this, {path: [...this.path], translations: {...this.translations}});
     }
 }
 
@@ -29,32 +28,14 @@ export class Folder {
 
     expanded?: boolean = true;
 
-    constructor(public name: string, public parent) {
-    }
-
-    get path(): string[] {
-        const path = [];
-        let parent: Folder = this;
-        while (parent !== null && parent.name !== null) {
-            path.unshift(parent.name);
-            parent = parent.parent;
-        }
-        return path;
-    }
-
-    get root(): Folder {
-        let parent: Folder = this;
-        while (!parent.isRoot) {
-            parent = parent.parent;
-        }
-        return parent;
-    }
-
-    get isRoot(): boolean {
-        return this.parent == null;
+    constructor(public name: string, public path: string[]) {
     }
 
     getChildByName(name: string): Folder | Translation {
         return this.children.find(c => c.name === name);
+    }
+
+    get clone() {
+        return Object.assign(new Folder(this.name, this.path), this);
     }
 }

@@ -14,18 +14,18 @@ import CloseIcon from '@material-ui/icons/Close';
 import {AppState} from '../../store';
 import {connect} from 'react-redux';
 import {Actions} from '../../store/translation/actions';
-import {TranslationTableState} from '../../store/translation/reducers';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import ConfirmationDialog from '../common/ConfirmationDialog';
+import {TranslationsState} from '../../store/translation/DTOs/TrasnlationsState';
 
 interface TranslationProps {
-    translationsState: TranslationTableState
+    translationsState: TranslationsState
     translation: TranslationType;
     indentCount: number;
 }
 
 function Translation(props: TranslationProps) {
-    const [translation, setTranslation] = useState(props.translation);
+    const [translation, setTranslation] = useState(props.translation.clone);
 
     const useStyles = makeStyles((theme: Theme) => ({
         input: {
@@ -62,7 +62,12 @@ function Translation(props: TranslationProps) {
 
     const onChange = (l) => (event) => {
         translation.translations[l] = event.target.value;
-        setTranslation(Object.create(translation));
+        setTranslation(translation.clone);
+    };
+
+    const onInputChange = (event) => {
+        translation.name = event.target.value;
+        setTranslation(translation.clone);
     };
 
     const classes = useStyles({});
@@ -71,7 +76,9 @@ function Translation(props: TranslationProps) {
         Actions.onEdit.dispatch(props.translation);
     }
 
-    const onSave = () => Actions.onSave.dispatch(translation);
+    const onSave = () => {
+        Actions.onSave.dispatch(translation);
+    };
 
     const onKeyPress = (e: React.KeyboardEvent<HTMLTableSectionElement>) => {
         if (e.key === 'Enter') {
@@ -116,7 +123,7 @@ function Translation(props: TranslationProps) {
                 <TableRow>
                     {langs.map(l => <TableCell key={l} onClick={onEdit}>
                         {l == langs[0] && <Indents count={props.indentCount}/>}
-                        {translation.translations[l]}
+                        {props.translation.translations[l]}
                     </TableCell>)}
                 </TableRow>
             </TableBody>
@@ -127,8 +134,15 @@ function Translation(props: TranslationProps) {
                 <TableRow>
                     <TableCell colSpan={langs.length} className={classes.inputNameCell}>
                         <Box display="flex">
-                            <Box flexGrow={1}>
-                                <Indents count={props.indentCount}/>{props.translation.name}
+                            <Box flexGrow={1} display="flex">
+                                <Indents count={props.indentCount}/>
+                                <TextField
+                                    onKeyPress={onEnterInText}
+                                    variant="outlined"
+                                    className={classes.input} label="name"
+                                    onChange={onInputChange}
+                                    value={translation.name}
+                                />
                             </Box>
                             <Box style={{position: 'relative'}}>
                                 {props.translationsState.editLoading &&
@@ -137,8 +151,8 @@ function Translation(props: TranslationProps) {
                                 <Button disabled={props.translationsState.editLoading} color="primary" onClick={onSave}>
                                     <CheckIcon/>
                                 </Button>
-                                <Button disabled={props.translationsState.editLoading} color="primary"
-                                        onClick={onDelete}><DeleteIcon/></Button>
+                                {!translation.isNew && <Button disabled={props.translationsState.editLoading} color="primary"
+                                                               onClick={onDelete}><DeleteIcon/></Button>}
                                 <Button disabled={props.translationsState.editLoading} color="primary"
                                         onClick={() => Actions.onEditClose.dispatch(props.translation)}><CloseIcon/></Button>
                                 <ConfirmationDialog open={confirmationOpen}

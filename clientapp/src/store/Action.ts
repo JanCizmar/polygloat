@@ -1,8 +1,10 @@
 import {container} from 'tsyringe';
 import {dispatchService} from '../service/dispatchService';
 
-export class Action<T = any> {
-    constructor(public type: string, public payloadProvider: (...params: any[]) => T) {
+export class Action<PayloadType = any, StateType = any> {
+    constructor(public type: string,
+                public payloadProvider: (...params: any[]) => PayloadType,
+                public stateModifier?: (state: StateType, action: { type: string, payload: PayloadType }) => StateType) {
     };
 
     dispatch(...params: any[]) {

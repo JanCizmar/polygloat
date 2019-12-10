@@ -1,5 +1,5 @@
 import {singleton} from 'tsyringe';
-import {Translation} from '../store/translation/types';
+import {Folder, Translation} from '../store/translation/types';
 
 const SERVER_URL = 'http://localhost:8080/';
 const REPOSITORY_ID = 2;
@@ -9,14 +9,21 @@ export class translationService {
     public getTranslations = async (...langs: string[]) =>
         (await fetch(`${SERVER_URL}api/public/repository/${REPOSITORY_ID}/translations/${langs.join(',')}`)).json();
 
-    async setTranslations(translationData: Translation) {
+    async setTranslations(translationData: Translation): Promise<Translation> {
+        throw new Error('can not set');
         await fetch(`${SERVER_URL}api/public/repository/${REPOSITORY_ID}/translations`, {
-            body: JSON.stringify({source: translationData.pathString, translations: translationData.translations}),
+            body: JSON.stringify({
+                path: translationData.pathString,
+                translations: translationData.translations,
+                oldSourceName: translationData.oldName,
+                newSourceName: translationData.name
+            }),
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
         });
+        return translationData;
     }
 
     async deleteSource(t: Translation) {
@@ -24,7 +31,15 @@ export class translationService {
             method: 'DELETE'
         });
 
-        t.parent.children.splice(t.parent.children.indexOf(t), 1);
-        return Object.create(t.parent.root);
+        //t.parent.children.splice(t.parent.children.indexOf(t), 1);
+        //return Object.create(t.parent.root);
+    }
+
+    async editFolder(f: Folder) {
+        return undefined;
+    }
+
+    deleteFolder(f: Folder) {
+
     }
 }

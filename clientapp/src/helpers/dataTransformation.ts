@@ -39,14 +39,14 @@ export class DataTransformation {
             const path = key.split('.');
             for (let i = 0; i < path.length; i++) {
                 if (i === (path.length - 1)) {
-                    let translation = new Translation(path[i], destructed[key], parent);
+                    let translation = new Translation(path[i], destructed[key], path.slice(0, path.length - 1));
                     parent.children.push(translation);
                     break;
                 }
 
                 let childFolder = parent.getChildByName(path[i]);
                 if (childFolder === undefined) {
-                    childFolder = new Folder(path[i], parent);
+                    childFolder = new Folder(path[i], path.slice(0, i - 1));
                     parent.children.push(childFolder);
                 }
                 parent = childFolder as Folder;

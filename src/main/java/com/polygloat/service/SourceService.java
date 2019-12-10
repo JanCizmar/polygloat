@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 @Service
 public class SourceService {
@@ -29,16 +30,34 @@ public class SourceService {
         this.repositoryRepository = repositoryRepository;
     }
 
-    public Source getOrCreateSource(Repository repository, SourceInfoDTO sourceInfoDTO) {
+    private Source getOrCreateSource(Repository repository, SourceInfoDTO sourceInfoDTO) {
         Folder folder = folderService.getOrCreatePath(repository, sourceInfoDTO.pathList);
-        return folder.getSource(sourceInfoDTO.sourceText).orElseGet(() -> {
+
+        Supplier<Source> sourceSupplier = () -> {
             Source s = new Source();
             s.setRepository(repository);
             s.setFolder(folder);
             s.setText(sourceInfoDTO.sourceText);
             sourceRepository.save(s);
             return s;
-        });
+        };
+
+        if (folder == null) {
+            return sourceRepository.findSourceByFolderAndRepositoryAndText(null, repository, sourceInfoDTO.sourceText)
+                    .orElseGet(sourceSupplier);
+        }
+
+        return folder.getSource(sourceInfoDTO.sourceText).orElseGet(sourceSupplier);
+    }
+
+    public Source getCreateOrModifySource(Repository repository, SourceInfoDTO sourceInfoDTO, String newSourceName) {
+        Source source = getOrCreateSource(repository, sourceInfoDTO);
+
+        if (!sourceInfoDTO.sourceText.equals(newSourceName)) {
+            source.setText(newSourceName);
+        }
+        sourceRepository.save(source);
+        return source;
     }
 
     private Optional<Source> getSource(Repository repository, SourceInfoDTO sourceInfoDTO) {
