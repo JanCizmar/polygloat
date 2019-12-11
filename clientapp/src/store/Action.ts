@@ -4,11 +4,17 @@ import {dispatchService} from '../service/dispatchService';
 export class Action<PayloadType = any, StateType = any> {
     constructor(public type: string,
                 public payloadProvider: (...params: any[]) => PayloadType,
-                public stateModifier?: (state: StateType, action: { type: string, payload: PayloadType }) => StateType) {
+                public stateModifier?: (state: StateType, action: { type: string, payload: PayloadType }) => StateType,
+                public successMessage?: string
+    ) {
     };
 
     dispatch(...params: any[]) {
-        container.resolve(dispatchService).dispatch({type: this.type, payload: this.payloadProvider(...params)});
+        container.resolve(dispatchService).dispatch({
+            type: this.type,
+            payload: this.payloadProvider(...params),
+            successMessage: this.successMessage
+        });
     }
 }
 

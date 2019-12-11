@@ -5,6 +5,7 @@ import {translationReducer} from './translation/reducers';
 import promise from 'redux-promise-middleware';
 import {errorHandling} from './middlewares/errorHandling';
 import {globalReducer} from './global/reducers';
+import {successMessage} from './middlewares/successMessage';
 
 const rootReducer = combineReducers({
     translations: translationReducer,
@@ -14,7 +15,7 @@ const rootReducer = combineReducers({
 export type AppState = ReturnType<typeof rootReducer>;
 
 export default function configureStore() {
-    const middlewares = [thunkMiddleware, errorHandling, promise];
+    const middlewares = [thunkMiddleware, errorHandling, successMessage, promise];
     const middleWareEnhancer = applyMiddleware(...middlewares);
 
     return createStore(

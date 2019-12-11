@@ -10,7 +10,6 @@ export class translationService {
         (await fetch(`${SERVER_URL}api/public/repository/${REPOSITORY_ID}/translations/${langs.join(',')}`)).json();
 
     async setTranslations(translationData: Translation): Promise<Translation> {
-        throw new Error('can not set');
         await fetch(`${SERVER_URL}api/public/repository/${REPOSITORY_ID}/translations`, {
             body: JSON.stringify({
                 path: translationData.pathString,
@@ -26,13 +25,11 @@ export class translationService {
         return translationData;
     }
 
-    async deleteSource(t: Translation) {
+    async deleteSource(t: Translation): Promise<Translation> {
         await fetch(`${SERVER_URL}api/public/repository/${REPOSITORY_ID}/translations/${t.pathString}`, {
             method: 'DELETE'
         });
-
-        //t.parent.children.splice(t.parent.children.indexOf(t), 1);
-        //return Object.create(t.parent.root);
+        return t;
     }
 
     async editFolder(f: Folder) {

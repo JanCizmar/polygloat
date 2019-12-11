@@ -13,7 +13,11 @@ export class Actions {
     static onEditClose = new Action(PREFIX + 'EDIT_CLOSE', (t: TranslationType) => t);
     static loadTranslations = new PromiseAction('LOAD_TRANSLATIONS',
         (...params: any[]) => Actions.service.getTranslations(...params));
-    static onSave = new PromiseAction(PREFIX + 'SAVE', (t: TranslationType) => Actions.service.setTranslations(t));
+    static onSave = new PromiseAction(PREFIX + 'SAVE',
+        (t: TranslationType) => Actions.service.setTranslations(t),
+        null,
+        'Translation saved'
+    );
     static onDelete = new PromiseAction(PREFIX + 'DELETE', (t: TranslationType) => Actions.service.deleteSource(t));
     static onNewTranslation = new Action<Folder, TranslationsState>(PREFIX + 'NEW', (f: Folder) => f,
         (state, action) => {

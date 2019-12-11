@@ -1,11 +1,3 @@
-// Describing the shape of the chat's slice of state
-
-export interface Message {
-    user: string;
-    message: string;
-    timestamp: number;
-}
-
 export class Translation {
 
     oldName = this.name;

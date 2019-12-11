@@ -4,10 +4,10 @@ import {Actions} from '../store/global/actions';
 import {AppState} from '../store';
 import {connect} from 'react-redux';
 import GlobalError from './common/GlobalError';
+import SnackBar from './common/SnackBar';
 
 interface Props {
     hasError: boolean;
-    hello: false;
 }
 
 class App extends React.Component<Props, null> {
@@ -31,7 +31,10 @@ class App extends React.Component<Props, null> {
         }
 
         return (
-            <Dashboard/>
+            <React.Fragment>
+                <Dashboard/>
+                <SnackBar/>
+            </React.Fragment>
         );
     }
 }

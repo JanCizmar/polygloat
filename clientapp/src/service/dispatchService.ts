@@ -8,7 +8,7 @@ export class dispatchService {
         this._store = store;
     }
 
-    dispatch(action: { type: string, payload: any }): void {
+    dispatch(action: { type: string, payload: any, successMessage: string }): void {
         if (this._store !== undefined) {
             this._store.dispatch(action);
             return;

@@ -1,6 +1,7 @@
 import {Folder, Translation} from '../types';
+import {AbstractState} from '../../abstractState';
 
-export class TranslationsState {
+export class TranslationsState extends AbstractState {
     translations: Folder = null;
     translationsLoading: boolean = false;
     translationsLoaded: boolean = false;
@@ -39,9 +40,5 @@ export class TranslationsState {
         folder.children[folder.children.indexOf(translation)] = t;
         t.oldName = t.name;
         return {...this, translations: root};
-    }
-
-    modify(props: { [P in keyof TranslationsState]: TranslationsState[P] } | any): TranslationsState {
-        return Object.assign(new TranslationsState(), this, props);
     }
 }
