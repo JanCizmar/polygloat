@@ -3,6 +3,7 @@ package com.polygloat.model;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.util.*;
 
 @Entity
@@ -22,6 +23,7 @@ public class Source extends AuditModel {
 
     @NotNull
     @NotBlank
+    @Pattern(regexp = "^[^.]*$")
     private String text;
 
     public Repository getRepository() {
@@ -69,18 +71,9 @@ public class Source extends AuditModel {
     }
 
     public List<String> getPath() {
-        ArrayList<String> path = new ArrayList<>();
-        Folder parent = this.getFolder();
-        int nesting = 0;
-        while (parent != null) {
-            if (nesting >= 1000) {
-                throw new RuntimeException("Nesting limit exceeded.");
-            }
-            path.add(parent.getName());
-            parent = parent.getParent();
-            nesting++;
+        if (this.getFolder() == null) {
+            return new LinkedList<>();
         }
-        Collections.reverse(path);
-        return path;
+        return this.getFolder().getFullPath();
     }
 }

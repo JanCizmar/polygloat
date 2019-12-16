@@ -3,10 +3,7 @@ package com.polygloat.service;
 import com.polygloat.DTOs.SourceInfoDTO;
 import com.polygloat.DTOs.SourceTranslationsDTO;
 import com.polygloat.Exceptions.NotFoundException;
-import com.polygloat.model.Language;
-import com.polygloat.model.Repository;
-import com.polygloat.model.Source;
-import com.polygloat.model.Translation;
+import com.polygloat.model.*;
 import com.polygloat.repository.RepositoryRepository;
 import com.polygloat.repository.TranslationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,6 +80,33 @@ public class TranslationService {
         return langTranslations;
     }
 
+    //todo optimize!!!
+    private Map<String, Object> createMap(List<Folder> folders, Set<Source> sources, String lang) {
+        Map<String, Object> result = new HashMap<>();
+
+        folders.forEach(f -> {
+            result.put(f.getName(), createMap(f.getChildFolders(), f.getSourceTexts(), lang));
+        });
+        sources.forEach(s -> {
+            String translation = s.getTranslations().stream()
+                    .filter(t -> t.getLanguage().getAbbreviation().equals(lang))
+                    .map(Translation::getText).findFirst()
+                    .orElse(null);
+
+            result.put(s.getText(), translation);
+        });
+
+        return result;
+    }
+
+    //todo optimize!!!
+    public Map<String, Object> getViewData(String[] abbrs, Long repositoryId) {
+        Repository repository = repositoryRepository.findById(repositoryId).orElseThrow(NotFoundException::new);
+
+        return Arrays.stream(abbrs).collect(Collectors.toMap(a -> a,
+                a -> createMap(repository.getChildFolders(), repository.getChildSources(), a)));
+    }
+
 
     private Stream<Translation> getTranslationEntityStream(Long repositoryId, String path) {
         SourceInfoDTO sourceInfo = new SourceInfoDTO(path);
@@ -109,6 +133,7 @@ public class TranslationService {
 
     public void setTranslations(Long repositoryId, SourceTranslationsDTO data) {
         Repository repository = repositoryRepository.findById(repositoryId).orElseThrow(NotFoundException::new);
+
         Source source = sourceService.getCreateOrModifySource(repository, data.getOldSourceInfo(), data.getNewSourceName());
         for (String lang : data.getTranslations().keySet()) {
             Translation translation = source.getTranslation(lang).orElse(null);

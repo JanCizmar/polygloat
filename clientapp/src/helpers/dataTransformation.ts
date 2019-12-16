@@ -46,7 +46,7 @@ export class DataTransformation {
 
                 let childFolder = parent.getChildByName(path[i]);
                 if (childFolder === undefined) {
-                    childFolder = new Folder(path[i], path.slice(0, i - 1));
+                    childFolder = new Folder(path[i], path.slice(0, i));
                     parent.children.push(childFolder);
                 }
                 parent = childFolder as Folder;

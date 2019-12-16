@@ -13,6 +13,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 interface Props {
     isEdited: boolean;
     folder: Folder
+    oldFolder: Folder
 }
 
 
@@ -23,20 +24,20 @@ export const FolderActions = (props: Props) => {
         <Box>
             {!props.isEdited ?
                 <React.Fragment>
-                    <IconButton onClick={() => Actions.onFolderEdit.dispatch(props.folder)}
+                    <IconButton onClick={() => Actions.onFolderEdit.dispatch(props.oldFolder)}
                                 size="small" aria-label="Edit folder"><EditIcon/></IconButton>
-                    <IconButton onClick={() => Actions.onNewTranslation.dispatch(props.folder)}
+                    <IconButton onClick={() => Actions.onNewTranslation.dispatch(props.oldFolder)}
                                 size="small" aria-label="Add translation"><AddIcon/></IconButton>
-                    <IconButton onClick={() => Actions.onNewFolder.dispatch(props.folder)}
+                    <IconButton onClick={() => Actions.onNewFolder.dispatch(props.oldFolder)}
                                 size="small" aria-label="Add folder"><CreateNewFolderIcon/></IconButton>
                 </React.Fragment>
                 :
                 <React.Fragment>
-                    <IconButton onClick={() => Actions.onFolderEditSave.dispatch(props.folder)}
+                    <IconButton onClick={() => Actions.onFolderEditSave.dispatch(props.oldFolder, props.folder)}
                                 size="small" aria-label="Save"><CheckIcon/></IconButton>
-                    <IconButton onClick={() => Actions.onFolderDelete.dispatch(props.folder)}
+                    <IconButton onClick={() => Actions.onFolderDelete.dispatch(props.oldFolder)}
                                 size="small" aria-label="Delete folder"><DeleteIcon/></IconButton>
-                    <IconButton onClick={() => Actions.onFolderEditClose.dispatch(props.folder)}
+                    <IconButton onClick={() => Actions.onFolderEditClose.dispatch(props.oldFolder)}
                                 size="small" aria-label="Cancel editing"><CloseIcon/></IconButton>
                 </React.Fragment>
             }

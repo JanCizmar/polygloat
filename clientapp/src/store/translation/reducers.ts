@@ -1,4 +1,4 @@
-import {Translation} from './types';
+import {Folder, Translation as TranslationType, Translation} from './types';
 import {DataTransformation} from '../../helpers/dataTransformation';
 import {Actions} from './actions';
 import {Action} from '../Action';
@@ -27,29 +27,29 @@ export function translationReducer(
             return state.modify({...resetAllEdits(state), editingTranslation: action.payload});
         case Actions.onEditClose.type:
             if (state.editingTranslation.isNew) {
-                //state.editingTranslation.removeFromParent();
+                state.removeTranslation(action.payload);
             }
-            return state.modify({...state, editingTranslation: null});
+            return state.modify({editingTranslation: null});
         case Actions.onSave.fulfilledType:
-            //action.payload.isNew = false;
-            //let deepCopy = action.payload.deepCopy;
-            return state.modify({...state.modifyTranslation(action.payload as Translation), ...resetAllEdits(state)});
+            const translation = action.payload as Translation;
+            translation.isNew = false;
+            return state.modify({...state.modifyTranslation(translation as Translation), ...resetAllEdits(state)});
         case Actions.onSave.pendingType:
             return state.modify({editLoading: true});
         case Actions.onDelete.pendingType:
             return state.modify({editLoading: true});
         case Actions.onDelete.fulfilledType:
-        //     return {...state, translations: action.payload, editLoading: false};
-        case Actions.onFolderToggle.type: {
-            //let folder = action.payload as Folder;
-            //folder.expanded = !folder.expanded;
-            //return {...state, translations: folder.root};
-        }
-        case Actions.onFolderEdit.type: {
-            //  return {...resetAllEdits(state), editingFolder: action.payload};
-        }
+            return state.removeTranslation(action.payload as TranslationType);
+        case Actions.onFolderToggle.type:
+            const {root, folder} = state.clonePath((action.payload as Folder).fullPath);
+            folder.expanded = !folder.expanded;
+            return state.modify({translations: root});
+        case Actions.onFolderEdit.type:
+            return state.modify({...resetAllEdits(state), editingFolder: action.payload});
+        case Actions.onFolderEditSave.fulfilledType:
+            return state.modify({...resetAllEdits, ...state.modifyFolder(action.payload as Folder)});
         case Actions.onFolderEditClose.type:
-        //return {...resetAllEdits(state)};
+            return state.modify({...resetAllEdits(state)});
         default:
             for (const key of Object.keys(Actions)) {
                 if (Actions[key] instanceof Action) {

@@ -16,9 +16,31 @@ export class TranslationsState extends AbstractState {
     addingTranslationIn: Folder = null;
 
     modifyTranslation(t: Translation): TranslationsState {
+        const {root, folder} = this.clonePath(t.path);
+
+        let translation = folder.findTranslationByOldName(t.oldName);
+
+        folder.children[folder.children.indexOf(translation)] = t;
+        t.oldName = t.name;
+        return this.modify({translations: root});
+    }
+
+    newTranslation(f: Folder) {
+        const {root, folder} = this.clonePath(f.fullPath);
+        const translations = {};
+        this.languages.forEach(l => translations[l] = '');
+        const translation = new Translation('', translations, f.fullPath);
+        translation.isNew = true;
+        this.editingTranslation = translation;
+        folder.children.push(translation);
+
+        return this.modify({translations: root});
+    }
+
+    public clonePath(path: string[]): { root: Folder, folder: Folder } {
         let root = this.translations.clone;
         let folder = root;
-        for (const folderName of t.path) {
+        for (const folderName of path) {
             let child: Folder = folder.getChildByName(folderName) as Folder;
 
             if (child === undefined) {
@@ -29,16 +51,19 @@ export class TranslationsState extends AbstractState {
             folder.children[folder.children.indexOf(child)] = clone;
             folder = clone;
         }
+        return {root, folder};
+    }
 
-        let translation: Translation = folder.children
-            .find(tr => tr instanceof Translation && (tr as Translation).oldName === t.oldName) as Translation;
+    removeTranslation(t: Translation) {
+        const {root, folder} = this.clonePath(t.path);
+        let translation = folder.findTranslationByOldName(t.oldName);
+        folder.children.splice(folder.children.indexOf(translation), 1);
+        return this.modify({translations: root, editingTranslation: null});
+    }
 
-        if (translation === undefined) {
-            throw new Error('Can not find translation');
-        }
+    modifyFolder(f: Folder): TranslationsState {
+        const {folder, root} = this.clonePath(f.fullPath);
 
-        folder.children[folder.children.indexOf(translation)] = t;
-        t.oldName = t.name;
-        return {...this, translations: root};
+        return this.modify({translations: root});
     }
 }

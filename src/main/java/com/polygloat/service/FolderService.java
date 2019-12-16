@@ -1,8 +1,11 @@
 package com.polygloat.service;
 
+import com.polygloat.DTOs.SetFolderRequestDTO;
+import com.polygloat.Exceptions.NotFoundException;
 import com.polygloat.model.Folder;
 import com.polygloat.model.Repository;
 import com.polygloat.repository.FolderRepository;
+import com.polygloat.repository.RepositoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,10 +18,12 @@ public class FolderService {
 
 
     private FolderRepository folderRepository;
+    private RepositoryRepository repositoryRepository;
 
     @Autowired
-    public FolderService(FolderRepository folderRepository) {
+    public FolderService(FolderRepository folderRepository, RepositoryRepository repositoryRepository) {
         this.folderRepository = folderRepository;
+        this.repositoryRepository = repositoryRepository;
     }
 
     public Folder getFolder(Folder parent, String name) {
@@ -80,5 +85,31 @@ public class FolderService {
                     .findFirst().orElse(null);
         }
         return Optional.ofNullable(folder);
+    }
+
+    public void setFolder(Long repositoryId, SetFolderRequestDTO data) {
+        Repository repository = repositoryRepository.findById(repositoryId).orElseThrow(NotFoundException::new);
+
+        Folder oldFolder = getFolder(repository, data.getOldFolder().getFullPathList()).orElse(null);
+
+        if (oldFolder != null) {
+            if (!oldFolder.getPath().equals(data.getNewFolder().getPathList())) {
+                Folder parent = getOrCreatePath(repository, data.getNewFolder().getPathList());
+                oldFolder.setParent(parent);
+            }
+            oldFolder.setName(data.getNewFolder().getName());
+            folderRepository.save(oldFolder);
+            return;
+        }
+
+        getOrCreatePath(repository, data.getNewFolder().getFullPathList());
+    }
+
+    public void deleteFolder(Long repositoryId, LinkedList<String> fullPath) {
+        Repository repository = repositoryRepository.findById(repositoryId).orElseThrow(NotFoundException::new);
+
+        Folder folder = getFolder(repository, fullPath).orElseThrow(NotFoundException::new);
+
+        folderRepository.delete(folder);
     }
 }

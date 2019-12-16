@@ -5,6 +5,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
@@ -122,5 +123,9 @@ public class Repository {
                 .filter(l -> l.getAbbreviation()
                         .equals(abbreviation))
                 .findFirst();
+    }
+
+    public Set<Source> getChildSources() {
+        return this.getSources().stream().filter(s -> s.getFolder() == null).collect(Collectors.toSet());
     }
 }

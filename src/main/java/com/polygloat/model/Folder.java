@@ -4,10 +4,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(uniqueConstraints = {
@@ -18,7 +15,7 @@ public class Folder extends AuditModel {
     @GeneratedValue
     private Long id;
 
-    @OneToMany(mappedBy = "folder")
+    @OneToMany(mappedBy = "folder", cascade = CascadeType.REMOVE)
     private Set<Source> sourceTexts = new HashSet<>();
 
     @NotNull
@@ -32,7 +29,7 @@ public class Folder extends AuditModel {
     @ManyToOne
     private Folder parent;
 
-    @OneToMany(mappedBy = "parent", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "parent", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     private List<Folder> childFolders;
 
     public Long getId() {
@@ -43,7 +40,7 @@ public class Folder extends AuditModel {
         this.id = id;
     }
 
-    public Set<Source> getSources() {
+    public Set<Source> getSourceTexts() {
         return sourceTexts;
     }
 
@@ -84,6 +81,28 @@ public class Folder extends AuditModel {
     }
 
     public Optional<Source> getSource(String name) {
-        return this.getSources().stream().filter(s -> s.getText().equals(name)).findFirst();
+        return this.getSourceTexts().stream().filter(s -> s.getText().equals(name)).findFirst();
+    }
+
+    public ArrayList<String> getFullPath() {
+        ArrayList<String> path = new ArrayList<>();
+        Folder parent = this;
+        int nesting = 0;
+        while (parent != null) {
+            if (nesting >= 1000) {
+                throw new RuntimeException("Nesting limit exceeded.");
+            }
+            path.add(parent.getName());
+            parent = parent.getParent();
+            nesting++;
+        }
+        Collections.reverse(path);
+        return path;
+    }
+
+    public List<String> getPath() {
+        LinkedList<String> fullPath = new LinkedList<>(getFullPath());
+        fullPath.removeLast();
+        return fullPath;
     }
 }

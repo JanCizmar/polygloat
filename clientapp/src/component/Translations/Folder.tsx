@@ -34,9 +34,16 @@ export const Folder = connect((state: AppState) => ({translations: state.transla
 
     const onToggle = () => Actions.onFolderToggle.dispatch(props.folder);
 
-    const [name, setName] = useState(props.folder.name);
+    const [folder, setFolder] = useState(props.folder.clone);
 
     const isEdited = props.translations.editingFolder === props.folder;
+
+    function onChange(e) {
+        folder.name = e.target.value;
+        setFolder(folder.clone);
+    }
+
+    console.log('rendering');
 
     const folderRow = props.folder.name !== null &&
         <TableBody>
@@ -48,9 +55,9 @@ export const Folder = connect((state: AppState) => ({translations: state.transla
                             {isEdited ?
                                 <Input autoFocus inputProps={{
                                     'aria-label': 'Folder name',
-                                }} value={name} onChange={(e) => setName(e.target.value)}/> : props.folder.name}
+                                }} value={folder.name} onChange={onChange}/> : props.folder.name}
                         </Box>
-                        <FolderActions isEdited={isEdited} folder={props.folder}/>
+                        <FolderActions isEdited={isEdited} folder={folder} oldFolder={props.folder}/>
                     </Box>
                 </TableCell>
             </TableRow>

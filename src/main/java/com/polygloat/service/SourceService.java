@@ -50,11 +50,17 @@ public class SourceService {
         return folder.getSource(sourceInfoDTO.sourceText).orElseGet(sourceSupplier);
     }
 
-    public Source getCreateOrModifySource(Repository repository, SourceInfoDTO sourceInfoDTO, String newSourceName) {
+    public Source getCreateOrModifySource(Repository repository, SourceInfoDTO sourceInfoDTO, String newSourceText) {
+
+        //if creating new translation (the sourceText is "") setting the source name to newSource name
+        if (sourceInfoDTO.sourceText.isEmpty()) {
+            sourceInfoDTO.sourceText = newSourceText;
+        }
+
         Source source = getOrCreateSource(repository, sourceInfoDTO);
 
-        if (!sourceInfoDTO.sourceText.equals(newSourceName)) {
-            source.setText(newSourceName);
+        if (!sourceInfoDTO.sourceText.equals(newSourceText)) {
+            source.setText(newSourceText);
         }
         sourceRepository.save(source);
         return source;
@@ -69,7 +75,7 @@ public class SourceService {
         if (folder == null) {
             return Optional.empty();
         }
-        return folder.getSources().stream().filter(s -> s.getText().equals(sourceInfoDTO.sourceText)).findFirst();
+        return folder.getSourceTexts().stream().filter(s -> s.getText().equals(sourceInfoDTO.sourceText)).findFirst();
     }
 
     public void deleteSource(Long repositoryId, String sourcePath) {

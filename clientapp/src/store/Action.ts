@@ -18,8 +18,7 @@ export class Action<PayloadType = any, StateType = any> {
     }
 }
 
-export class PromiseAction<T> extends Action<Promise<T>> {
-
+export class PromiseAction<T, S> extends Action<Promise<T>, S> {
     get fulfilledType() {
         return this.type + '_FULFILLED';
     }
@@ -32,3 +31,7 @@ export class PromiseAction<T> extends Action<Promise<T>> {
         return this.type + '_REJECTED';
     }
 }
+
+/*export class HttpAction {
+    constructor(public type: string, )
+}*/

@@ -23,10 +23,10 @@ public class TranslationController {
         this.sourceService = sourceService;
     }
 
-    @RequestMapping(value = "/{language}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{languages}", method = RequestMethod.GET)
     public Map<String, Object> getTranslations(@PathVariable("repositoryId") Long repositoryId,
-                                               @PathVariable("language") String language) {
-        return translationService.getTranslations(language, repositoryId);
+                                               @PathVariable("languages") String languages) {
+        return translationService.getTranslations(parseLanguages(languages), repositoryId);
     }
 
     @RequestMapping(value = "/source/{sourceText}", method = RequestMethod.GET)
@@ -45,5 +45,15 @@ public class TranslationController {
     public void deleteTranslation(@PathVariable("repositoryId") Long repositoryId,
                                   @PathVariable("sourcePath") String sourcePath) {
         sourceService.deleteSource(repositoryId, sourcePath);
+    }
+
+    @RequestMapping(value = "/view/{languages}", method = RequestMethod.GET)
+    public Map<String, Object> getViewTranslations(@PathVariable("repositoryId") Long repositoryId,
+                                                   @PathVariable("languages") String languages) {
+        return translationService.getViewData(parseLanguages(languages), repositoryId);
+    }
+
+    private String[] parseLanguages(String languages) {
+        return languages.split(",");
     }
 }
