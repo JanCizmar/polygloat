@@ -21,7 +21,7 @@ public class FolderController {
     @RequestMapping(value = "", method = RequestMethod.POST)
     public void setFolder(@RequestBody SetFolderRequestDTO data,
                           @PathVariable("repositoryId") Long repositoryId) {
-        folderService.setFolder(repositoryId, data);
+        folderService.setFolder(repositoryId, data.getOldFolder(), data.getNewFolder());
     }
 
     @RequestMapping(value = "/{fullPath}", method = RequestMethod.DELETE)

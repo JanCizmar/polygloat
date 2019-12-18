@@ -3,29 +3,24 @@ package com.polygloat.DTOs;
 import java.util.Arrays;
 import java.util.LinkedList;
 
-public class FolderDTO {
+public class FolderDTO implements IPathItem {
     private String name;
     private String path;
 
+    public FolderDTO() {
+    }
+
+    public FolderDTO(String name, String path) {
+        this.name = name;
+        this.path = path;
+    }
 
     public String getName() {
         return name;
     }
 
-    public String getPath() {
-        return path;
-    }
-
-    public LinkedList<String> getPathList() {
-        if (path == null || path.isEmpty()) {
-            return new LinkedList<>();
-        }
-        return new LinkedList<>(Arrays.asList(path.split("\\.")));
-    }
-
-    public LinkedList<String> getFullPathList() {
-        LinkedList<String> pathList = getPathList();
-        pathList.add(name);
-        return pathList;
+    @Override
+    public PathDTO getPathObject() {
+        return PathDTO.fromPathAndName(this.path, this.name);
     }
 }

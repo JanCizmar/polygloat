@@ -1,5 +1,6 @@
 package com.polygloat.service;
 
+import com.polygloat.DTOs.FolderDTO;
 import com.polygloat.DTOs.SetFolderRequestDTO;
 import com.polygloat.Exceptions.NotFoundException;
 import com.polygloat.model.Folder;
@@ -15,7 +16,6 @@ import java.util.Optional;
 
 @Service
 public class FolderService {
-
 
     private FolderRepository folderRepository;
     private RepositoryRepository repositoryRepository;
@@ -36,9 +36,8 @@ public class FolderService {
                 .findFirst().orElse(null);
     }
 
-    @Transactional
     public Folder getOrCreatePath(Repository repository, LinkedList<String> path) {
-        if (path.size() < 1) {
+        if (path.isEmpty()) {
             return null;
         }
         String folderName = path.removeFirst();
@@ -87,22 +86,30 @@ public class FolderService {
         return Optional.ofNullable(folder);
     }
 
-    public void setFolder(Long repositoryId, SetFolderRequestDTO data) {
+    public void setFolder(Long repositoryId, FolderDTO folderDTO) {
+        setFolder(repositoryId, null, folderDTO);
+    }
+
+    public void setFolder(Long repositoryId, FolderDTO oldFolderDTO, FolderDTO newFolderDTO) {
         Repository repository = repositoryRepository.findById(repositoryId).orElseThrow(NotFoundException::new);
 
-        Folder oldFolder = getFolder(repository, data.getOldFolder().getFullPathList()).orElse(null);
+        Folder oldFolder = null;
+
+        if (oldFolderDTO != null) {
+            oldFolder = getFolder(repository, oldFolderDTO.getFullPathList()).orElse(null);
+        }
 
         if (oldFolder != null) {
-            if (!oldFolder.getPath().equals(data.getNewFolder().getPathList())) {
-                Folder parent = getOrCreatePath(repository, data.getNewFolder().getPathList());
+            if (!oldFolder.getPath().equals(newFolderDTO.getPathList())) {
+                Folder parent = getOrCreatePath(repository, newFolderDTO.getPathList());
                 oldFolder.setParent(parent);
             }
-            oldFolder.setName(data.getNewFolder().getName());
+            oldFolder.setName(newFolderDTO.getName());
             folderRepository.save(oldFolder);
             return;
         }
 
-        getOrCreatePath(repository, data.getNewFolder().getFullPathList());
+        getOrCreatePath(repository, newFolderDTO.getFullPathList());
     }
 
     public void deleteFolder(Long repositoryId, LinkedList<String> fullPath) {

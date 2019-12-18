@@ -3,7 +3,7 @@ package com.polygloat.DTOs;
 import java.util.Arrays;
 import java.util.LinkedList;
 
-public class SourceInfoDTO {
+public class SourceInfoDTO implements IPathItem {
     public LinkedList<String> pathList;
     public String sourceText;
 
@@ -26,5 +26,10 @@ public class SourceInfoDTO {
             return;
         }
         pathList = new LinkedList<>(Arrays.asList(path.split("\\.")));
+    }
+
+    @Override
+    public PathDTO getPathObject() {
+        return PathDTO.fromPathAndName(this.pathList, this.sourceText);
     }
 }
