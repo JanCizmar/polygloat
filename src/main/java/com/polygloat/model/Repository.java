@@ -6,17 +6,17 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
-public class Repository {
+public class Repository implements IFolder {
 
     @Id
     @GeneratedValue
-    @Getter @Setter
+    @Getter
+    @Setter
     private Long id;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "repository")

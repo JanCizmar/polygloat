@@ -84,7 +84,8 @@ public class DbPopulatorReal {
         return language;
     }
 
-    private void createTranslation(Repository repository, Folder folder, String english, String deutsch, Language en, Language de) {
+    private void createTranslation(Repository repository, Folder folder, String english,
+                                   String deutsch, Language en, Language de) {
         Source source = new Source();
         source.setFolder(folder);
         source.setRepository(repository);

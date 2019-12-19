@@ -72,4 +72,15 @@ class TranslationServiceTest {
         throw new IllegalStateException("Can not evaluate path");
     }
 
+    @Test
+    @Transactional
+    void getSourceTranslations() {
+        Map<String, String> map = translationService.getSourceTranslations(2L,
+                PathDTO.fromFullPath("home.news.This_is_another_translation_in_news_folder"));
+        assertThat(map.get("en")).isInstanceOf(String.class);
+        map = translationService.getSourceTranslations(2L,
+                PathDTO.fromFullPath("Hello_world"));
+        assertThat(map.get("en")).isInstanceOf(String.class);
+    }
+
 }

@@ -1,5 +1,8 @@
 package com.polygloat.model;
 
+import com.polygloat.DTOs.IPathItem;
+import com.polygloat.DTOs.PathDTO;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -10,7 +13,7 @@ import java.util.*;
 @Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = {"name", "repository_id", "parent_id"})
 })
-public class Folder extends AuditModel {
+public class Folder extends AuditModel implements IPathItem, IFolder {
     @Id
     @GeneratedValue
     private Long id;
@@ -72,16 +75,17 @@ public class Folder extends AuditModel {
         this.parent = parent;
     }
 
+    @Override
+    public Set<Source> getChildSources() {
+        return this.getSourceTexts();
+    }
+
     public Set<Folder> getChildFolders() {
         return childFolders;
     }
 
     public void setChildFolders(Set<Folder> childFolders) {
         this.childFolders = childFolders;
-    }
-
-    public Optional<Source> getSource(String name) {
-        return this.getSourceTexts().stream().filter(s -> s.getText().equals(name)).findFirst();
     }
 
     public ArrayList<String> getFullPath() {
@@ -104,5 +108,10 @@ public class Folder extends AuditModel {
         LinkedList<String> fullPath = new LinkedList<>(getFullPath());
         fullPath.removeLast();
         return fullPath;
+    }
+
+    @Override
+    public PathDTO getPathObject() {
+        return PathDTO.fromFullPath(getFullPath());
     }
 }

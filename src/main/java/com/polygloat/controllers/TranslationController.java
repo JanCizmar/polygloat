@@ -1,5 +1,6 @@
 package com.polygloat.controllers;
 
+import com.polygloat.DTOs.PathDTO;
 import com.polygloat.DTOs.SourceTranslationsDTO;
 import com.polygloat.service.SourceService;
 import com.polygloat.service.TranslationService;
@@ -32,7 +33,8 @@ public class TranslationController {
     @RequestMapping(value = "/source/{sourceText}", method = RequestMethod.GET)
     public Map<String, String> getSourceTranslations(@PathVariable("repositoryId") Long repositoryId,
                                                      @PathVariable("sourceText") String fullPath) {
-        return translationService.getSourceTranslations(repositoryId, fullPath);
+        PathDTO pathDTO = PathDTO.fromFullPath(fullPath);
+        return translationService.getSourceTranslations(repositoryId, pathDTO);
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)

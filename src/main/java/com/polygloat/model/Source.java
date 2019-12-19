@@ -1,5 +1,8 @@
 package com.polygloat.model;
 
+import com.polygloat.DTOs.IPathItem;
+import com.polygloat.DTOs.PathDTO;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -7,7 +10,7 @@ import javax.validation.constraints.Pattern;
 import java.util.*;
 
 @Entity
-public class Source extends AuditModel {
+public class Source extends AuditModel implements IPathItem {
     @Id
     @GeneratedValue
     private Long id;
@@ -75,5 +78,10 @@ public class Source extends AuditModel {
             return new LinkedList<>();
         }
         return this.getFolder().getFullPath();
+    }
+
+    @Override
+    public PathDTO getPathObject() {
+        return PathDTO.fromPathAndName(getPath(), getText());
     }
 }

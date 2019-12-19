@@ -1,6 +1,5 @@
 package com.polygloat.repository;
 
-import com.polygloat.model.Language;
 import com.polygloat.model.Translation;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
