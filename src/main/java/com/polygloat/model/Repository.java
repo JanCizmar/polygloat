@@ -1,5 +1,8 @@
 package com.polygloat.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -13,22 +16,23 @@ public class Repository {
 
     @Id
     @GeneratedValue
+    @Getter @Setter
     private Long id;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "repository")
-    private List<Language> languages;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "repository")
+    private Set<Language> languages;
 
     @OneToMany(mappedBy = "repository", fetch = FetchType.EAGER)
-    private List<Source> sources;
+    private Set<Source> sources;
 
     @ManyToOne
     private UserAccount createdBy;
 
     @OneToMany(mappedBy = "repository")
-    private List<Permission> permissions;
+    private Set<Permission> permissions;
 
     @OneToMany(mappedBy = "repository")
-    private List<Folder> folders;
+    private Set<Folder> folders;
 
     @NotBlank
     @Size(min = 3, max = 500)
@@ -45,19 +49,11 @@ public class Repository {
 
     private String description;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public List<Language> getLanguages() {
+    public Set<Language> getLanguages() {
         return languages;
     }
 
-    public void setLanguages(List<Language> languages) {
+    public void setLanguages(Set<Language> languages) {
         this.languages = languages;
     }
 
@@ -85,19 +81,19 @@ public class Repository {
         this.createdBy = createdBy;
     }
 
-    public List<Permission> getPermissions() {
+    public Set<Permission> getPermissions() {
         return permissions;
     }
 
-    public void setPermissions(List<Permission> permissions) {
+    public void setPermissions(Set<Permission> permissions) {
         this.permissions = permissions;
     }
 
-    public List<Source> getSources() {
+    public Set<Source> getSources() {
         return sources;
     }
 
-    public void setSources(List<Source> sources) {
+    public void setSources(Set<Source> sources) {
         this.sources = sources;
     }
 
@@ -106,15 +102,15 @@ public class Repository {
      *
      * @return All repository folders
      */
-    public List<Folder> getFolders() {
+    public Set<Folder> getFolders() {
         return folders;
     }
 
-    public List<Folder> getChildFolders() {
-        return folders.stream().filter(f -> f.getParent() == null).collect(Collectors.toList());
+    public Set<Folder> getChildFolders() {
+        return folders.stream().filter(f -> f.getParent() == null).collect(Collectors.toSet());
     }
 
-    public void setFolders(List<Folder> folders) {
+    public void setFolders(Set<Folder> folders) {
         this.folders = folders;
     }
 

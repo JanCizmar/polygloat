@@ -20,7 +20,7 @@ public class UserAccount {
     private Set<Repository> createdRepositories = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
-    private List<Permission> permissions;
+    private Set<Permission> permissions;
 
     public UserAccount() {
     }
@@ -53,11 +53,11 @@ public class UserAccount {
         this.createdRepositories = createdRepositories;
     }
 
-    public List<Permission> getPermissions() {
+    public Set<Permission> getPermissions() {
         return permissions;
     }
 
-    public void setPermissions(List<Permission> permissions) {
+    public void setPermissions(Set<Permission> permissions) {
         this.permissions = permissions;
     }
 }

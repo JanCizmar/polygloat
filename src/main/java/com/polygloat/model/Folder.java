@@ -30,7 +30,7 @@ public class Folder extends AuditModel {
     private Folder parent;
 
     @OneToMany(mappedBy = "parent", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
-    private List<Folder> childFolders;
+    private Set<Folder> childFolders;
 
     public Long getId() {
         return id;
@@ -72,11 +72,11 @@ public class Folder extends AuditModel {
         this.parent = parent;
     }
 
-    public List<Folder> getChildFolders() {
+    public Set<Folder> getChildFolders() {
         return childFolders;
     }
 
-    public void setChildFolders(List<Folder> childFolders) {
+    public void setChildFolders(Set<Folder> childFolders) {
         this.childFolders = childFolders;
     }
 
@@ -86,14 +86,14 @@ public class Folder extends AuditModel {
 
     public ArrayList<String> getFullPath() {
         ArrayList<String> path = new ArrayList<>();
-        Folder parent = this;
+        Folder sParent = this;
         int nesting = 0;
-        while (parent != null) {
+        while (sParent != null) {
             if (nesting >= 1000) {
                 throw new RuntimeException("Nesting limit exceeded.");
             }
-            path.add(parent.getName());
-            parent = parent.getParent();
+            path.add(sParent.getName());
+            sParent = sParent.getParent();
             nesting++;
         }
         Collections.reverse(path);

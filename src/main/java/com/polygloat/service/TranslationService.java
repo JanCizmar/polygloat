@@ -4,10 +4,12 @@ import com.polygloat.DTOs.SourceInfoDTO;
 import com.polygloat.DTOs.SourceTranslationsDTO;
 import com.polygloat.Exceptions.NotFoundException;
 import com.polygloat.model.*;
+import com.polygloat.repository.FolderRepository;
 import com.polygloat.repository.RepositoryRepository;
 import com.polygloat.repository.TranslationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -20,17 +22,20 @@ public class TranslationService {
     private RepositoryRepository repositoryRepository;
     private FolderService folderService;
     private SourceService sourceService;
+    private FolderRepository folderRepository;
 
     @Autowired
     public TranslationService(TranslationRepository translationRepository,
                               RepositoryRepository repositoryRepository,
                               FolderService folderService,
-                              SourceService sourceService) {
+                              SourceService sourceService,
+                              FolderRepository folderRepository) {
 
         this.translationRepository = translationRepository;
         this.repositoryRepository = repositoryRepository;
         this.folderService = folderService;
         this.sourceService = sourceService;
+        this.folderRepository = folderRepository;
     }
 
     @SuppressWarnings("unchecked")
@@ -67,13 +72,13 @@ public class TranslationService {
 
     @SuppressWarnings("unchecked")
     public Map<String, Object> getTranslations(String[] abbrs, Long repositoryId) {
-        List<Translation> allByLanguages = translationRepository
-                .getAllByLanguageAbbreviationInAndSourceRepositoryIdOrderBySourceText(Arrays.asList(abbrs), repositoryId);
+        Set<Translation> allByLanguages = translationRepository.getTranslations(Arrays.asList(abbrs), repositoryId);
 
         HashMap<String, Object> langTranslations = new LinkedHashMap<>();
         for (Translation translation : allByLanguages) {
-            Map map = (Map) langTranslations.computeIfAbsent(translation.getLanguage().getAbbreviation(),
-                    t -> new LinkedHashMap<>());
+            Map<String, Object> map = (Map<String, Object>) langTranslations
+                    .computeIfAbsent(translation.getLanguage().getAbbreviation(),
+                                     t -> new LinkedHashMap<>());
             addToMap(translation, map);
         }
 
@@ -81,15 +86,18 @@ public class TranslationService {
     }
 
     //todo optimize!!!
-    private Map<String, Object> createMap(List<Folder> folders, Set<Source> sources, String lang) {
+    private Map<String, Object> createMap(Set<Folder> folders, Set<Source> sources, String lang, Set<Translation> translations, Set<Source> allSources) {
         Map<String, Object> result = new HashMap<>();
 
         folders.forEach(f -> {
-            result.put(f.getName(), createMap(f.getChildFolders(), f.getSourceTexts(), lang));
+            result.put(f.getName(), createMap(f.getChildFolders(), allSources.stream()
+                    .filter(s -> s.getFolder() != null && s.getFolder().getId()
+                            .equals(f.getId())).collect(Collectors.toSet()), lang, translations, allSources));
         });
+
         sources.forEach(s -> {
-            String translation = s.getTranslations().stream()
-                    .filter(t -> t.getLanguage().getAbbreviation().equals(lang))
+            String translation = translations.stream()
+                    .filter(t -> t.getLanguage().getAbbreviation().equals(lang) && t.getSource().getId().equals(s.getId()))
                     .map(Translation::getText).findFirst()
                     .orElse(null);
 
@@ -99,14 +107,17 @@ public class TranslationService {
         return result;
     }
 
-    //todo optimize!!!
+    @Transactional
     public Map<String, Object> getViewData(String[] abbrs, Long repositoryId) {
         Repository repository = repositoryRepository.findById(repositoryId).orElseThrow(NotFoundException::new);
+        Set<Source> sources = repository.getSources();
+        repository.getFolders();
+        Set<Translation> translations = translationRepository.getTranslations(Arrays.asList(abbrs), repositoryId);
 
-        return Arrays.stream(abbrs).collect(Collectors.toMap(a -> a,
-                a -> createMap(repository.getChildFolders(), repository.getChildSources(), a)));
+        return Arrays.stream(abbrs)
+                .collect(Collectors.toMap(a -> a,
+                                          a -> createMap(repository.getChildFolders(), repository.getChildSources(), a, translations, sources)));
     }
-
 
     private Stream<Translation> getTranslationEntityStream(Long repositoryId, String path) {
         SourceInfoDTO sourceInfo = new SourceInfoDTO(path);
@@ -126,7 +137,7 @@ public class TranslationService {
 
         //add defined languages
         translations.putAll(getTranslationEntityStream(repositoryId, fullPath)
-                .collect(Collectors.toMap(t -> t.getLanguage().getAbbreviation(), Translation::getText)));
+                                    .collect(Collectors.toMap(t -> t.getLanguage().getAbbreviation(), Translation::getText)));
 
         return translations;
     }

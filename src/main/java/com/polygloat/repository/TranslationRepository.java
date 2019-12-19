@@ -1,11 +1,15 @@
 package com.polygloat.repository;
 
+import com.polygloat.model.Language;
 import com.polygloat.model.Translation;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface TranslationRepository extends JpaRepository<Translation, Long> {
@@ -24,4 +28,8 @@ public interface TranslationRepository extends JpaRepository<Translation, Long> 
 
     List<Translation> getAllBySourceRepositoryIdAndSourceTextIn(Long source_repository_id,
                                                                 Collection<String> source_text);
+
+    @EntityGraph(attributePaths = {"source.repository.folders"})
+    @Query("from Translation t where t.language.abbreviation in :languages and t.source.repository.id = :repositoryId")
+    Set<Translation> getTranslations(List<String> languages, Long repositoryId);
 }

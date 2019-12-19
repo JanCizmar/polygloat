@@ -1,7 +1,7 @@
 package com.polygloat.model;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 public class Language extends AuditModel {
@@ -11,7 +11,7 @@ public class Language extends AuditModel {
     private Long id;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "language")
-    private List<Translation> translations;
+    private Set<Translation> translations;
 
     @ManyToOne
     private Repository repository;
@@ -28,11 +28,11 @@ public class Language extends AuditModel {
         this.id = id;
     }
 
-    public List<Translation> getTranslations() {
+    public Set<Translation> getTranslations() {
         return translations;
     }
 
-    public void setTranslations(List<Translation> translations) {
+    public void setTranslations(Set<Translation> translations) {
         this.translations = translations;
     }
 
