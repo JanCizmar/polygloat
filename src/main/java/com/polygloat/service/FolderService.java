@@ -1,7 +1,6 @@
 package com.polygloat.service;
 
 import com.polygloat.DTOs.FolderDTO;
-import com.polygloat.DTOs.SetFolderRequestDTO;
 import com.polygloat.Exceptions.NotFoundException;
 import com.polygloat.model.Folder;
 import com.polygloat.model.Repository;
@@ -9,7 +8,6 @@ import com.polygloat.repository.FolderRepository;
 import com.polygloat.repository.RepositoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedList;
 import java.util.Optional;
@@ -86,11 +84,11 @@ public class FolderService {
         return Optional.ofNullable(folder);
     }
 
-    public void setFolder(Long repositoryId, FolderDTO folderDTO) {
-        setFolder(repositoryId, null, folderDTO);
+    public Folder setFolder(Long repositoryId, FolderDTO folderDTO) {
+        return setFolder(repositoryId, null, folderDTO);
     }
 
-    public void setFolder(Long repositoryId, FolderDTO oldFolderDTO, FolderDTO newFolderDTO) {
+    public Folder setFolder(Long repositoryId, FolderDTO oldFolderDTO, FolderDTO newFolderDTO) {
         Repository repository = repositoryRepository.findById(repositoryId).orElseThrow(NotFoundException::new);
 
         Folder oldFolder = null;
@@ -106,10 +104,10 @@ public class FolderService {
             }
             oldFolder.setName(newFolderDTO.getName());
             folderRepository.save(oldFolder);
-            return;
+            return oldFolder;
         }
 
-        getOrCreatePath(repository, newFolderDTO.getFullPathList());
+        return getOrCreatePath(repository, newFolderDTO.getFullPathList());
     }
 
     public void deleteFolder(Long repositoryId, LinkedList<String> fullPath) {
