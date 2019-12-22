@@ -4,14 +4,14 @@ import java.util.LinkedList;
 
 public interface IPathItem {
 
-    PathDTO getPathObject();
+    PathDTO getPath();
 
     default LinkedList<String> getPathList() {
-        return getPathObject().getPath();
+        return getPath().getPath();
     }
 
     default LinkedList<String> getFullPathList() {
-        return getPathObject().getFullPath();
+        return getPath().getFullPath();
     }
 
 }

@@ -35,29 +35,33 @@ public class DbPopulatorReal {
         userAccount.setUsername("user");
         userRepository.save(userAccount);
 
+
+        File root = createFolder(null, null);
+
         Repository repository = new Repository();
         repository.setName("Application");
         repository.setCreatedBy(userAccount);
+        repository.setRootFolder(root);
         repositoryRepository.save(repository);
 
         Language en = createLanguage("en", repository);
         Language de = createLanguage("de", repository);
 
-        createTranslation(repository, null, "Hello world!", "Hallo Welt!", en, de);
-        createTranslation(repository, null, "English text one.", "Deutsch text einz.", en, de);
+        createTranslation(repository, root, "Hello world!", "Hallo Welt!", en, de);
+        createTranslation(repository, root, "English text one.", "Deutsch text einz.", en, de);
         entityManager.flush();
 
-        Folder home = createFolder(repository, null, "home");
+        File home = createFolder(root, "home");
         createTranslation(repository, home, "This is translation in home folder",
                 "Dies ist die Übersetzung im Home-Ordner", en, de);
 
-        Folder news = createFolder(repository, home, "news");
+        File news = createFolder(home, "news");
         createTranslation(repository, news, "This is translation in news folder",
                 "Dies ist die Übersetzung im News-Ordner", en, de);
         createTranslation(repository, news, "This is another translation in news folder",
                 "Dies ist eine weitere Übersetzung im Nachrichtenordner", en, de);
 
-        Folder sampleApp = createFolder(repository, null, "sampleApp");
+        File sampleApp = createFolder(root, "sampleApp");
         createTranslation(repository, sampleApp, "This is standard text somewhere in DOM.",
                 "Dies ist Standardtext irgendwo im DOM.", en, de);
         createTranslation(repository, sampleApp, "This is another standard text somewhere in DOM.",
@@ -84,14 +88,22 @@ public class DbPopulatorReal {
         return language;
     }
 
-    private void createTranslation(Repository repository, Folder folder, String english,
+    private void createTranslation(Repository repository, File parent, String english,
                                    String deutsch, Language en, Language de) {
-        Source source = new Source();
-        source.setFolder(folder);
-        source.setRepository(repository);
-        source.setText(english.replaceAll("[^\\w\\d]", "_")
+
+
+        File file = new File();
+        file.setParent(parent);
+        file.setName(english.replaceAll("[^\\w\\d]", "_")
                 .replaceAll("^_*(.*?)_*$", "$1"));
+
+        Source source = new Source();
+        file.setSource(source);
+        file.setRepository(repository);
+
         entityManager.persist(source);
+        entityManager.persist(file);
+
 
         Translation translation = new Translation();
         translation.setLanguage(en);
@@ -108,10 +120,9 @@ public class DbPopulatorReal {
         entityManager.persist(translationDe);
     }
 
-    private Folder createFolder(Repository repository, Folder parent, String name) {
-        Folder folder = new Folder();
+    private File createFolder(File parent, String name) {
+        File folder = new File();
         folder.setName(name);
-        folder.setRepository(repository);
         folder.setParent(parent);
         entityManager.persist(folder);
         return folder;

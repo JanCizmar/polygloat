@@ -44,6 +44,6 @@ public class TranslationDTO {
     }
 
     public static TranslationDTO fromEntity(Translation t) {
-        return new TranslationDTO(t.getSource().getText(), t.getText(), t.getLanguage().getAbbreviation());
+        return new TranslationDTO(t.getSource().getFile().getName(), t.getText(), t.getLanguage().getAbbreviation());
     }
 }

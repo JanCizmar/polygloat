@@ -1,11 +1,16 @@
 package com.polygloat.DTOs;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Arrays;
 import java.util.LinkedList;
 
 public class SourceInfoDTO implements IPathItem {
-    public LinkedList<String> pathList;
-    public String sourceText;
+    private LinkedList<String> pathList;
+    @Getter
+    @Setter
+    private String sourceText;
 
     /**
      * @param fullPath string of full path with source name as the last item of path
@@ -29,7 +34,7 @@ public class SourceInfoDTO implements IPathItem {
     }
 
     @Override
-    public PathDTO getPathObject() {
+    public PathDTO getPath() {
         return PathDTO.fromPathAndName(this.pathList, this.sourceText);
     }
 }

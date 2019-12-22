@@ -1,65 +1,53 @@
 package com.polygloat.service;
 
 import com.polygloat.DTOs.FolderDTO;
+import com.polygloat.DTOs.PathDTO;
 import com.polygloat.Exceptions.NotFoundException;
-import com.polygloat.model.Folder;
+import com.polygloat.model.File;
 import com.polygloat.model.Repository;
-import com.polygloat.repository.FolderRepository;
+import com.polygloat.repository.FileRepository;
 import com.polygloat.repository.RepositoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
-import java.util.Optional;
 
 @Service
 public class FolderService {
 
-    private FolderRepository folderRepository;
+    private FileRepository fileRepository;
     private RepositoryRepository repositoryRepository;
 
     @Autowired
-    public FolderService(FolderRepository folderRepository, RepositoryRepository repositoryRepository) {
-        this.folderRepository = folderRepository;
+    public FolderService(FileRepository fileRepository, RepositoryRepository repositoryRepository) {
+        this.fileRepository = fileRepository;
         this.repositoryRepository = repositoryRepository;
     }
 
-    public Folder getFolder(Folder parent, String name) {
-        return parent.getChildFolders().stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
-    }
+    public File getOrCreatePath(Repository repository, PathDTO path) {
+        LinkedList<String> fullPath = path.getFullPath();
 
-    public Folder getFolderInRoot(Repository repository, String name) {
-        return repository.getFolders().stream()
-                .filter(folder -> folder.getName().equals(name) && folder.getParent() == null)
-                .findFirst().orElse(null);
-    }
-
-    public Folder getOrCreatePath(Repository repository, LinkedList<String> path) {
-        if (path.isEmpty()) {
-            return null;
+        if (fullPath.isEmpty()) {
+            throw new IllegalArgumentException("Can not create root folder - path is empty");
         }
-        String folderName = path.removeFirst();
-        Folder parent = getFolderInRoot(repository, folderName);
+
+        File parent = repository.getRootFolder();
         boolean parentCreated = false;
-        if (parent == null) {
-            parent = new Folder();
-            parent.setName(folderName);
-            parent.setRepository(repository);
-            folderRepository.save(parent);
-            parentCreated = true;
-        }
-        for (String item : path) {
-            Folder folder = null;
+        for (String item : fullPath) {
+            File folder = null;
             if (!parentCreated) {
                 //if parent was just created, dont try to retrieve the folder from db, it just can't exist
-                folder = getFolder(parent, item);
+                folder = parent.getChild(item);
             }
             if (folder == null) {
-                folder = new Folder();
+                if (!parent.isFolder()) {
+                    throw new IllegalStateException("Can not set non-directory file as parent");
+                }
+                folder = new File();
                 folder.setName(item);
                 folder.setRepository(repository);
                 folder.setParent(parent);
-                folderRepository.save(folder);
+                fileRepository.save(folder);
                 parentCreated = true;
             }
             parent = folder;
@@ -67,54 +55,37 @@ public class FolderService {
         return parent;
     }
 
-    @SuppressWarnings("unchecked")
-    public Optional<Folder> getFolder(Repository repository, LinkedList<String> path) {
-        Folder folder;
-        path = (LinkedList<String>) path.clone();
-
-        String pathItem = path.pollFirst();
-        folder = repository.getChildFolders().stream().filter(f -> f.getName().equals(pathItem))
-                .findFirst().orElse(null);
-
-        while (!path.isEmpty() && folder != null) {
-            String fPathItem = path.pollFirst();
-            folder = folder.getChildFolders().stream().filter(f -> f.getName().equals(fPathItem))
-                    .findFirst().orElse(null);
-        }
-        return Optional.ofNullable(folder);
-    }
-
-    public Folder setFolder(Long repositoryId, FolderDTO folderDTO) {
+    public File setFolder(Long repositoryId, FolderDTO folderDTO) {
         return setFolder(repositoryId, null, folderDTO);
     }
 
-    public Folder setFolder(Long repositoryId, FolderDTO oldFolderDTO, FolderDTO newFolderDTO) {
+    public File setFolder(Long repositoryId, FolderDTO oldFolderDTO, FolderDTO newFolderDTO) {
         Repository repository = repositoryRepository.findById(repositoryId).orElseThrow(NotFoundException::new);
 
-        Folder oldFolder = null;
+        File oldFolder = null;
 
         if (oldFolderDTO != null) {
-            oldFolder = getFolder(repository, oldFolderDTO.getFullPathList()).orElse(null);
+            oldFolder = repository.getRootFolder().evaluatePath(oldFolderDTO.getPath()).orElse(null);
         }
 
         if (oldFolder != null) {
-            if (!oldFolder.getPath().equals(newFolderDTO.getPathList())) {
-                Folder parent = getOrCreatePath(repository, newFolderDTO.getPathList());
+            if (!oldFolder.getPath().getPath().equals(newFolderDTO.getPath().getPath())) {
+                File parent = getOrCreatePath(repository, newFolderDTO.getPath());
                 oldFolder.setParent(parent);
             }
             oldFolder.setName(newFolderDTO.getName());
-            folderRepository.save(oldFolder);
+            fileRepository.save(oldFolder);
             return oldFolder;
         }
 
-        return getOrCreatePath(repository, newFolderDTO.getFullPathList());
+        return getOrCreatePath(repository, newFolderDTO.getPath());
     }
 
-    public void deleteFolder(Long repositoryId, LinkedList<String> fullPath) {
+    public void deleteFolder(Long repositoryId, PathDTO pathDTO) {
         Repository repository = repositoryRepository.findById(repositoryId).orElseThrow(NotFoundException::new);
 
-        Folder folder = getFolder(repository, fullPath).orElseThrow(NotFoundException::new);
+        File folder = repository.getRootFolder().evaluatePath(pathDTO).orElseThrow(NotFoundException::new);
 
-        folderRepository.delete(folder);
+        fileRepository.delete(folder);
     }
 }

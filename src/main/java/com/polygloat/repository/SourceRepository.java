@@ -1,13 +1,16 @@
 package com.polygloat.repository;
 
-import com.polygloat.model.Folder;
 import com.polygloat.model.Source;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Query;
 
-import java.util.Optional;
+import java.util.List;
+import java.util.Set;
 
-@Repository
+@org.springframework.stereotype.Repository
 public interface SourceRepository extends JpaRepository<Source, Long> {
-    Optional<Source> findSourceByFolderAndRepositoryAndText(Folder folder, com.polygloat.model.Repository repository, String text);
+    @Query("from Source s " +
+            "join fetch Translation t on t.source = s and t.language.abbreviation in :languages " +
+            "where s.file.repository.id = :repositoryId")
+    Set<Source> getSourcesWithTranslations(List<String> languages, Long repositoryId);
 }

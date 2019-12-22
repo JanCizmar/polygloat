@@ -1,11 +1,13 @@
 package com.polygloat.DTOs;
 
 import com.polygloat.Exceptions.InvalidPathException;
+import lombok.Data;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+@Data
 public class PathDTO {
     public static final String DELIMITER_REGEX = "\\.";
 

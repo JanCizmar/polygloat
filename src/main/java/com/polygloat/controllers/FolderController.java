@@ -1,11 +1,9 @@
 package com.polygloat.controllers;
 
+import com.polygloat.DTOs.PathDTO;
 import com.polygloat.DTOs.SetFolderRequestDTO;
 import com.polygloat.service.FolderService;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Arrays;
-import java.util.LinkedList;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -28,8 +26,6 @@ public class FolderController {
     public void deleteTranslation(@PathVariable("repositoryId") Long repositoryId,
                                   @PathVariable("fullPath") String fullPath) {
 
-        LinkedList<String> pathList = new LinkedList<>(Arrays.asList(fullPath.split("\\.")));
-
-        folderService.deleteFolder(repositoryId, pathList);
+        folderService.deleteFolder(repositoryId, PathDTO.fromFullPath(fullPath));
     }
 }

@@ -1,18 +1,10 @@
 package com.polygloat.development;
 
-import com.github.javafaker.Faker;
-import com.polygloat.model.*;
-import com.polygloat.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
-import java.util.Locale;
 
 @Component
 public class DbPopulator {
-    private UserRepository userRepository;
+  /*  private UserRepository userRepository;
 
     private RepositoryRepository repositoryRepository;
     private LanguageRepository languageRepository;
@@ -64,7 +56,7 @@ public class DbPopulator {
                 }
                 for (int z = 0; z < 50; z++) {
                     Source source = fakeSource(repository);
-                    System.out.print(String.format("\rCreating source %s.", source.getText()));
+                    System.out.print(String.format("\rCreating source %s.", source.getFile().getName()));
                     //sourceRepository.save(source);
                     entityManager.persist(source);
 
@@ -99,8 +91,8 @@ public class DbPopulator {
     }
 
     //Todo: create folder structure
-    private Folder fakeFolder(Repository repository) {
-        Folder folder = new Folder();
+    private File fakeFolder(Repository repository) {
+        File folder = new File();
         folder.setName(faker.lorem().word());
         return folder;
     }
@@ -108,7 +100,7 @@ public class DbPopulator {
     private Source fakeSource(Repository repository) {
         Source source = new Source();
         source.setRepository(repository);
-        source.setText(faker.lebowski().quote().replace(" ", "_"));
+        source.(faker.lebowski().quote().replace(" ", "_"));
         return source;
     }
 
@@ -119,5 +111,5 @@ public class DbPopulator {
         Faker faker = new Faker(new Locale(language.getAbbreviation()));
         translation.setText(faker.weather().description());
         return translation;
-    }
+    }*/
 }

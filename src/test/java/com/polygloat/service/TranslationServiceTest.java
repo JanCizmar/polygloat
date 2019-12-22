@@ -2,7 +2,7 @@ package com.polygloat.service;
 
 import com.polygloat.DTOs.FolderDTO;
 import com.polygloat.DTOs.PathDTO;
-import com.polygloat.model.Folder;
+import com.polygloat.model.File;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,21 +30,21 @@ class TranslationServiceTest {
 
     @Test
     void testGetViewData() {
-        Map<String, Object> viewData = translationService.getViewData(new String[]{"en", "de"}, 2L);
+        Map<String, Object> viewData = translationService.getViewData(new String[]{"en", "de"}, 3L);
         assertThat(viewData.get("en")).isInstanceOf(Map.class);
         //assertThat(((Map)viewData.get("en")).get("sampleApp"))
     }
 
     @Test
     void viewDataContainingEmptyFolders() {
-        Folder folder = folderService.setFolder(2L, new FolderDTO("aaa", "sampleApp"));
+        File folder = folderService.setFolder(2L, new FolderDTO("aaa", "sampleApp"));
 
         TestTransaction.flagForCommit();
         TestTransaction.end();
         entityManager.clear();
         TestTransaction.start();
 
-        Map<String, Object> viewData = translationService.getViewData(new String[]{"en", "de"}, 2L);
+        Map<String, Object> viewData = translationService.getViewData(new String[]{"en", "de"}, 3L);
         Object o = evaluatePath(viewData, PathDTO.fromFullPath("en.sampleApp.aaa"));
         assertThat(o).isInstanceOf(Map.class);
         assertThat(((Map) o).size()).isEqualTo(0);
@@ -53,7 +53,7 @@ class TranslationServiceTest {
     @Test
     @Transactional
     void getTranslations() {
-        Map<String, Object> viewData = translationService.getTranslations(new String[]{"en", "de"}, 2L);
+        Map<String, Object> viewData = translationService.getTranslations(new String[]{"en", "de"}, 3L);
         assertThat(viewData.get("en")).isInstanceOf(Map.class);
     }
 
@@ -75,10 +75,10 @@ class TranslationServiceTest {
     @Test
     @Transactional
     void getSourceTranslations() {
-        Map<String, String> map = translationService.getSourceTranslations(2L,
+        Map<String, String> map = translationService.getSourceTranslations(3L,
                 PathDTO.fromFullPath("home.news.This_is_another_translation_in_news_folder"));
         assertThat(map.get("en")).isInstanceOf(String.class);
-        map = translationService.getSourceTranslations(2L,
+        map = translationService.getSourceTranslations(3L,
                 PathDTO.fromFullPath("Hello_world"));
         assertThat(map.get("en")).isInstanceOf(String.class);
     }

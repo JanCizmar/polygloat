@@ -1,11 +1,18 @@
 package com.polygloat.DTOs;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 public class SourceTranslationsDTO {
     private String path;
     private Map<String, String> translations;
+
+    @NotNull
     private String oldSourceName;
+
+    @NotBlank
+    @NotNull
     private String newSourceName;
 
     public String getPath() {

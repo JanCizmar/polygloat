@@ -2,86 +2,41 @@ package com.polygloat.model;
 
 import com.polygloat.DTOs.IPathItem;
 import com.polygloat.DTOs.PathDTO;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 @Entity
 public class Source extends AuditModel implements IPathItem {
     @Id
     @GeneratedValue
+    @Getter
+    @Setter
     private Long id;
 
-    @ManyToOne
-    private Repository repository;
-
-    @ManyToOne
-    private Folder folder;
+    @OneToOne(mappedBy = "source", optional = false)
+    @Getter
+    @Setter
+    private File file;
 
     @OneToMany(mappedBy = "source", cascade = CascadeType.REMOVE)
+    @Getter
+    @Setter
     private Set<Translation> translations = new HashSet<>();
-
-    @NotNull
-    @NotBlank
-    @Pattern(regexp = "^[^.]*$")
-    private String text;
-
-    public Repository getRepository() {
-        return repository;
-    }
-
-    public void setRepository(Repository repository) {
-        this.repository = repository;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Folder getFolder() {
-        return folder;
-    }
-
-    public void setFolder(Folder folder) {
-        this.folder = folder;
-    }
 
     public Optional<Translation> getTranslation(String abbr) {
         return this.getTranslations().stream().filter(t -> t.getLanguage().getAbbreviation().equals(abbr)).findFirst();
     }
 
-    public Set<Translation> getTranslations() {
-        return translations;
+    public PathDTO getPath() {
+        return PathDTO.fromPathAndName(this.getFile().getPath().getFullPath(), getFile().getName());
     }
 
-    public void setTranslations(Set<Translation> translations) {
-        this.translations = translations;
-    }
-
-    public List<String> getPath() {
-        if (this.getFolder() == null) {
-            return new LinkedList<>();
-        }
-        return this.getFolder().getFullPath();
-    }
-
-    @Override
-    public PathDTO getPathObject() {
-        return PathDTO.fromPathAndName(getPath(), getText());
+    public String getText() {
+        return getFile().getName();
     }
 }
