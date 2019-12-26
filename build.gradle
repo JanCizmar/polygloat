@@ -47,9 +47,9 @@ repositories {
 def liveDb = [
         url         : 'jdbc:postgresql://localhost:5432/app',
         referenceUrl: 'hibernate:spring:com.polygloat' +
-                      '?dialect=org.hibernate.dialect.PostgreSQL95Dialect' +
-                      '&hibernate.physical_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy' +
-                      '&hibernate.implicit_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy',
+                '?dialect=org.hibernate.dialect.PostgreSQL95Dialect' +
+                '&hibernate.physical_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy' +
+                '&hibernate.implicit_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy',
         username    : 'postgres',
         password    : 'postgres',
 ]

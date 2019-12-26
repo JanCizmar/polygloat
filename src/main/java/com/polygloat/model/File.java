@@ -1,18 +1,21 @@
 package com.polygloat.model;
 
 import com.polygloat.DTOs.PathDTO;
+import com.polygloat.model.hooks.FileUpdateListener;
 import com.sun.istack.Nullable;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
-import java.util.*;
+import java.util.Set;
 
 @Entity
 @Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"name", "parent_id"})
+        @UniqueConstraint(columnNames = {"name", "parent_id"}),
+        @UniqueConstraint(columnNames = {"repository_id", "name", "materialized_path"})
 })
+@EntityListeners({FileUpdateListener.class})
 public class File extends AuditModel {
     @Id
     @GeneratedValue
@@ -33,7 +36,6 @@ public class File extends AuditModel {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @Getter
-    @Setter
     private File parent;
 
     @Setter
@@ -46,37 +48,24 @@ public class File extends AuditModel {
     @Setter
     private Set<File> children;
 
+    @Getter
+    @Column(name = "materialized_path")
+    private String materializedPath;
+
+    @Transient
+    @Getter
+    @Setter
+    private String oldName;
+
     public PathDTO getPath() {
-        ArrayList<String> path = new ArrayList<>();
-        File sParent = this;
-        int nesting = 0;
-        while (sParent != null && sParent.getName() != null) {
-            if (nesting >= 1000) {
-                throw new RuntimeException("Nesting limit exceeded.");
-            }
-            path.add(sParent.getName());
-            sParent = sParent.getParent();
-            nesting++;
-        }
-        Collections.reverse(path);
-        return PathDTO.fromFullPath(path);
-    }
-
-    public Optional<File> evaluatePath(PathDTO pathDTO) {
-        LinkedList<String> fullPath = pathDTO.getFullPath();
-        if (pathDTO.getFullPath().isEmpty()) {
-            return Optional.of(this);
+        if (this.isRoot()) {
+            return null;
         }
 
-        String itemName = fullPath.removeFirst();
-        File file = this.children.stream().filter(f -> f.getName()
-                .equals(itemName)).findFirst().orElse(null);
-
-        if (file == null) {
-            return Optional.empty();
+        if (this.materializedPath == null) {
+            throw new IllegalStateException("Path is not initialized yet");
         }
-
-        return file.evaluatePath(PathDTO.fromFullPath(fullPath));
+        return PathDTO.fromPathAndName(materializedPath, name);
     }
 
     public boolean isFolder() {
@@ -85,5 +74,29 @@ public class File extends AuditModel {
 
     public File getChild(String name) {
         return this.getChildren().stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
+    }
+
+    public void setParent(File parent) {
+        this.parent = parent;
+        materializedPath = createMaterializedPath();
+    }
+
+    private String createMaterializedPath() {
+
+        //root has no path
+        if (this.isRoot()) {
+            return null;
+        }
+
+        //root's children have empty path
+        if (this.parent.isRoot()) {
+            return "";
+        }
+
+        return this.parent.getPath().getFullPathString();
+    }
+
+    public boolean isRoot() {
+        return this.parent == null && this.getName() == null;
     }
 }

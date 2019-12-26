@@ -4,12 +4,14 @@ import com.polygloat.Exceptions.InvalidPathException;
 import lombok.Data;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 @Data
 public class PathDTO {
-    public static final String DELIMITER_REGEX = "\\.";
+    public static final String DELIMITER = ".";
+    public static final String DELIMITER_REGEX = String.format("\\%s", DELIMITER);
 
     private LinkedList<String> fullPath = new LinkedList<>();
 
@@ -30,7 +32,11 @@ public class PathDTO {
 
     public static PathDTO fromPathAndName(String path, String name) {
         PathDTO pathDTO = new PathDTO();
-        pathDTO.add(validate(Arrays.asList(path.split(DELIMITER_REGEX, 0))));
+        List<String> items = Arrays.asList(path.split(DELIMITER_REGEX, 0));
+        if (path.isEmpty()) {
+            items = Collections.emptyList();
+        }
+        pathDTO.add(validate(items));
         pathDTO.add(name);
         return pathDTO;
     }
@@ -54,6 +60,14 @@ public class PathDTO {
 
     public LinkedList<String> getFullPath() {
         return new LinkedList<>(this.fullPath);
+    }
+
+    public String getFullPathString() {
+        return String.join(DELIMITER, getFullPath());
+    }
+
+    public String getPathString() {
+        return String.join(DELIMITER, getPath());
     }
 
     static private String validate(String item) {

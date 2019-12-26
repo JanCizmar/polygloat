@@ -14,8 +14,6 @@ public interface TranslationRepository extends JpaRepository<Translation, Long> 
 
     @EntityGraph(attributePaths = {"source.file.repository.languages",
             "source.file.parent.parent.parent.parent.parent"})
-    @Query("from Translation t join fetch Source s on t.source = s join fetch File f on f.source = s " +
-            "join fetch Repository r on r = f.repository " +
-            "where t.source.file.repository.id = :repositoryId and t.language.abbreviation in :languages")
+    @Query("from Translation t where t.source.file.repository.id = :repositoryId and t.language.abbreviation in :languages")
     Set<Translation> getTranslations(List<String> languages, Long repositoryId);
 }

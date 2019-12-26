@@ -13,14 +13,14 @@ import java.util.HashSet;
 @Transactional
 class SourceServiceTest {
     @Autowired
-    SourceService sourceService;
+    FileService fileService;
 
     @Autowired
     RepositoryRepository repositoryRepository;
 
     @Test
     void findAllInRepository() {
-        sourceService.findAllInRepository(repositoryRepository.findById(2L).orElse(null),
+        fileService.findAllInRepository(repositoryRepository.findById(3L).orElse(null),
                 new HashSet<>(Arrays.asList("en", "de")));
 
 

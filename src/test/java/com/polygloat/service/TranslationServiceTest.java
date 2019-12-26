@@ -23,7 +23,7 @@ class TranslationServiceTest {
     TranslationService translationService;
 
     @Autowired
-    FolderService folderService;
+    FileService fileService;
 
     @Autowired
     EntityManager entityManager;
@@ -37,7 +37,7 @@ class TranslationServiceTest {
 
     @Test
     void viewDataContainingEmptyFolders() {
-        File folder = folderService.setFolder(2L, new FolderDTO("aaa", "sampleApp"));
+        File folder = fileService.setFolder(2L, new FolderDTO("aaa", "sampleApp"));
 
         TestTransaction.flagForCommit();
         TestTransaction.end();

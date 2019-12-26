@@ -22,20 +22,20 @@ public class TranslationService {
 
     private TranslationRepository translationRepository;
     private RepositoryRepository repositoryRepository;
-    private FolderService folderService;
+    private FileService fileService;
     private SourceService sourceService;
     private FileRepository fileRepository;
 
     @Autowired
     public TranslationService(TranslationRepository translationRepository,
                               RepositoryRepository repositoryRepository,
-                              FolderService folderService,
+                              FileService fileService,
                               SourceService sourceService,
                               FileRepository fileRepository) {
 
         this.translationRepository = translationRepository;
         this.repositoryRepository = repositoryRepository;
-        this.folderService = folderService;
+        this.fileService = fileService;
         this.sourceService = sourceService;
         this.fileRepository = fileRepository;
     }
@@ -110,7 +110,7 @@ public class TranslationService {
     public Map<String, String> getSourceTranslations(Long repositoryId, PathDTO fullPath) {
         Repository repository = repositoryRepository.findById(repositoryId).orElseThrow(NotFoundException::new);
 
-        File file = repository.getRootFolder().evaluatePath(fullPath).orElseThrow(NotFoundException::new);
+        File file = fileService.evaluatePath(repository, fullPath).orElseThrow(NotFoundException::new);
 
         Source source = file.getSource();
 

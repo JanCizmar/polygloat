@@ -35,10 +35,10 @@ public class DbPopulatorReal {
         userAccount.setUsername("user");
         userRepository.save(userAccount);
 
-
-        File root = createFolder(null, null);
-
         Repository repository = new Repository();
+
+        File root = createFolder(null, repository, null);
+
         repository.setName("Application");
         repository.setCreatedBy(userAccount);
         repository.setRootFolder(root);
@@ -51,17 +51,17 @@ public class DbPopulatorReal {
         createTranslation(repository, root, "English text one.", "Deutsch text einz.", en, de);
         entityManager.flush();
 
-        File home = createFolder(root, "home");
+        File home = createFolder(root, repository, "home");
         createTranslation(repository, home, "This is translation in home folder",
                 "Dies ist die Übersetzung im Home-Ordner", en, de);
 
-        File news = createFolder(home, "news");
+        File news = createFolder(home, repository, "news");
         createTranslation(repository, news, "This is translation in news folder",
                 "Dies ist die Übersetzung im News-Ordner", en, de);
         createTranslation(repository, news, "This is another translation in news folder",
                 "Dies ist eine weitere Übersetzung im Nachrichtenordner", en, de);
 
-        File sampleApp = createFolder(root, "sampleApp");
+        File sampleApp = createFolder(root, repository, "sampleApp");
         createTranslation(repository, sampleApp, "This is standard text somewhere in DOM.",
                 "Dies ist Standardtext irgendwo im DOM.", en, de);
         createTranslation(repository, sampleApp, "This is another standard text somewhere in DOM.",
@@ -120,9 +120,10 @@ public class DbPopulatorReal {
         entityManager.persist(translationDe);
     }
 
-    private File createFolder(File parent, String name) {
+    private File createFolder(File parent, Repository repository, String name) {
         File folder = new File();
         folder.setName(name);
+        folder.setRepository(repository);
         folder.setParent(parent);
         entityManager.persist(folder);
         return folder;
