@@ -20,9 +20,8 @@ class SourceServiceTest {
 
     @Test
     void findAllInRepository() {
-        fileService.findAllInRepository(repositoryRepository.findById(3L).orElse(null),
+        fileService.getDataForView(repositoryRepository.findById(3L).orElse(null),
                 new HashSet<>(Arrays.asList("en", "de")));
-
 
     }
 }

@@ -10,15 +10,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @SpringBootApplication
 @EnableJpaAuditing
 public class Application {
-
-    @Value("${app.populate:true}")
-    private boolean populate;
-
     @Autowired
-    public Application(DbPopulatorReal populator) {
+    public Application(DbPopulatorReal populator, @Value("${app.populate:true}") boolean populate) {
         if (populate) {
-            populator.populate();
-
+            populator.autoPopulate();
         }
     }
 

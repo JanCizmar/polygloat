@@ -1,10 +1,14 @@
 package com.polygloat.model;
 
 import javax.persistence.*;
+
 @Entity
-public class Translation extends AuditModel{
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"source_id", "language_id"}),
+})
+public class Translation extends AuditModel {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(columnDefinition = "text")

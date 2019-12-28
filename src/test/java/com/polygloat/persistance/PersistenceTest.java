@@ -37,7 +37,7 @@ class PersistenceTest {
     @Test
     @Transactional
     void testPopulator() {
-        populator.populate();
+        populator.autoPopulate();
 
         List<UserAccount> all = userRepository.findAll();
 

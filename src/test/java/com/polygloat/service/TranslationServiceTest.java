@@ -1,15 +1,17 @@
 package com.polygloat.service;
 
-import com.polygloat.DTOs.FolderDTO;
 import com.polygloat.DTOs.PathDTO;
-import com.polygloat.model.File;
+import com.polygloat.Exceptions.NotFoundException;
+import com.polygloat.development.DbPopulatorReal;
+import com.polygloat.model.Repository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -28,32 +30,19 @@ class TranslationServiceTest {
     @Autowired
     EntityManager entityManager;
 
-    @Test
-    void testGetViewData() {
-        Map<String, Object> viewData = translationService.getViewData(new String[]{"en", "de"}, 3L);
-        assertThat(viewData.get("en")).isInstanceOf(Map.class);
-        //assertThat(((Map)viewData.get("en")).get("sampleApp"))
-    }
+    @Autowired
+    DbPopulatorReal dbPopulator;
 
-    @Test
-    void viewDataContainingEmptyFolders() {
-        File folder = fileService.setFolder(2L, new FolderDTO("aaa", "sampleApp"));
-
-        TestTransaction.flagForCommit();
-        TestTransaction.end();
-        entityManager.clear();
-        TestTransaction.start();
-
-        Map<String, Object> viewData = translationService.getViewData(new String[]{"en", "de"}, 3L);
-        Object o = evaluatePath(viewData, PathDTO.fromFullPath("en.sampleApp.aaa"));
-        assertThat(o).isInstanceOf(Map.class);
-        assertThat(((Map) o).size()).isEqualTo(0);
-    }
+    @Autowired
+    RepositoryService repositoryService;
 
     @Test
     @Transactional
     void getTranslations() {
-        Map<String, Object> viewData = translationService.getTranslations(new String[]{"en", "de"}, 3L);
+        dbPopulator.populate("App");
+        Repository app = repositoryService.findByName("App").orElseThrow(NotFoundException::new);
+
+        Map<String, Object> viewData = translationService.getTranslations(new HashSet<>(Arrays.asList("en", "de")), app.getId());
         assertThat(viewData.get("en")).isInstanceOf(Map.class);
     }
 
@@ -75,10 +64,13 @@ class TranslationServiceTest {
     @Test
     @Transactional
     void getSourceTranslations() {
-        Map<String, String> map = translationService.getSourceTranslations(3L,
+        dbPopulator.populate("App");
+        Repository app = repositoryService.findByName("App").orElseThrow(NotFoundException::new);
+
+        Map<String, String> map = translationService.getSourceTranslations(app.getId(),
                 PathDTO.fromFullPath("home.news.This_is_another_translation_in_news_folder"));
         assertThat(map.get("en")).isInstanceOf(String.class);
-        map = translationService.getSourceTranslations(3L,
+        map = translationService.getSourceTranslations(app.getId(),
                 PathDTO.fromFullPath("Hello_world"));
         assertThat(map.get("en")).isInstanceOf(String.class);
     }

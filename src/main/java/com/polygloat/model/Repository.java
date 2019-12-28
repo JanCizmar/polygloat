@@ -6,15 +6,19 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
 @Entity
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"name", "created_by_id"}),
+        @UniqueConstraint(columnNames = {"root_folder_id"}),
+})
 public class Repository {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter
     @Setter
     private Long id;
@@ -22,7 +26,7 @@ public class Repository {
     @Getter
     @Setter
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "repository")
-    private Set<Language> languages;
+    private Set<Language> languages = new LinkedHashSet<>();
 
     @Getter
     @Setter
@@ -42,7 +46,7 @@ public class Repository {
     @Getter
     @Setter
     @OneToMany(mappedBy = "repository")
-    private Set<File> files = new HashSet<>();
+    private Set<File> files = new LinkedHashSet<>();
 
     @Getter
     @Setter

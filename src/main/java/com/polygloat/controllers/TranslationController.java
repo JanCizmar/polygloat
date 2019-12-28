@@ -2,12 +2,14 @@ package com.polygloat.controllers;
 
 import com.polygloat.DTOs.PathDTO;
 import com.polygloat.DTOs.SourceTranslationsDTO;
+import com.polygloat.DTOs.response.FileViewDataItem;
 import com.polygloat.service.SourceService;
 import com.polygloat.service.TranslationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -30,9 +32,9 @@ public class TranslationController {
         return translationService.getTranslations(parseLanguages(languages), repositoryId);
     }
 
-    @RequestMapping(value = "/source/{sourceText}", method = RequestMethod.GET)
+    @RequestMapping(value = "/source/{sourceFullPath}", method = RequestMethod.GET)
     public Map<String, String> getSourceTranslations(@PathVariable("repositoryId") Long repositoryId,
-                                                     @PathVariable("sourceText") String fullPath) {
+                                                     @PathVariable("sourceFullPath") String fullPath) {
         PathDTO pathDTO = PathDTO.fromFullPath(fullPath);
         return translationService.getSourceTranslations(repositoryId, pathDTO);
     }
@@ -50,12 +52,14 @@ public class TranslationController {
     }
 
     @RequestMapping(value = "/view/{languages}", method = RequestMethod.GET)
-    public Map<String, Object> getViewTranslations(@PathVariable("repositoryId") Long repositoryId,
-                                                   @PathVariable("languages") String languages) {
-        return translationService.getViewData(parseLanguages(languages), repositoryId);
+    public Set<FileViewDataItem> getViewData(@PathVariable("repositoryId") Long repositoryId,
+                                             @PathVariable("languages") String languages) {
+        return translationService.getViewData(parseLanguages(languages), repositoryId).stream()
+                .map(FileViewDataItem::new)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    private String[] parseLanguages(String languages) {
-        return languages.split(",");
+    private Set<String> parseLanguages(String languages) {
+        return new HashSet<>(Arrays.asList(languages.split(",")));
     }
 }

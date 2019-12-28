@@ -1,6 +1,7 @@
 package com.polygloat.service;
 
 import com.polygloat.DTOs.SourceInfoDTO;
+import com.polygloat.DTOs.SourceTranslationsDTO;
 import com.polygloat.Exceptions.NotFoundException;
 import com.polygloat.model.File;
 import com.polygloat.model.Repository;
@@ -9,7 +10,6 @@ import com.polygloat.repository.RepositoryRepository;
 import com.polygloat.repository.SourceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.util.Optional;
@@ -37,37 +37,21 @@ public class SourceService {
     private Source getOrCreateSource(Repository repository, SourceInfoDTO sourceInfoDTO) {
         File file = fileService.getOrCreatePath(repository, sourceInfoDTO.getPath());
 
-        if (file.isFolder()) {
+        if (file.isFolder() && file.getChildren() != null && !file.getChildren().isEmpty()) {
             throw new IllegalArgumentException("Requested file is folder");
         }
 
         Source source = file.getSource();
 
         if (source == null) {
-            Source s = new Source();
-            s.setFile(file);
-            sourceRepository.save(s);
-            return s;
+            source = new Source();
+            source.setFile(file);
+            file.setSource(source);
+            return source;
         }
-
-        return source;
-    }
-
-    @Transactional
-    public Source getCreateOrModifySource(Repository repository, SourceInfoDTO sourceInfoDTO, String newSourceText) {
-
-        //if creating new translation (the sourceText is "") setting the source name to newSource name
-        if (sourceInfoDTO.getSourceText().isEmpty()) {
-            sourceInfoDTO.setSourceText(newSourceText);
-        }
-
-        Source source = getOrCreateSource(repository, sourceInfoDTO);
-
-        File file = source.getFile();
-        file.setName(newSourceText);
 
         entityManager.persist(file);
-        sourceRepository.save(source);
+        entityManager.persist(source);
 
         return source;
     }
@@ -83,4 +67,25 @@ public class SourceService {
         sourceRepository.delete(getSource(repository, sourceInfoDTO).orElseThrow(NotFoundException::new));
     }
 
+    public Source getCreateOrModifySource(Repository repository, SourceTranslationsDTO data) {
+        //if creating new translation old source info is null
+
+        SourceInfoDTO sourceToRetrieve = data.getNewSourceInfo();
+        if (data.getOldSourceInfo() != null) {
+            //if old source (modifying a source), retrieve old one
+            sourceToRetrieve = data.getOldSourceInfo();
+        }
+
+        Source source = getOrCreateSource(repository, sourceToRetrieve);
+
+        File file = source.getFile();
+
+        //new source info is always set, so setting the new name
+        file.setName(data.getNewSourceName());
+
+        entityManager.persist(file);
+        sourceRepository.save(source);
+
+        return source;
+    }
 }

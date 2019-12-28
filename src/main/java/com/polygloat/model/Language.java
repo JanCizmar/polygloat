@@ -4,10 +4,15 @@ import javax.persistence.*;
 import java.util.Set;
 
 @Entity
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"repository_id", "name"}),
+        @UniqueConstraint(columnNames = {"repository_id", "abbreviation"})
+
+})
 public class Language extends AuditModel {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "language")

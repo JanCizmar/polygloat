@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
@@ -18,7 +19,7 @@ import java.util.Set;
 @EntityListeners({FileUpdateListener.class})
 public class File extends AuditModel {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter
     @Setter
     private Long id;
@@ -46,7 +47,7 @@ public class File extends AuditModel {
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @Getter
     @Setter
-    private Set<File> children;
+    private Set<File> children = new LinkedHashSet<>();
 
     @Getter
     @Column(name = "materialized_path")
@@ -56,6 +57,19 @@ public class File extends AuditModel {
     @Getter
     @Setter
     private String oldName;
+
+    public File() {
+    }
+
+    public File(String name, File parent, Repository repository) {
+        this.name = name;
+        this.setParent(parent);
+        this.repository = repository;
+    }
+
+    public PathDTO getOldPath() {
+        return PathDTO.fromPathAndName(getPath().getPath(), oldName);
+    }
 
     public PathDTO getPath() {
         if (this.isRoot()) {

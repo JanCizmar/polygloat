@@ -2,7 +2,7 @@ package com.polygloat.service;
 
 import com.polygloat.DTOs.FolderDTO;
 import com.polygloat.DTOs.PathDTO;
-import com.polygloat.DTOs.QueryResults.FileDTO;
+import com.polygloat.DTOs.queryResults.FileDTO;
 import com.polygloat.Exceptions.NotFoundException;
 import com.polygloat.model.File;
 import com.polygloat.model.Repository;
@@ -10,6 +10,7 @@ import com.polygloat.repository.FileRepository;
 import com.polygloat.repository.RepositoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.*;
@@ -108,16 +109,23 @@ public class FileService {
                 pathDTO.getName());
     }
 
-    public LinkedHashSet<FileDTO> findAllInRepository(Repository repository, Set<String> abbrs) {
+    @Transactional
+    public LinkedHashSet<FileDTO> getDataForView(Repository repository, Set<String> abbrs) {
         CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
         CriteriaQuery<Object> query1 = cb.createQuery();
         Root<File> file = query1.from(File.class);
         Join<Object, Object> source = file.join("source", JoinType.LEFT);
 
-        Set<Path<?>> selection = new LinkedHashSet<>();
-        selection.add(file.get("materializedPath"));
-        selection.add(file.get("name"));
+        Set<Selection<?>> selection = new LinkedHashSet<>();
+
+        Selection<String> fullPath = cb.concat(file.get("materializedPath"), cb.concat(".", file.get("name")))
+                .alias("fullPath");
+
+        selection.add(fullPath);
+
+        selection.add(file.get("source").get("id"));
+
         Set<Predicate> restrictions = new HashSet<>();
 
         for (String abbr : abbrs) {
@@ -126,15 +134,15 @@ public class FileService {
 
             restrictions.add(cb.or(cb.equal(language.get("abbreviation"), abbr), cb.isNull(file.get("source"))));
 
-            query1.orderBy(cb.asc(translations.get("text")));
+            //query1.orderBy(cb.asc(translations.get("text")));
             selection.add(language.get("abbreviation"));
             selection.add(translations.get("text"));
         }
 
-        Path<?>[] paths = selection.toArray(new Path<?>[0]);
+        Selection<?>[] paths = selection.toArray(new Selection<?>[0]);
 
-        query1.multiselect(paths).distinct(true);
-
+        query1.multiselect(paths);
+        query1.orderBy(cb.asc((Expression<?>) fullPath));
         restrictions.add(cb.equal(file.get("repository"), repository));
         restrictions.add(cb.isNotNull(file.get("name")));
 
@@ -145,6 +153,25 @@ public class FileService {
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
+    void deleteFile(File fileEntity) {
+        CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+        CriteriaDelete<File> delete = cb.createCriteriaDelete(File.class);
+        Root<File> fileRoot = delete.from(File.class);
+
+        Path<String> mPath = fileRoot.get("materializedPath");
+
+        String oldPath = fileEntity.getOldPath().getFullPathString();
+
+        String likeString = String.format("%s%%", oldPath);
+
+        delete.where(cb.and(cb.equal(fileRoot.get("repository"), fileEntity.getRepository()), cb.like(mPath, likeString)));
+
+        this.entityManager.createQuery(delete).executeUpdate();
+        this.entityManager.clear();
+
+        fileRepository.delete(fileEntity);
+    }
+
     public void updateChildMaterializedPaths(File fileEntity) {
         CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
         CriteriaUpdate<File> update = cb.createCriteriaUpdate(File.class);
@@ -152,7 +179,7 @@ public class FileService {
 
         Path<String> mPath = fileRoot.get("materializedPath");
 
-        String oldPath = fileEntity.getPath().getPathString() + PathDTO.DELIMITER + fileEntity.getOldName();
+        String oldPath = fileEntity.getOldPath().getFullPathString();
 
         update.set(mPath, cb.concat(fileEntity.getPath().getFullPathString(), cb.substring(mPath, oldPath.length() + 1)));
 
@@ -161,5 +188,6 @@ public class FileService {
         update.where(cb.and(cb.equal(fileRoot.get("repository"), fileEntity.getRepository()), cb.like(mPath, likeString)));
 
         this.entityManager.createQuery(update).executeUpdate();
+        this.entityManager.clear();
     }
 }

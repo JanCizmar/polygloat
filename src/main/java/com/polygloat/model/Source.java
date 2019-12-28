@@ -13,7 +13,7 @@ import java.util.Set;
 @Entity
 public class Source extends AuditModel implements IPathItem {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter
     @Setter
     private Long id;

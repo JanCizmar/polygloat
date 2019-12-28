@@ -16,6 +16,9 @@ public class DbPopulatorReal {
     private UserRepository userRepository;
 
     private RepositoryRepository repositoryRepository;
+    private Language de;
+    private Language en;
+
 
     @Autowired
     public DbPopulatorReal(EntityManager entityManager, UserRepository userRepository, RepositoryRepository repositoryRepository) {
@@ -25,31 +28,42 @@ public class DbPopulatorReal {
     }
 
     @Transactional
-    public void populate() {
+    public void autoPopulate() {
         //do not populate if db is not empty
-        if (userRepository.count() > 0) {
-            return;
+        if (userRepository.count() == 0) {
+            this.populate("Application");
         }
+    }
 
+    @Transactional
+    public File createBase(String repositoryName) {
         UserAccount userAccount = new UserAccount();
         userAccount.setUsername("user");
         userRepository.save(userAccount);
 
         Repository repository = new Repository();
+        repository.setName(repositoryName);
+        repository.setCreatedBy(userAccount);
 
         File root = createFolder(null, repository, null);
-
-        repository.setName("Application");
-        repository.setCreatedBy(userAccount);
         repository.setRootFolder(root);
+
+        en = createLanguage("en", repository);
+        de = createLanguage("de", repository);
+
         repositoryRepository.save(repository);
 
-        Language en = createLanguage("en", repository);
-        Language de = createLanguage("de", repository);
+        return root;
+    }
+
+    @Transactional
+    public void populate(String repositoryName) {
+        File root = createBase(repositoryName);
+
+        Repository repository = root.getRepository();
 
         createTranslation(repository, root, "Hello world!", "Hallo Welt!", en, de);
         createTranslation(repository, root, "English text one.", "Deutsch text einz.", en, de);
-        entityManager.flush();
 
         File home = createFolder(root, repository, "home");
         createTranslation(repository, home, "This is translation in home folder",
@@ -84,6 +98,9 @@ public class DbPopulatorReal {
         language.setAbbreviation(name);
         language.setRepository(repository);
         language.setName(name);
+
+        repository.getLanguages().add(language);
+
         entityManager.persist(language);
         return language;
     }
@@ -101,8 +118,11 @@ public class DbPopulatorReal {
         file.setSource(source);
         file.setRepository(repository);
 
-        entityManager.persist(source);
         entityManager.persist(file);
+
+        source.setFile(file);
+
+        entityManager.persist(source);
 
 
         Translation translation = new Translation();
@@ -110,12 +130,17 @@ public class DbPopulatorReal {
         translation.setSource(source);
         translation.setText(english);
 
+
+        source.getTranslations().add(translation);
+
         entityManager.persist(translation);
 
         Translation translationDe = new Translation();
         translationDe.setLanguage(de);
         translationDe.setSource(source);
         translationDe.setText(deutsch);
+
+        source.getTranslations().add(translationDe);
 
         entityManager.persist(translationDe);
     }

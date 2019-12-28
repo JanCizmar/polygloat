@@ -1,26 +1,32 @@
 package com.polygloat.service;
 
+import com.polygloat.AbstractTransactionalTest;
 import com.polygloat.DTOs.PathDTO;
+import com.polygloat.DTOs.queryResults.FileDTO;
+import com.polygloat.Exceptions.NotFoundException;
 import com.polygloat.development.DbPopulatorReal;
 import com.polygloat.model.File;
 import com.polygloat.model.Repository;
 import com.polygloat.repository.RepositoryRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
 @Transactional
-class FileServiceTest {
+@SpringBootTest
+class FileServiceTest extends AbstractTransactionalTest {
+
+    private static final Long REPOSITORY_ID = 3L;
+
     @Autowired
     FileService fileService;
 
@@ -31,50 +37,122 @@ class FileServiceTest {
     DbPopulatorReal dbPopulator;
 
     @Autowired
-    EntityManager entityManager;
+    RepositoryService repositoryService;
 
     private boolean initialized = false;
 
+    private Repository repository;
+
+    private File createdFileEntity;
+
+    void createTestData() {
+        newTransaction();
+        File rootFolder = dbPopulator.createBase("Application");
+
+        repository = rootFolder.getRepository();
+
+        this.createdFileEntity = new File("subfolder1", rootFolder, repository);
+        File file2 = new File("subfolder2", createdFileEntity, repository);
+        File file3 = new File("subfolder3", file2, repository);
+        File file4 = new File("subfolder4", file2, repository);
+        File file5 = new File("subfolder5", file2, repository);
+        entityManager.persist(createdFileEntity);
+        entityManager.persist(file2);
+        entityManager.persist(file3);
+        entityManager.persist(file4);
+        entityManager.persist(file5);
+        newTransaction();
+    }
+
+    void removeTestData() {
+        newTransaction();
+        File file = entityManager.merge(createdFileEntity);
+        fileService.deleteFile(file);
+        newTransaction();
+    }
+
     @BeforeEach
-    void beforeClass() {
-        if (!initialized) {
-            dbPopulator.populate();
-            TestTransaction.flagForCommit();
-            TestTransaction.end();
-            entityManager.clear();
-            TestTransaction.start();
-            initialized = true;
-        }
+    void beforeEach() {
+        createTestData();
+    }
+
+    @AfterEach
+    void afterEach() {
+        removeTestData();
     }
 
     @Test
-    void findAllInRepository() {
-        fileService.findAllInRepository(repositoryRepository.findById(3L).orElse(null),
+    void getViewData() {
+        dbPopulator.populate("App2");
+
+        newTransaction();
+
+        Repository repository = repositoryService.findByName("App2").orElseThrow(NotFoundException::new);
+
+        LinkedHashSet<FileDTO> allInRepository = fileService.getDataForView(
+                repository,
                 new HashSet<>(Arrays.asList("en", "de")));
+        assertThat(allInRepository).isNotEmpty();
     }
 
     @Test
-    void updateChildMaterializedPaths() {
-        Repository repository = repositoryRepository.findById(3L).orElse(null);
-        File file = fileService.evaluatePath(repository, PathDTO.fromFullPath("home.news")).orElse(null);
-        file.setName("newNews");
+    void updateChildMaterializedPathsMiddleItem() {
+        File file = fileService.evaluatePath(repository, PathDTO.fromFullPath("subfolder1.subfolder2"))
+                .orElseThrow(NotFoundException::new);
+        file.setName("newSubfolder2");
         fileService.updateChildMaterializedPaths(file);
 
-        TestTransaction.flagForCommit();
-        TestTransaction.end();
-        entityManager.clear();
-        TestTransaction.start();
-
+        newTransaction();
         entityManager.merge(repository);
 
         file = fileService.evaluatePath(repository,
-                PathDTO.fromFullPath("home.news.This_is_another_translation_in_news_folder"))
+                PathDTO.fromFullPath("subfolder1.subfolder2"))
                 .orElse(null);
         assertThat(file).isNull();
 
         file = fileService.evaluatePath(repository,
-                PathDTO.fromFullPath("home.newNews.This_is_another_translation_in_news_folder")).orElse(null);
+                PathDTO.fromFullPath("subfolder1.newSubfolder2")).orElse(null);
+        assertThat(file).isNotNull();
+
+        file = fileService.evaluatePath(repository,
+                PathDTO.fromFullPath("subfolder1.newSubfolder2.subfolder3")).orElse(null);
+        assertThat(file).isNotNull();
+        file = fileService.evaluatePath(repository,
+                PathDTO.fromFullPath("subfolder1.newSubfolder2.subfolder3")).orElse(null);
+        assertThat(file).isNotNull();
+        file = fileService.evaluatePath(repository,
+                PathDTO.fromFullPath("subfolder1.newSubfolder2.subfolder5")).orElse(null);
         assertThat(file).isNotNull();
     }
 
+    @Test
+    void updateChildMaterializedPathsFirstItem() {
+        File file = fileService.evaluatePath(repository, PathDTO.fromFullPath("subfolder1"))
+                .orElseThrow(NotFoundException::new);
+        file.setName("newSubfolder1");
+        fileService.updateChildMaterializedPaths(file);
+        newTransaction();
+
+        file = fileService.evaluatePath(repository,
+                PathDTO.fromFullPath("newSubfolder1.subfolder2.subfolder3")).orElse(null);
+        assertThat(file).isNotNull();
+    }
+
+    @Test
+    void deleteFileTest() {
+        File file = fileService.evaluatePath(repository,
+                PathDTO.fromFullPath("subfolder1.subfolder2")).orElseThrow(NotFoundException::new);
+
+        fileService.deleteFile(file);
+
+        newTransaction();
+
+        file = fileService.evaluatePath(repository,
+                PathDTO.fromFullPath("subfolder1.subfolder2")).orElse(null);
+        assertThat(file).isNull();
+
+        file = fileService.evaluatePath(repository,
+                PathDTO.fromFullPath("subfolder1.newSubfolder2.subfolder3")).orElse(null);
+        assertThat(file).isNull();
+    }
 }

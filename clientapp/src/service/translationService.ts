@@ -4,7 +4,7 @@ import {BaseHttpService} from './baseHttpService';
 import {messageService} from './messageService';
 
 const SERVER_URL = 'http://localhost:8080/';
-const REPOSITORY_ID = 2;
+const REPOSITORY_ID = 1;
 
 const http = container.resolve(BaseHttpService);
 
