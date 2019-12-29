@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,9 +26,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class TranslationControllerTest extends AbstractControllerTest {
 
     @Test
+    @Rollback
     void getViewData() throws Exception {
         dbPopulator.populate("app");
 
@@ -45,6 +49,7 @@ class TranslationControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    @Rollback
     void getTranslations() throws Exception {
         dbPopulator.populate("app");
 
@@ -78,26 +83,18 @@ class TranslationControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    @Rollback
     void setTranslations() throws Exception {
         File app = dbPopulator.createBase("app");
 
-        HashMap<String, String> translations = new HashMap<>();
-        translations.put("en", "en text");
-        translations.put("de", "de text");
-
-        SourceTranslationsDTO sourceTranslationsDTO = new SourceTranslationsDTO(
-                "home.news",
-                translations,
-                null,
-                "This_is_another_translation_in_news_folder");
+        SourceTranslationsDTO sourceTranslationsDTO = getSourceTranslationsDTO();
 
         MvcResult mvcResult = mvc.perform(
                 post("/api/public/repository/" + app.getRepository().getId() + "/translations")
                         .contentType(MediaType.APPLICATION_JSON).content(asJsonString(sourceTranslationsDTO)))
                 .andExpect(status().isOk()).andReturn();
 
-        File file = fileService.evaluatePath(app.getRepository(), sourceTranslationsDTO.getNewSourceInfo()
-                .getPath()).orElse(null);
+        File file = fileService.evaluatePath(app.getRepository(), sourceTranslationsDTO.getNewSourcePath()).orElse(null);
 
         assertThat(file).isNotNull();
         assertThat(file.getSource()).isNotNull();
@@ -105,8 +102,15 @@ class TranslationControllerTest extends AbstractControllerTest {
         newTransaction();
     }
 
-    @Test
-    void deleteTranslation() {
-    }
+    private SourceTranslationsDTO getSourceTranslationsDTO() {
+        HashMap<String, String> translations = new HashMap<>();
+        translations.put("en", "en text");
+        translations.put("de", "de text");
 
+        return new SourceTranslationsDTO(
+                "home.news",
+                translations,
+                null,
+                "This_is_another_translation_in_news_folder");
+    }
 }

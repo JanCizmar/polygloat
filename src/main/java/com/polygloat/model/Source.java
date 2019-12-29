@@ -18,12 +18,12 @@ public class Source extends AuditModel implements IPathItem {
     @Setter
     private Long id;
 
-    @OneToOne(mappedBy = "source", optional = false)
+    @OneToOne(mappedBy = "source", optional = false, orphanRemoval = true)
     @Getter
     @Setter
     private File file;
 
-    @OneToMany(mappedBy = "source", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "source", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @Getter
     @Setter
     private Set<Translation> translations = new HashSet<>();

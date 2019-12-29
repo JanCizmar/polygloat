@@ -29,7 +29,7 @@ export class Actions {
     static onFolderEditClose = new Action(PREFIX + 'FOLDER_EDIT_CLOSE', (f: Folder) => f);
     private static service = container.resolve(translationService);
     static onFolderEditSave = new PromiseAction(PREFIX + 'FOLDER_EDIT_SAVE',
-        (oldFolder: Folder, newFolder: Folder) => Actions.service.editFolder(oldFolder, newFolder));
+        (oldFolder: Folder, newFolder: Folder) => Actions.service.moveFile(oldFolder, newFolder));
     static onFolderDelete = new Action(PREFIX + 'FOLDER_DELETE',
         (f: Folder) => (f: Folder) => Actions.service.deleteFolder(f));
 }

@@ -36,17 +36,17 @@ public class SourceTranslationsDTO {
     }
 
     @JsonIgnore
-    public SourceInfoDTO getOldSourceInfo() {
+    public PathDTO getOldSourcePath() {
         //probably new translation
         if (oldSourceText == null || oldSourceText.isEmpty()) {
             return null;
         }
-        return new SourceInfoDTO(path, oldSourceText);
+        return PathDTO.fromPathAndName(path, oldSourceText);
     }
 
     @JsonIgnore
-    public SourceInfoDTO getNewSourceInfo() {
-        return new SourceInfoDTO(path, getNewSourceName());
+    public PathDTO getNewSourcePath() {
+        return PathDTO.fromPathAndName(path, getNewSourceName());
     }
 
     public Map<String, String> getTranslations() {

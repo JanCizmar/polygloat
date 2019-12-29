@@ -80,6 +80,10 @@ public class PathDTO {
         return item;
     }
 
+    public PathDTO getParent() {
+        return PathDTO.fromFullPath(this.getPath());
+    }
+
     static private List<String> validate(List<String> list) {
         list.forEach(PathDTO::validate);
         return list;
@@ -93,4 +97,18 @@ public class PathDTO {
         this.fullPath.addAll(validate(list));
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        PathDTO pathDTO = (PathDTO) o;
+
+        return getFullPath().equals(pathDTO.getFullPath());
+    }
+
+    @Override
+    public int hashCode() {
+        return getFullPath().hashCode();
+    }
 }

@@ -8,7 +8,7 @@ import javax.persistence.PostLoad;
 import javax.persistence.PrePersist;
 
 @Component
-public class FileUpdateListener {
+public class FileHooks {
 
     private static FileService fileService;
 
@@ -22,5 +22,6 @@ public class FileUpdateListener {
     @PostLoad
     public void postLoad(File f) {
         f.setOldName(f.getName());
+        f.setOldMaterializedPath(f.getMaterializedPath());
     }
 }

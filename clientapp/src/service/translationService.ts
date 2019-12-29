@@ -41,14 +41,14 @@ export class translationService {
         return t;
     }
 
-    async editFolder(oldFolder: Folder, newFolder: Folder) {
-        const folderToBody = (f: Folder) => ({path: f.pathString, name: f.name});
+    async moveFile(oldFolder: Folder, newFolder: Folder) {
+        const fileToBody = (f: Folder) => (f.fullPathString);
 
         await http.fetch(`${SERVER_URL}api/public/repository/${REPOSITORY_ID}/folders`, {
             method: 'POST',
             body: JSON.stringify({
-                oldFolder: folderToBody(oldFolder),
-                newFolder: folderToBody(newFolder)
+                oldFileFullPath: fileToBody(oldFolder),
+                newFileFullPath: fileToBody(newFolder)
             }),
             headers: {
                 'Content-Type': 'application/json'

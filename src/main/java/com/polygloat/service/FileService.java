@@ -1,8 +1,9 @@
 package com.polygloat.service;
 
-import com.polygloat.DTOs.FolderDTO;
 import com.polygloat.DTOs.PathDTO;
 import com.polygloat.DTOs.queryResults.FileDTO;
+import com.polygloat.Exceptions.FileAlreadyExists;
+import com.polygloat.Exceptions.InvalidPathException;
 import com.polygloat.Exceptions.NotFoundException;
 import com.polygloat.model.File;
 import com.polygloat.model.Repository;
@@ -36,69 +37,90 @@ public class FileService {
     public File getOrCreatePath(Repository repository, PathDTO path) {
         LinkedList<String> fullPath = path.getFullPath();
 
-        if (fullPath.isEmpty()) {
-            throw new IllegalArgumentException("Can not create root folder - path is empty");
-        }
-
         File parent = repository.getRootFolder();
+
         boolean parentCreated = false;
         for (String item : fullPath) {
-            File folder = null;
+            File file = null;
             if (!parentCreated) {
                 //if parent was just created, dont try to retrieve the folder from db, it just can't exist
-                folder = parent.getChild(item);
+                file = parent.getChild(item);
             }
-            if (folder == null) {
+            if (file == null) {
                 if (!parent.isFolder()) {
                     throw new IllegalStateException("Can not set non-directory file as parent");
                 }
-                folder = new File();
-                folder.setName(item);
-                folder.setRepository(repository);
-                folder.setParent(parent);
-                fileRepository.save(folder);
+                file = new File();
+                file.setName(item);
+                file.setRepository(repository);
+                file.setParent(parent);
+                parent.getChildren().add(file);
+                fileRepository.save(file);
                 parentCreated = true;
             }
-            parent = folder;
+            parent = file;
         }
         return parent;
     }
 
-    public File setFolder(Long repositoryId, FolderDTO folderDTO) {
-        return setFolder(repositoryId, null, folderDTO);
-    }
 
-    //todo change child materialized path on change
-    public File setFolder(Long repositoryId, FolderDTO oldFolderDTO, FolderDTO newFolderDTO) {
-        Repository repository = repositoryRepository.findById(repositoryId).orElseThrow(NotFoundException::new);
+    private void validateMove(Repository repository, PathDTO oldFilePath, PathDTO newFilePath) {
 
-        File oldFolder = null;
-
-        if (oldFolderDTO != null) {
-            oldFolder = evaluatePath(repository, oldFolderDTO.getPath()).orElse(null);
+        if (oldFilePath == null) {
+            return;
         }
 
-        if (oldFolder != null) {
-            if (!oldFolder.getPath().getPath().equals(newFolderDTO.getPath().getPath())) {
-                File parent = getOrCreatePath(repository, newFolderDTO.getPath());
-                oldFolder.setParent(parent);
+        if (newFilePath.getFullPath().isEmpty() || (oldFilePath.getFullPath().isEmpty())) {
+            throw new InvalidPathException();
+        }
+
+        PathDTO parent = newFilePath;
+        while (!parent.getFullPath().isEmpty()) {
+            if (parent.equals(oldFilePath)) {
+                throw new InvalidPathException();
             }
-            oldFolder.setName(newFolderDTO.getName());
-            fileRepository.save(oldFolder);
-            return oldFolder;
+            parent = parent.getParent();
         }
 
-        return getOrCreatePath(repository, newFolderDTO.getPath());
+        Optional<File> file = this.evaluatePath(repository, newFilePath);
+
+        if (file.isPresent()) {
+            throw new FileAlreadyExists();
+        }
+
     }
 
-    public void deleteFolder(Long repositoryId, PathDTO pathDTO) {
+    //todo validate if newFilePath is not oldFilePath's child
+    @Transactional
+    public File setFile(Long repositoryId, PathDTO oldFilePath, PathDTO newFilePath) {
         Repository repository = repositoryRepository.findById(repositoryId).orElseThrow(NotFoundException::new);
 
-        File folder = evaluatePath(repository, pathDTO).orElseThrow(NotFoundException::new);
+        validateMove(repository, oldFilePath, newFilePath);
 
-        fileRepository.delete(folder);
+        File oldFile = null;
+
+        if (oldFilePath != null) {
+            oldFile = evaluatePath(repository, oldFilePath).orElse(null);
+        }
+
+        if (oldFile != null) {
+            if (!oldFilePath.getPath().equals(newFilePath.getPath())) {
+                //paths are not equal - change parent
+                File parent = getOrCreatePath(repository, newFilePath.getParent());
+                oldFile.setParent(parent);
+            }
+
+            if (newFilePath.getName() == null || newFilePath.getName().isEmpty()) {
+                throw new InvalidPathException();
+            }
+
+            oldFile.setName(newFilePath.getName());
+            fileRepository.save(oldFile);
+            return oldFile;
+        }
+
+        return getOrCreatePath(repository, newFilePath);
     }
-
 
     public Optional<File> evaluatePath(Repository repository, PathDTO pathDTO) {
         if (repository == null) {
@@ -153,7 +175,7 @@ public class FileService {
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    void deleteFile(File fileEntity) {
+    public void deleteFile(File fileEntity) {
         CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
         CriteriaDelete<File> delete = cb.createCriteriaDelete(File.class);
         Root<File> fileRoot = delete.from(File.class);
@@ -189,5 +211,10 @@ public class FileService {
 
         this.entityManager.createQuery(update).executeUpdate();
         this.entityManager.clear();
+    }
+
+    public void deleteFile(Long repositoryId, PathDTO sourcePath) {
+        Repository repository = repositoryRepository.findById(repositoryId).orElseThrow(NotFoundException::new);
+        this.deleteFile(this.evaluatePath(repository, sourcePath).orElseThrow(NotFoundException::new));
     }
 }

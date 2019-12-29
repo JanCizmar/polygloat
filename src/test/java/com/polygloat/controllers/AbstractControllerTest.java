@@ -3,13 +3,13 @@ package com.polygloat.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.polygloat.AbstractTransactionalTest;
 import com.polygloat.development.DbPopulatorReal;
+import com.polygloat.repository.SourceRepository;
 import com.polygloat.service.FileService;
 import com.polygloat.service.RepositoryService;
+import com.polygloat.service.TranslationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class AbstractControllerTest extends AbstractTransactionalTest {
     @Autowired
     protected MockMvc mvc;
@@ -19,6 +19,11 @@ public abstract class AbstractControllerTest extends AbstractTransactionalTest {
     RepositoryService repositoryService;
     @Autowired
     FileService fileService;
+    @Autowired
+    TranslationService translationService;
+
+    @Autowired
+    SourceRepository sourceRepository;
 
     public static String asJsonString(final Object obj) {
         try {

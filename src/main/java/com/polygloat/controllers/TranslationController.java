@@ -45,12 +45,6 @@ public class TranslationController {
         translationService.setTranslations(repositoryId, data);
     }
 
-    @RequestMapping(value = "/{sourcePath}", method = RequestMethod.DELETE)
-    public void deleteTranslation(@PathVariable("repositoryId") Long repositoryId,
-                                  @PathVariable("sourcePath") String sourcePath) {
-        sourceService.deleteSource(repositoryId, sourcePath);
-    }
-
     @RequestMapping(value = "/view/{languages}", method = RequestMethod.GET)
     public Set<FileViewDataItem> getViewData(@PathVariable("repositoryId") Long repositoryId,
                                              @PathVariable("languages") String languages) {

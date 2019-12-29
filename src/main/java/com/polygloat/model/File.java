@@ -1,7 +1,7 @@
 package com.polygloat.model;
 
 import com.polygloat.DTOs.PathDTO;
-import com.polygloat.model.hooks.FileUpdateListener;
+import com.polygloat.model.hooks.FileHooks;
 import com.sun.istack.Nullable;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +16,7 @@ import java.util.Set;
         @UniqueConstraint(columnNames = {"name", "parent_id"}),
         @UniqueConstraint(columnNames = {"repository_id", "name", "materialized_path"})
 })
-@EntityListeners({FileUpdateListener.class})
+@EntityListeners({FileHooks.class})
 public class File extends AuditModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +24,7 @@ public class File extends AuditModel {
     @Setter
     private Long id;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @Getter
     @Setter
     private Source source;
@@ -58,6 +58,11 @@ public class File extends AuditModel {
     @Setter
     private String oldName;
 
+    @Transient
+    @Getter
+    @Setter
+    private String oldMaterializedPath;
+
     public File() {
     }
 
@@ -68,7 +73,7 @@ public class File extends AuditModel {
     }
 
     public PathDTO getOldPath() {
-        return PathDTO.fromPathAndName(getPath().getPath(), oldName);
+        return PathDTO.fromPathAndName(oldMaterializedPath, oldName);
     }
 
     public PathDTO getPath() {

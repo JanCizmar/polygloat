@@ -3,6 +3,7 @@ package com.polygloat.service;
 import com.polygloat.AbstractTransactionalTest;
 import com.polygloat.DTOs.PathDTO;
 import com.polygloat.DTOs.queryResults.FileDTO;
+import com.polygloat.Exceptions.InvalidPathException;
 import com.polygloat.Exceptions.NotFoundException;
 import com.polygloat.development.DbPopulatorReal;
 import com.polygloat.model.File;
@@ -16,10 +17,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Transactional
 @SpringBootTest
@@ -154,5 +157,30 @@ class FileServiceTest extends AbstractTransactionalTest {
         file = fileService.evaluatePath(repository,
                 PathDTO.fromFullPath("subfolder1.newSubfolder2.subfolder3")).orElse(null);
         assertThat(file).isNull();
+    }
+
+
+    @Test
+    void moveFile() {
+        assertThatThrownBy(() -> {
+            fileService.setFile(1L,
+                    PathDTO.fromFullPath("aa.aa"),
+                    PathDTO.fromFullPath(Collections.emptyList()));
+        }).isInstanceOf(InvalidPathException.class);
+
+        assertThatThrownBy(() -> {
+            fileService.setFile(1L,
+                    PathDTO.fromFullPath(Collections.emptyList()),
+                    PathDTO.fromFullPath("aa.aa"));
+        }).isInstanceOf(InvalidPathException.class);
+
+
+        assertThatThrownBy(() -> {
+            fileService.setFile(1L,
+                    PathDTO.fromFullPath("aa.aa"),
+                    PathDTO.fromFullPath("aa.aa.aa"));
+        }).isInstanceOf(InvalidPathException.class);
+
+
     }
 }

@@ -1,8 +1,7 @@
 package com.polygloat.service;
 
-import com.polygloat.DTOs.SourceInfoDTO;
+import com.polygloat.DTOs.PathDTO;
 import com.polygloat.DTOs.SourceTranslationsDTO;
-import com.polygloat.Exceptions.NotFoundException;
 import com.polygloat.model.File;
 import com.polygloat.model.Repository;
 import com.polygloat.model.Source;
@@ -12,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
-import java.util.Optional;
 
 @Service
 public class SourceService {
@@ -34,8 +32,8 @@ public class SourceService {
         this.entityManager = entityManager;
     }
 
-    private Source getOrCreateSource(Repository repository, SourceInfoDTO sourceInfoDTO) {
-        File file = fileService.getOrCreatePath(repository, sourceInfoDTO.getPath());
+    private Source getOrCreateSource(Repository repository, PathDTO path) {
+        File file = fileService.getOrCreatePath(repository, path);
 
         if (file.isFolder() && file.getChildren() != null && !file.getChildren().isEmpty()) {
             throw new IllegalArgumentException("Requested file is folder");
@@ -56,24 +54,13 @@ public class SourceService {
         return source;
     }
 
-    private Optional<Source> getSource(Repository repository, SourceInfoDTO sourceInfoDTO) {
-        File file = fileService.evaluatePath(repository, sourceInfoDTO.getPath()).orElseThrow(NotFoundException::new);
-        return Optional.ofNullable(file.getSource());
-    }
-
-    public void deleteSource(Long repositoryId, String sourcePath) {
-        SourceInfoDTO sourceInfoDTO = new SourceInfoDTO(sourcePath);
-        Repository repository = repositoryRepository.findById(repositoryId).orElseThrow(NotFoundException::new);
-        sourceRepository.delete(getSource(repository, sourceInfoDTO).orElseThrow(NotFoundException::new));
-    }
-
     public Source getCreateOrModifySource(Repository repository, SourceTranslationsDTO data) {
         //if creating new translation old source info is null
 
-        SourceInfoDTO sourceToRetrieve = data.getNewSourceInfo();
-        if (data.getOldSourceInfo() != null) {
+        PathDTO sourceToRetrieve = data.getNewSourcePath();
+        if (data.getOldSourcePath() != null) {
             //if old source (modifying a source), retrieve old one
-            sourceToRetrieve = data.getOldSourceInfo();
+            sourceToRetrieve = data.getOldSourcePath();
         }
 
         Source source = getOrCreateSource(repository, sourceToRetrieve);
