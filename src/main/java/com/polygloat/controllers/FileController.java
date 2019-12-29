@@ -1,7 +1,7 @@
 package com.polygloat.controllers;
 
 import com.polygloat.DTOs.PathDTO;
-import com.polygloat.DTOs.SetFileRequestDTO;
+import com.polygloat.DTOs.request.SetFileRequestDTO;
 import com.polygloat.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/api/public/repository/{repositoryId}/file")
-public class FileController {
+public class FileController extends AbstractController {
 
     private FileService fileService;
 

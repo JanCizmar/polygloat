@@ -1,8 +1,8 @@
 package com.polygloat.controllers;
 
 import com.polygloat.DTOs.PathDTO;
-import com.polygloat.DTOs.SetFileRequestDTO;
-import com.polygloat.DTOs.SourceTranslationsDTO;
+import com.polygloat.DTOs.request.SetFileRequestDTO;
+import com.polygloat.DTOs.request.SourceTranslationsDTO;
 import com.polygloat.model.File;
 import com.polygloat.model.Source;
 import org.junit.jupiter.api.Test;
@@ -47,7 +47,7 @@ class FileControllerTest extends AbstractControllerTest {
         translationService.setTranslations(root.getRepository().getId(), sourceTranslationsDTO);
         PathDTO path = sourceTranslationsDTO.getNewSourcePath();
 
-        newTransaction();
+        commitTransaction();
 
         Optional<File> file = fileService.evaluatePath(root.getRepository(), path);
 
@@ -62,7 +62,7 @@ class FileControllerTest extends AbstractControllerTest {
                         path.getFullPathString()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
 
-        newTransaction();
+        commitTransaction();
 
         file = fileService.evaluatePath(root.getRepository(), path);
         assertThat(file).isEmpty();

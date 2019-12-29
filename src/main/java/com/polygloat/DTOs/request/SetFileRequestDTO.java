@@ -1,6 +1,7 @@
-package com.polygloat.DTOs;
+package com.polygloat.DTOs.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.polygloat.DTOs.PathDTO;
 import lombok.Getter;
 
 public class SetFileRequestDTO {

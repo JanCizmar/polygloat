@@ -3,7 +3,7 @@ package com.polygloat.persistance;
 import com.polygloat.development.DbPopulatorReal;
 import com.polygloat.model.UserAccount;
 import com.polygloat.repository.RepositoryRepository;
-import com.polygloat.repository.UserRepository;
+import com.polygloat.repository.UserAccountRepository;
 import org.hibernate.Hibernate;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ class PersistenceTest {
     DbPopulatorReal populator;
 
     @Autowired
-    UserRepository userRepository;
+    UserAccountRepository userAccountRepository;
 
     @Autowired
     RepositoryRepository repositoryRepository;
@@ -39,7 +39,7 @@ class PersistenceTest {
     void testPopulator() {
         populator.autoPopulate();
 
-        List<UserAccount> all = userRepository.findAll();
+        List<UserAccount> all = userAccountRepository.findAll();
 
         assertThat(all.size()).isGreaterThan(0);
 

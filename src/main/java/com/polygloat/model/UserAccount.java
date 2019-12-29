@@ -1,5 +1,8 @@
 package com.polygloat.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -8,14 +11,22 @@ import java.util.Set;
 public class UserAccount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Getter
+    @Setter
     private int id;
 
+    @Getter
+    @Setter
     private String username;
 
     @OneToMany(mappedBy = "createdBy")
+    @Getter
+    @Setter
     private Set<Repository> createdRepositories = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
+    @Getter
+    @Setter
     private Set<Permission> permissions;
 
     public UserAccount() {
@@ -25,35 +36,4 @@ public class UserAccount {
         this.username = username;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public Set<Repository> getCreatedRepositories() {
-        return createdRepositories;
-    }
-
-    public void setCreatedRepositories(Set<Repository> createdRepositories) {
-        this.createdRepositories = createdRepositories;
-    }
-
-    public Set<Permission> getPermissions() {
-        return permissions;
-    }
-
-    public void setPermissions(Set<Permission> permissions) {
-        this.permissions = permissions;
-    }
 }

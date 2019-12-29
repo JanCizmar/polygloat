@@ -1,7 +1,7 @@
 package com.polygloat.controllers;
 
 import com.polygloat.DTOs.PathDTO;
-import com.polygloat.DTOs.SourceTranslationsDTO;
+import com.polygloat.DTOs.request.SourceTranslationsDTO;
 import com.polygloat.DTOs.response.FileViewDataItem;
 import com.polygloat.service.SourceService;
 import com.polygloat.service.TranslationService;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/api/public/repository/{repositoryId}/translations")
-public class TranslationController {
+public class TranslationController extends AbstractController {
 
     private TranslationService translationService;
     private SourceService sourceService;

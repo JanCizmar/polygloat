@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
@@ -26,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Transactional
 @SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class FileServiceTest extends AbstractTransactionalTest {
 
     private static final Long REPOSITORY_ID = 3L;
@@ -49,7 +51,7 @@ class FileServiceTest extends AbstractTransactionalTest {
     private File createdFileEntity;
 
     void createTestData() {
-        newTransaction();
+        commitTransaction();
         File rootFolder = dbPopulator.createBase("Application");
 
         repository = rootFolder.getRepository();
@@ -64,14 +66,13 @@ class FileServiceTest extends AbstractTransactionalTest {
         entityManager.persist(file3);
         entityManager.persist(file4);
         entityManager.persist(file5);
-        newTransaction();
+        commitTransaction();
     }
 
     void removeTestData() {
-        newTransaction();
         File file = entityManager.merge(createdFileEntity);
         fileService.deleteFile(file);
-        newTransaction();
+        commitTransaction();
     }
 
     @BeforeEach
@@ -88,7 +89,7 @@ class FileServiceTest extends AbstractTransactionalTest {
     void getViewData() {
         dbPopulator.populate("App2");
 
-        newTransaction();
+        commitTransaction();
 
         Repository repository = repositoryService.findByName("App2").orElseThrow(NotFoundException::new);
 
@@ -105,7 +106,7 @@ class FileServiceTest extends AbstractTransactionalTest {
         file.setName("newSubfolder2");
         fileService.updateChildMaterializedPaths(file);
 
-        newTransaction();
+        commitTransaction();
         entityManager.merge(repository);
 
         file = fileService.evaluatePath(repository,
@@ -134,7 +135,7 @@ class FileServiceTest extends AbstractTransactionalTest {
                 .orElseThrow(NotFoundException::new);
         file.setName("newSubfolder1");
         fileService.updateChildMaterializedPaths(file);
-        newTransaction();
+        commitTransaction();
 
         file = fileService.evaluatePath(repository,
                 PathDTO.fromFullPath("newSubfolder1.subfolder2.subfolder3")).orElse(null);
@@ -148,7 +149,7 @@ class FileServiceTest extends AbstractTransactionalTest {
 
         fileService.deleteFile(file);
 
-        newTransaction();
+        commitTransaction();
 
         file = fileService.evaluatePath(repository,
                 PathDTO.fromFullPath("subfolder1.subfolder2")).orElse(null);
@@ -158,7 +159,6 @@ class FileServiceTest extends AbstractTransactionalTest {
                 PathDTO.fromFullPath("subfolder1.newSubfolder2.subfolder3")).orElse(null);
         assertThat(file).isNull();
     }
-
 
     @Test
     void moveFile() {
@@ -180,7 +180,6 @@ class FileServiceTest extends AbstractTransactionalTest {
                     PathDTO.fromFullPath("aa.aa"),
                     PathDTO.fromFullPath("aa.aa.aa"));
         }).isInstanceOf(InvalidPathException.class);
-
-
+        rollbackTransaction();
     }
 }

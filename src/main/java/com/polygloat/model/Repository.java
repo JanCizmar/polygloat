@@ -2,6 +2,7 @@ package com.polygloat.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -15,6 +16,7 @@ import java.util.Set;
         @UniqueConstraint(columnNames = {"name", "created_by_id"}),
         @UniqueConstraint(columnNames = {"root_folder_id"}),
 })
+@Where(clause = "deleted = 0")
 public class Repository {
 
     @Id
@@ -58,6 +60,10 @@ public class Repository {
     @Setter
     private String description;
 
+    @Getter
+    @Setter
+    private boolean deleted = false;
+
     public Repository() {
     }
 
@@ -66,7 +72,6 @@ public class Repository {
         this.name = name;
         this.description = description;
     }
-
 
     public Optional<Language> getLanguage(String abbreviation) {
         return this.languages.stream()

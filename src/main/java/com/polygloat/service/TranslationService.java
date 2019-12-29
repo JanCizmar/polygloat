@@ -1,8 +1,8 @@
 package com.polygloat.service;
 
 import com.polygloat.DTOs.PathDTO;
-import com.polygloat.DTOs.SourceTranslationsDTO;
 import com.polygloat.DTOs.queryResults.FileDTO;
+import com.polygloat.DTOs.request.SourceTranslationsDTO;
 import com.polygloat.Exceptions.NotFoundException;
 import com.polygloat.model.File;
 import com.polygloat.model.Repository;

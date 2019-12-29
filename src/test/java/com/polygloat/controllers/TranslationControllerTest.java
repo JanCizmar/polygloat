@@ -1,7 +1,7 @@
 package com.polygloat.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.polygloat.DTOs.SourceTranslationsDTO;
+import com.polygloat.DTOs.request.SourceTranslationsDTO;
 import com.polygloat.Exceptions.NotFoundException;
 import com.polygloat.model.File;
 import com.polygloat.model.Repository;
@@ -99,7 +99,7 @@ class TranslationControllerTest extends AbstractControllerTest {
         assertThat(file).isNotNull();
         assertThat(file.getSource()).isNotNull();
 
-        newTransaction();
+        commitTransaction();
     }
 
     private SourceTranslationsDTO getSourceTranslationsDTO() {

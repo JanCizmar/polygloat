@@ -1,7 +1,8 @@
-package com.polygloat.DTOs;
+package com.polygloat.DTOs.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.polygloat.DTOs.PathDTO;
 import lombok.Getter;
 
 import javax.validation.constraints.NotBlank;
@@ -10,7 +11,10 @@ import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SourceTranslationsDTO {
+    @Getter
     private String path;
+
+    @Getter
     private Map<String, String> translations;
 
     @NotNull
@@ -31,10 +35,6 @@ public class SourceTranslationsDTO {
         this.newSourceName = newSourceName;
     }
 
-    public String getPath() {
-        return path;
-    }
-
     @JsonIgnore
     public PathDTO getOldSourcePath() {
         //probably new translation
@@ -47,10 +47,6 @@ public class SourceTranslationsDTO {
     @JsonIgnore
     public PathDTO getNewSourcePath() {
         return PathDTO.fromPathAndName(path, getNewSourceName());
-    }
-
-    public Map<String, String> getTranslations() {
-        return translations;
     }
 
 }

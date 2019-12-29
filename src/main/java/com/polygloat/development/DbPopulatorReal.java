@@ -2,7 +2,7 @@ package com.polygloat.development;
 
 import com.polygloat.model.*;
 import com.polygloat.repository.RepositoryRepository;
-import com.polygloat.repository.UserRepository;
+import com.polygloat.repository.UserAccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +13,7 @@ import javax.persistence.EntityManager;
 public class DbPopulatorReal {
     private EntityManager entityManager;
 
-    private UserRepository userRepository;
+    private UserAccountRepository userAccountRepository;
 
     private RepositoryRepository repositoryRepository;
     private Language de;
@@ -21,16 +21,16 @@ public class DbPopulatorReal {
 
 
     @Autowired
-    public DbPopulatorReal(EntityManager entityManager, UserRepository userRepository, RepositoryRepository repositoryRepository) {
+    public DbPopulatorReal(EntityManager entityManager, UserAccountRepository userAccountRepository, RepositoryRepository repositoryRepository) {
         this.entityManager = entityManager;
-        this.userRepository = userRepository;
+        this.userAccountRepository = userAccountRepository;
         this.repositoryRepository = repositoryRepository;
     }
 
     @Transactional
     public void autoPopulate() {
         //do not populate if db is not empty
-        if (userRepository.count() == 0) {
+        if (userAccountRepository.count() == 0) {
             this.populate("Application");
         }
     }
@@ -39,7 +39,7 @@ public class DbPopulatorReal {
     public File createBase(String repositoryName) {
         UserAccount userAccount = new UserAccount();
         userAccount.setUsername("user");
-        userRepository.save(userAccount);
+        userAccountRepository.save(userAccount);
 
         Repository repository = new Repository();
         repository.setName(repositoryName);

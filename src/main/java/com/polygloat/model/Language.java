@@ -1,5 +1,10 @@
 package com.polygloat.model;
 
+import com.polygloat.DTOs.request.LanguageDTO;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.Where;
+
 import javax.persistence.*;
 import java.util.Set;
 
@@ -9,59 +14,47 @@ import java.util.Set;
         @UniqueConstraint(columnNames = {"repository_id", "abbreviation"})
 
 })
+@Where(clause = "deleted = 0")
 public class Language extends AuditModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Getter
+    @Setter
     private Long id;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "language")
+
+    @Getter
+    @Setter
     private Set<Translation> translations;
 
     @ManyToOne
+    @Getter
+    @Setter
     private Repository repository;
 
+    @Getter
+    @Setter
     private String abbreviation;
 
+    @Getter
+    @Setter
     private String name;
 
-    public Long getId() {
-        return id;
+    @Getter
+    @Setter
+    private boolean deleted = false;
+
+    public static Language fromRequestDTO(LanguageDTO dto) {
+        Language language = new Language();
+        language.setName(dto.getName());
+        language.setAbbreviation(dto.getAbbreviation());
+        return language;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Set<Translation> getTranslations() {
-        return translations;
-    }
-
-    public void setTranslations(Set<Translation> translations) {
-        this.translations = translations;
-    }
-
-    public Repository getRepository() {
-        return repository;
-    }
-
-    public void setRepository(Repository repository) {
-        this.repository = repository;
-    }
-
-    public String getAbbreviation() {
-        return abbreviation;
-    }
-
-    public void setAbbreviation(String abbreviation) {
-        this.abbreviation = abbreviation;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public void updateByDTO(LanguageDTO dto) {
+        this.name = dto.getName();
+        this.abbreviation = dto.getAbbreviation();
     }
 }
