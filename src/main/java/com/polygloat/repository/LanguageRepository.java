@@ -11,4 +11,6 @@ public interface LanguageRepository extends JpaRepository<Language, Long> {
     Optional<Language> findByAbbreviationAndRepository(String abbreviation, com.polygloat.model.Repository repository);
 
     Optional<Language> findByNameAndRepository(String name, com.polygloat.model.Repository repository);
+
+    Optional<Language> findByAbbreviationAndRepositoryId(String abbreviation, Long repositoryId);
 }

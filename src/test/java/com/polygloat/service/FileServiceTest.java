@@ -29,9 +29,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class FileServiceTest extends AbstractTransactionalTest {
-
-    private static final Long REPOSITORY_ID = 3L;
-
     @Autowired
     FileService fileService;
 
@@ -163,20 +160,20 @@ class FileServiceTest extends AbstractTransactionalTest {
     @Test
     void moveFile() {
         assertThatThrownBy(() -> {
-            fileService.setFile(1L,
+            fileService.setFile(repository.getId(),
                     PathDTO.fromFullPath("aa.aa"),
                     PathDTO.fromFullPath(Collections.emptyList()));
         }).isInstanceOf(InvalidPathException.class);
 
         assertThatThrownBy(() -> {
-            fileService.setFile(1L,
+            fileService.setFile(repository.getId(),
                     PathDTO.fromFullPath(Collections.emptyList()),
                     PathDTO.fromFullPath("aa.aa"));
         }).isInstanceOf(InvalidPathException.class);
 
 
         assertThatThrownBy(() -> {
-            fileService.setFile(1L,
+            fileService.setFile(repository.getId(),
                     PathDTO.fromFullPath("aa.aa"),
                     PathDTO.fromFullPath("aa.aa.aa"));
         }).isInstanceOf(InvalidPathException.class);

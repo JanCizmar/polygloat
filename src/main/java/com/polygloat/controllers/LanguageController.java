@@ -57,7 +57,7 @@ public class LanguageController extends AbstractController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public void deleteRepository(@PathVariable Long id) {
+    public void deleteLanguage(@PathVariable Long id) {
         languageService.deleteLanguage(id);
     }
 }

@@ -63,6 +63,10 @@ public class LanguageService {
         return languageRepository.findByAbbreviationAndRepository(abbreviation, repository);
     }
 
+    public Optional<Language> findByAbbreviation(String abbreviation, Long repositoryId) {
+        return languageRepository.findByAbbreviationAndRepositoryId(abbreviation, repositoryId);
+    }
+
     public Optional<Language> findByName(String name, Repository repository) {
         return languageRepository.findByNameAndRepository(name, repository);
     }

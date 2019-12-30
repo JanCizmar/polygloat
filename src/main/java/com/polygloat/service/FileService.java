@@ -90,7 +90,6 @@ public class FileService {
 
     }
 
-    //todo validate if newFilePath is not oldFilePath's child
     @Transactional
     public File setFile(Long repositoryId, PathDTO oldFilePath, PathDTO newFilePath) {
         Repository repository = repositoryRepository.findById(repositoryId).orElseThrow(NotFoundException::new);
