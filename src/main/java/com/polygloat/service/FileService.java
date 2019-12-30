@@ -65,7 +65,6 @@ public class FileService {
 
 
     private void validateMove(Repository repository, PathDTO oldFilePath, PathDTO newFilePath) {
-
         if (oldFilePath == null) {
             return;
         }
@@ -131,7 +130,7 @@ public class FileService {
     }
 
     @Transactional
-    public LinkedHashSet<FileDTO> getDataForView(Repository repository, Set<String> abbrs) {
+    public LinkedHashSet<FileDTO> getDataForView(Repository repository, Set<String> abbrs, int offset, int limit, String searchString) {
         CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
         CriteriaQuery<Object> query1 = cb.createQuery();
@@ -140,14 +139,16 @@ public class FileService {
 
         Set<Selection<?>> selection = new LinkedHashSet<>();
 
-        Selection<String> fullPath = cb.concat(file.get("materializedPath"), cb.concat(".", file.get("name")))
-                .alias("fullPath");
+        Selection<String> fullPath = cb.concat(file.get("materializedPath"), cb.concat(".", file.get("name"))).alias("fullPath");
 
         selection.add(fullPath);
 
+        //for isSource property
         selection.add(file.get("source").get("id"));
 
         Set<Predicate> restrictions = new HashSet<>();
+
+        Set<Expression<String>> fullTextFields = new HashSet<>();
 
         for (String abbr : abbrs) {
             Join<Object, Object> translations = source.join("translations", JoinType.LEFT);
@@ -158,7 +159,10 @@ public class FileService {
             //query1.orderBy(cb.asc(translations.get("text")));
             selection.add(language.get("abbreviation"));
             selection.add(translations.get("text"));
+            fullTextFields.add(translations.get("text"));
         }
+
+        fullTextFields.add((Expression<String>) fullPath);
 
         Selection<?>[] paths = selection.toArray(new Selection<?>[0]);
 
@@ -167,9 +171,19 @@ public class FileService {
         restrictions.add(cb.equal(file.get("repository"), repository));
         restrictions.add(cb.isNotNull(file.get("name")));
 
+        Set<Predicate> fullTextRestrictions = new HashSet<>();
+
+        if (searchString != null && !searchString.isEmpty()) {
+            for (Expression<String> fullTextField : fullTextFields) {
+                fullTextRestrictions.add(cb.like(fullTextField, "%" + searchString + "%"));
+            }
+            restrictions.add(cb.or(fullTextRestrictions.toArray(new Predicate[0])));
+        }
+
         query1.where(restrictions.toArray(new Predicate[0]));
 
-        return this.entityManager.createQuery(query1).getResultList()
+        return this.entityManager.createQuery(query1).setFirstResult(offset).setMaxResults(limit)
+                .getResultList()
                 .stream().map(i -> new FileDTO((Object[]) i))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }

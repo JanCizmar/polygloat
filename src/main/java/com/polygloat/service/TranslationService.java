@@ -70,10 +70,10 @@ public class TranslationService {
     }
 
     @Transactional
-    public LinkedHashSet<FileDTO> getViewData(Set<String> langs, Long repositoryId) {
+    public LinkedHashSet<FileDTO> getViewData(Set<String> langs, Long repositoryId, int offset, int limit, String search) {
         Repository repository = repositoryRepository.findById(repositoryId).orElseThrow(NotFoundException::new);
 
-        return fileService.getDataForView(repository, langs);
+        return fileService.getDataForView(repository, langs, offset, limit, search);
 
     }
 

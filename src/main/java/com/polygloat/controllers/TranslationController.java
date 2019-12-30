@@ -47,8 +47,12 @@ public class TranslationController extends AbstractController {
 
     @RequestMapping(value = "/view/{languages}", method = RequestMethod.GET)
     public Set<FileViewDataItem> getViewData(@PathVariable("repositoryId") Long repositoryId,
-                                             @PathVariable("languages") String languages) {
-        return translationService.getViewData(parseLanguages(languages), repositoryId).stream()
+                                             @PathVariable("languages") String languages,
+                                             @RequestParam(name = "limit", defaultValue = "50") int limit,
+                                             @RequestParam(name = "offset", defaultValue = "0") int offset,
+                                             @RequestParam(name = "search", required = false) String search
+    ) {
+        return translationService.getViewData(parseLanguages(languages), repositoryId, offset, limit, search).stream()
                 .map(FileViewDataItem::new)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }

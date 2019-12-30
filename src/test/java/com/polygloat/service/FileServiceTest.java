@@ -92,7 +92,7 @@ class FileServiceTest extends AbstractTransactionalTest {
 
         LinkedHashSet<FileDTO> allInRepository = fileService.getDataForView(
                 repository,
-                new HashSet<>(Arrays.asList("en", "de")));
+                new HashSet<>(Arrays.asList("en", "de")), 0, 150, null);
         assertThat(allInRepository).isNotEmpty();
     }
 

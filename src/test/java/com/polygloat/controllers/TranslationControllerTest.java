@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
@@ -36,9 +37,52 @@ class TranslationControllerTest extends AbstractControllerTest {
 
         Repository repository = repositoryService.findByName("app").orElseThrow(NotFoundException::new);
 
-        MvcResult mvcResult = mvc.perform(
-                get("/api/public/repository/" + repository.getId().toString() + "/translations/view/en,de")
-                        .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn();
+        MvcResult mvcResult = performGetDataForView(repository.getId(), "").andExpect(status().isOk()).andReturn();
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        List<Map<String, Object>> list = mapper.readValue(mvcResult.getResponse().getContentAsString(), List.class);
+
+        Map<String, Object> first = list.get(0);
+        assertThat(first).containsKeys("fullPath", "translations", "source");
+    }
+
+    @Test
+    @Rollback
+    void getViewDataSearch() throws Exception {
+        dbPopulator.populate("app");
+
+        Repository repository = repositoryService.findByName("app").orElseThrow(NotFoundException::new);
+
+        String searchString = "This";
+
+        MvcResult mvcResult = performGetDataForView(repository.getId(), "?search=" + searchString).andExpect(status().isOk()).andReturn();
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        List<Map<String, Object>> list = mapper.readValue(mvcResult.getResponse().getContentAsString(), List.class);
+
+        Map<String, Object> first = list.get(0);
+        assertThat(first).containsKeys("fullPath", "translations", "source");
+
+        assertSearch(list, searchString);
+    }
+
+    private void assertSearch(List<Map<String, Object>> list, String searchString) {
+        for (Map<String, Object> map : list) {
+            assertThat(asJsonString(map)).contains(searchString);
+        }
+    }
+
+
+    @Test
+    @Rollback
+    void getViewDataLimitOffset() throws Exception {
+        dbPopulator.populate("app");
+
+        Repository repository = repositoryService.findByName("app").orElseThrow(NotFoundException::new);
+
+        MvcResult mvcResult = performGetDataForView(repository.getId(), "").andExpect(status().isOk()).andReturn();
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -113,4 +157,11 @@ class TranslationControllerTest extends AbstractControllerTest {
                 null,
                 "This_is_another_translation_in_news_folder");
     }
+
+    private ResultActions performGetDataForView(Long repositoryId, String queryString) throws Exception {
+        return mvc.perform(
+                get("/api/public/repository/" + repositoryId + "/translations/view/en,de" + queryString)
+                        .contentType(MediaType.APPLICATION_JSON));
+    }
+
 }
