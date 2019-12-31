@@ -179,4 +179,42 @@
                                  initiallyDeferred="false" referencedColumnNames="id" referencedTableName="user_account"
                                  validate="true"/>
     </changeSet>
+    <changeSet author="jenik (generated)" id="1577725600684-4">
+        <addColumn tableName="language">
+            <column name="deleted" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jenik (generated)" id="1577725600684-5">
+        <addColumn tableName="repository">
+            <column name="deleted" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jenik (generated)" id="1577725600684-6">
+        <addUniqueConstraint columnNames="repository_id, abbreviation" constraintName="UK81px5yg1ucqsijlxk3pnncfpb"
+                             tableName="language"/>
+    </changeSet>
+    <changeSet author="jenik (generated)" id="1577725600684-7">
+        <addUniqueConstraint columnNames="name, created_by_id" constraintName="UKecviceu2utnk423qkbx2ejony"
+                             tableName="repository"/>
+    </changeSet>
+    <changeSet author="jenik (generated)" id="1577725600684-8">
+        <addUniqueConstraint columnNames="repository_id, name" constraintName="UKfxvom47gi4qes6po1dsmhj25b"
+                             tableName="language"/>
+    </changeSet>
+    <changeSet author="jenik (generated)" id="1577725600684-9">
+        <addUniqueConstraint columnNames="source_id, language_id" constraintName="UKkyxcxq3siw777k16bvlhqydmj"
+                             tableName="translation"/>
+    </changeSet>
+    <changeSet author="jenik (generated)" id="1577725600684-10">
+        <dropSequence sequenceName="hibernate_sequence"/>
+    </changeSet>
+    <changeSet author="jenik (generated)" id="1577725600684-1">
+        <addUniqueConstraint columnNames="root_folder_id" constraintName="UKbj6fyvj3cst3m9m38llqtrao"
+                             tableName="repository"/>
+    </changeSet>
+
 </databaseChangeLog>

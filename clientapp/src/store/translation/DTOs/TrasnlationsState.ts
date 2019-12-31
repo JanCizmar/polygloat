@@ -6,7 +6,7 @@ export class TranslationsState extends AbstractState {
     translationsLoading: boolean = false;
     translationsLoaded: boolean = false;
     translationLoadingError: string = null;
-    languages: string[] = [];
+    languages: string[] = ['en', 'de'];
     editingTranslation: Translation = null;
     editLoading: boolean = false;
     editingSaved: boolean = false;

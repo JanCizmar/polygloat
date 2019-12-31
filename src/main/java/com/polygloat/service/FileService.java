@@ -6,6 +6,7 @@ import com.polygloat.Exceptions.FileAlreadyExists;
 import com.polygloat.Exceptions.InvalidPathException;
 import com.polygloat.Exceptions.NotFoundException;
 import com.polygloat.model.File;
+import com.polygloat.model.File_;
 import com.polygloat.model.Repository;
 import com.polygloat.repository.FileRepository;
 import com.polygloat.repository.RepositoryRepository;
@@ -168,14 +169,14 @@ public class FileService {
 
         query1.multiselect(paths);
         query1.orderBy(cb.asc((Expression<?>) fullPath));
-        restrictions.add(cb.equal(file.get("repository"), repository));
-        restrictions.add(cb.isNotNull(file.get("name")));
+        restrictions.add(cb.equal(file.get(File_.repository), repository));
+        restrictions.add(cb.isNotNull(file.get(File_.name)));
 
         Set<Predicate> fullTextRestrictions = new HashSet<>();
 
         if (searchString != null && !searchString.isEmpty()) {
             for (Expression<String> fullTextField : fullTextFields) {
-                fullTextRestrictions.add(cb.like(fullTextField, "%" + searchString + "%"));
+                fullTextRestrictions.add(cb.like(cb.upper(fullTextField), "%" + searchString.toUpperCase() + "%"));
             }
             restrictions.add(cb.or(fullTextRestrictions.toArray(new Predicate[0])));
         }
@@ -188,6 +189,7 @@ public class FileService {
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
+    @Transactional
     public void deleteFile(File fileEntity) {
         CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
         CriteriaDelete<File> delete = cb.createCriteriaDelete(File.class);
@@ -226,6 +228,7 @@ public class FileService {
         this.entityManager.clear();
     }
 
+    @Transactional
     public void deleteFile(Long repositoryId, PathDTO sourcePath) {
         Repository repository = repositoryRepository.findById(repositoryId).orElseThrow(NotFoundException::new);
         this.deleteFile(this.evaluatePath(repository, sourcePath).orElseThrow(NotFoundException::new));

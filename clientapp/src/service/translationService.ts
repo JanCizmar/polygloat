@@ -13,16 +13,17 @@ const messaging = container.resolve(messageService);
 @singleton()
 export class translationService {
 
-    public getTranslations = async (...langs: string[]) =>
-        (await http.fetch(`${SERVER_URL}api/public/repository/${REPOSITORY_ID}/translations/view/${langs.join(',')}`)).json();
+    public getTranslations = async (search, langs: string[]) =>
+        (await http.fetch(`${SERVER_URL}api/public/repository/${REPOSITORY_ID}/translations/view/${langs.join(',')}` +
+            `?search=${search}`)).json();
 
     async setTranslations(translationData: Translation): Promise<any> {
         await http.fetch(`${SERVER_URL}api/public/repository/${REPOSITORY_ID}/translations`, {
             body: JSON.stringify({
                 path: translationData.pathString,
                 translations: translationData.translations,
-                oldSourceName: translationData.oldName,
-                newSourceName: translationData.name
+                oldSourceText: translationData.oldName,
+                newSourceText: translationData.name
             }),
             method: 'POST',
             headers: {
@@ -33,8 +34,8 @@ export class translationService {
         return translationData;
     }
 
-    async deleteSource(t: Translation): Promise<any> {
-        await http.fetch(`${SERVER_URL}api/public/repository/${REPOSITORY_ID}/translations/${t.fullPathString}`, {
+    async deleteFile(t: Translation): Promise<any> {
+        await http.fetch(`${SERVER_URL}api/public/repository/${REPOSITORY_ID}/file/${t.fullPathString}`, {
             method: 'DELETE'
         });
         messaging.success('Translation deleted');

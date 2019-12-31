@@ -33,9 +33,9 @@ class TranslationControllerTest extends AbstractControllerTest {
     @Test
     @Rollback
     void getViewData() throws Exception {
-        dbPopulator.populate("app");
+        dbPopulator.populate("app1");
 
-        Repository repository = repositoryService.findByName("app").orElseThrow(NotFoundException::new);
+        Repository repository = repositoryService.findByName("app1").orElseThrow(NotFoundException::new);
 
         MvcResult mvcResult = performGetDataForView(repository.getId(), "").andExpect(status().isOk()).andReturn();
 
@@ -50,9 +50,9 @@ class TranslationControllerTest extends AbstractControllerTest {
     @Test
     @Rollback
     void getViewDataSearch() throws Exception {
-        dbPopulator.populate("app");
+        dbPopulator.populate("app2");
 
-        Repository repository = repositoryService.findByName("app").orElseThrow(NotFoundException::new);
+        Repository repository = repositoryService.findByName("app2").orElseThrow(NotFoundException::new);
 
         String searchString = "This";
 
@@ -78,9 +78,9 @@ class TranslationControllerTest extends AbstractControllerTest {
     @Test
     @Rollback
     void getViewDataLimitOffset() throws Exception {
-        dbPopulator.populate("app");
+        dbPopulator.populate("app3");
 
-        Repository repository = repositoryService.findByName("app").orElseThrow(NotFoundException::new);
+        Repository repository = repositoryService.findByName("app3").orElseThrow(NotFoundException::new);
 
         MvcResult mvcResult = performGetDataForView(repository.getId(), "").andExpect(status().isOk()).andReturn();
 
@@ -110,10 +110,11 @@ class TranslationControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    @Rollback
     void getSourceTranslations() throws Exception {
-        dbPopulator.populate("app");
+        dbPopulator.populate("app4");
 
-        Repository repository = repositoryService.findByName("app").orElseThrow(NotFoundException::new);
+        Repository repository = repositoryService.findByName("app4").orElseThrow(NotFoundException::new);
 
         MvcResult mvcResult = mvc.perform(
                 get("/api/public/repository/" + repository.getId().toString() +
@@ -129,7 +130,7 @@ class TranslationControllerTest extends AbstractControllerTest {
     @Test
     @Rollback
     void setTranslations() throws Exception {
-        File app = dbPopulator.createBase("app");
+        File app = dbPopulator.createBase("app5");
 
         SourceTranslationsDTO sourceTranslationsDTO = getSourceTranslationsDTO();
 
@@ -144,6 +145,42 @@ class TranslationControllerTest extends AbstractControllerTest {
         assertThat(file.getSource()).isNotNull();
 
         commitTransaction();
+    }
+
+    @Test
+    @Rollback
+    void setTranslationsModify() throws Exception {
+        File app = dbPopulator.createBase("app6");
+
+        SourceTranslationsDTO sourceTranslationsDTO = getSourceTranslationsDTO();
+
+        //create old tranlation
+        translationService.setTranslations(app.getRepository().getId(), sourceTranslationsDTO);
+
+        commitTransaction();
+
+        //modify source text
+        sourceTranslationsDTO.setOldSourceText(sourceTranslationsDTO.getNewSourceText());
+        sourceTranslationsDTO.setNewSourceText("newSourceText");
+
+        MvcResult mvcResult = mvc.perform(
+                post("/api/public/repository/" + app.getRepository().getId() + "/translations")
+                        .contentType(MediaType.APPLICATION_JSON).content(asJsonString(sourceTranslationsDTO)))
+                .andExpect(status().isOk()).andReturn();
+
+
+        commitTransaction();
+
+        //evaluate new path
+        File file = fileService.evaluatePath(app.getRepository(), sourceTranslationsDTO.getNewSourcePath()).orElse(null);
+
+        //should be present
+        assertThat(file).isNotNull();
+        assertThat(file.getSource()).isNotNull();
+
+        //old path should not be present
+        file = fileService.evaluatePath(app.getRepository(), sourceTranslationsDTO.getOldSourcePath()).orElse(null);
+        assertThat(file).isNull();
     }
 
     private SourceTranslationsDTO getSourceTranslationsDTO() {

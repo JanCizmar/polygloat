@@ -14,7 +14,7 @@ import java.util.Set;
         @UniqueConstraint(columnNames = {"repository_id", "abbreviation"})
 
 })
-@Where(clause = "deleted = 0")
+@Where(clause = "deleted = 'false'")
 public class Language extends AuditModel {
 
     @Id

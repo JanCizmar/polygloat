@@ -16,7 +16,7 @@ import java.util.Set;
         @UniqueConstraint(columnNames = {"name", "created_by_id"}),
         @UniqueConstraint(columnNames = {"root_folder_id"}),
 })
-@Where(clause = "deleted = 0")
+@Where(clause = "deleted = 'false'")
 public class Repository {
 
     @Id

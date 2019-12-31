@@ -68,7 +68,7 @@ public class SourceService {
         File file = source.getFile();
 
         //new source info is always set, so setting the new name
-        file.setName(data.getNewSourceName());
+        file.setName(data.getNewSourceText());
 
         entityManager.persist(file);
         sourceRepository.save(source);

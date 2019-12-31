@@ -24,7 +24,7 @@ interface TranslationProps {
     indentCount: number;
 }
 
-function Translation(props: TranslationProps) {
+function Source(props: TranslationProps) {
     const [translation, setTranslation] = useState(props.translation.clone);
 
     const useStyles = makeStyles((theme: Theme) => ({
@@ -181,4 +181,4 @@ function Translation(props: TranslationProps) {
     );
 };
 
-export default connect((state: AppState) => ({translationsState: state.translations}))(Translation);
+export default connect((state: AppState) => ({translationsState: state.translations}))(Source);

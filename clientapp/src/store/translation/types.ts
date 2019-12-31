@@ -42,7 +42,11 @@ export class Folder {
      * returns path with folder name as last item
      */
     get fullPath() {
+        if (this.isRoot()) {
+            return [];
+        }
         return [...this.path, this.name];
+
     }
 
     get fullPathString() {
@@ -68,5 +72,9 @@ export class Folder {
         }
 
         return translation;
+    }
+
+    isRoot() {
+        return this.path === null;
     }
 }

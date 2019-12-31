@@ -2,7 +2,7 @@ import {Folder as FolderType} from '../../store/translation/types';
 import * as React from 'react';
 import {useState} from 'react';
 import TableRow from '@material-ui/core/TableRow';
-import Translation from './Translation';
+import Source from './Source';
 import {makeStyles, Theme} from '@material-ui/core';
 import {Indents} from '../TreeTable/Indetnts';
 import {TableCell} from '../TreeTable/TableCell';
@@ -79,8 +79,8 @@ export const Folder = connect((state: AppState) => ({translations: state.transla
                 folder={c as FolderType}
             />
             :
-            <Translation indentCount={props.indentCount + 1}
-                         translation={c} key={c.name}/>);
+            <Source indentCount={props.indentCount + 1}
+                    translation={c} key={c.name}/>);
 
     return (
         <React.Fragment>

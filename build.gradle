@@ -97,6 +97,8 @@ dependencies {
     implementation 'com.github.javafaker:javafaker:1.0.1'
     compileOnly 'org.projectlombok:lombok:1.18.10'
     annotationProcessor 'org.projectlombok:lombok:1.18.10'
+    compileOnly 'org.hibernate:hibernate-jpamodelgen'
+    annotationProcessor('org.hibernate:hibernate-jpamodelgen')
 }
 
 task unpack(type: Copy) {

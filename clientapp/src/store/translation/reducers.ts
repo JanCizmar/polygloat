@@ -15,8 +15,7 @@ export function translationReducer(
             return state.modify({translationsLoading: true});
         case Actions.loadTranslations.fulfilledType:
             return state.modify({
-                languages: Object.keys(action.payload),
-                translations: DataTransformation.translationsToArray(action.payload),
+                translations: DataTransformation.toFolderStructure(action.payload),
                 translationsLoaded: true,
                 translationsLoading: false,
                 translationLoadingError: null,
