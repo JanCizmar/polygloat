@@ -3,7 +3,7 @@ package com.polygloat.model;
 import javax.persistence.*;
 
 @Entity
-public class Permission {
+public class Permission extends AuditModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;

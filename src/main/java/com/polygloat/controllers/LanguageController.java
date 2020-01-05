@@ -1,8 +1,8 @@
 package com.polygloat.controllers;
 
-import com.polygloat.DTOs.request.LanguageDTO;
-import com.polygloat.DTOs.request.validators.LanguageValidator;
-import com.polygloat.Exceptions.NotFoundException;
+import com.polygloat.dtos.request.LanguageDTO;
+import com.polygloat.dtos.request.validators.LanguageValidator;
+import com.polygloat.exceptions.NotFoundException;
 import com.polygloat.model.Language;
 import com.polygloat.model.Repository;
 import com.polygloat.service.LanguageService;
@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(origins = "*")
-@RequestMapping("/api/public/repository/{repositoryId}/languages")
-public class LanguageController extends AbstractController {
+@RequestMapping("/api/repository/{repositoryId}/languages")
+public class LanguageController implements IController {
     private LanguageService languageService;
     private RepositoryService repositoryService;
     private LanguageValidator languageValidator;
@@ -32,7 +32,7 @@ public class LanguageController extends AbstractController {
         this.languageValidator = languageValidator;
     }
 
-    @RequestMapping(value = "", method = RequestMethod.POST)
+    @PostMapping(value = "")
     public LanguageDTO createLanguage(@PathVariable("repositoryId") Long repositoryId,
                                       @RequestBody @Valid LanguageDTO dto) {
         Repository repository = repositoryService.findById(repositoryId).orElseThrow(NotFoundException::new);
@@ -42,7 +42,7 @@ public class LanguageController extends AbstractController {
         return LanguageDTO.fromEntity(language);
     }
 
-    @RequestMapping(value = "/edit", method = RequestMethod.POST)
+    @PostMapping(value = "/edit")
     public LanguageDTO editLanguage(@RequestBody @Valid LanguageDTO dto) {
 
         languageValidator.validateEdit(dto);
@@ -50,13 +50,13 @@ public class LanguageController extends AbstractController {
         return LanguageDTO.fromEntity(languageService.editLanguage(dto));
     }
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
+    @GetMapping(value = "")
     public Set<LanguageDTO> getAll() {
         return languageService.findAll().stream().map(LanguageDTO::fromEntity)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{id}")
     public void deleteLanguage(@PathVariable Long id) {
         languageService.deleteLanguage(id);
     }

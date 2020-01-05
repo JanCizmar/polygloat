@@ -1,7 +1,7 @@
 package com.polygloat.unit;
 
-import com.polygloat.DTOs.PathDTO;
-import com.polygloat.Exceptions.InvalidPathException;
+import com.polygloat.dtos.PathDTO;
+import com.polygloat.exceptions.InvalidPathException;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -35,14 +35,18 @@ public class PathDTOTest {
     void testFromNamePath() {
         LinkedList<String> testList = getTestList();
         String name = testList.removeLast();
-        PathDTO.fromPathAndName(String.join(".", testList), name);
+        PathDTO pathDTO = PathDTO.fromPathAndName(String.join(".", testList), name);
+        assertThat(pathDTO.getName()).isEqualTo(name);
+        assertThat(pathDTO.getFullPath()).isEqualTo(getTestList());
     }
 
     @Test
     void testFromNamePathList() {
         LinkedList<String> testList = getTestList();
         String name = testList.removeLast();
-        PathDTO.fromPathAndName(testList, name);
+        PathDTO pathDTO = PathDTO.fromPathAndName(testList, name);
+        assertThat(pathDTO.getName()).isEqualTo(name);
+        assertThat(pathDTO.getFullPath()).isEqualTo(getTestList());
     }
 
 

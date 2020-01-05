@@ -1,13 +1,8 @@
 import {Folder, Translation} from '../store/translation/types';
-
-class FileDTO {
-    fullPath: String;
-    translations: {};
-    source: boolean;
-}
+import {FileResponse} from '../service/response.types';
 
 export class DataTransformation {
-    public static toFolderStructure(files: FileDTO[]): Folder {
+    public static toFolderStructure(files: FileResponse[]): Folder {
         const root: Folder = new Folder(null, null);
         let parent = root;
         for (const file of files) {
@@ -16,7 +11,7 @@ export class DataTransformation {
         return root;
     }
 
-    private static addToRoot(root: Folder, file: FileDTO) {
+    private static addToRoot(root: Folder, file: FileResponse) {
         let fullPath = file.fullPath.split('.');
         if (file.source) {
             let parent: Folder = root;

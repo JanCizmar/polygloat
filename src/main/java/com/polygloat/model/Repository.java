@@ -17,7 +17,7 @@ import java.util.Set;
         @UniqueConstraint(columnNames = {"root_folder_id"}),
 })
 @Where(clause = "deleted = 'false'")
-public class Repository {
+public class Repository extends AuditModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

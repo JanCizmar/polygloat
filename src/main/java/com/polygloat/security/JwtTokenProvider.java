@@ -1,6 +1,8 @@
 package com.polygloat.security;
 
+import com.polygloat.exceptions.NotFoundException;
 import com.polygloat.model.UserAccount;
+import com.polygloat.service.UserAccountService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -23,17 +25,31 @@ import java.util.List;
 @Component
 public class JwtTokenProvider {
 
-    @Autowired
     private JwtProperties properties;
+    private UserAccountService userAccountService;
 
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
 
+    @Autowired
+    public JwtTokenProvider(JwtProperties properties, UserAccountService userAccountService) {
+        this.properties = properties;
+        this.userAccountService = userAccountService;
+    }
+
     public JwtToken generateToken(Authentication authentication) {
         LdapUserDetailsImpl userPrincipal = (LdapUserDetailsImpl) authentication.getPrincipal();
+
+        UserAccount userAccountEntity = userAccountService.getByUserName(userPrincipal.getUsername()).orElseGet(() -> {
+            UserAccount userAccount = new UserAccount();
+            userAccount.setUsername(userPrincipal.getUsername());
+            userAccountService.createUser(userAccount);
+            return userAccount;
+        });
+
         Date now = new Date();
 
         return new JwtToken(Jwts.builder()
-                .setSubject(userPrincipal.getUsername())
+                .setSubject(userAccountEntity.getId().toString())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(now.getTime() + properties.getJwtExpirationInMs()))
                 .signWith(properties.getKey())
@@ -59,11 +75,11 @@ public class JwtTokenProvider {
     }
 
     public Authentication getAuthentication(JwtToken token) {
-        UserAccount userDetails = new UserAccount(token.getUsername());
+        UserAccount userDetails = userAccountService.get(token.getId()).orElseThrow(NotFoundException::new);
 
-        List<GrantedAuthority> authorities = new LinkedList();
+        List<GrantedAuthority> authorities = new LinkedList<>();
 
-        GrantedAuthority grantedAuthority = (GrantedAuthority) () -> "user";
+        GrantedAuthority grantedAuthority = () -> "user";
 
         authorities.add(grantedAuthority);
 

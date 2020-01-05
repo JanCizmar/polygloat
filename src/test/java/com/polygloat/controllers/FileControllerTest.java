@@ -1,8 +1,8 @@
 package com.polygloat.controllers;
 
-import com.polygloat.DTOs.PathDTO;
-import com.polygloat.DTOs.request.SetFileRequestDTO;
-import com.polygloat.DTOs.request.SourceTranslationsDTO;
+import com.polygloat.dtos.PathDTO;
+import com.polygloat.dtos.request.SetFileRequestDTO;
+import com.polygloat.dtos.request.SourceTranslationsDTO;
 import com.polygloat.model.File;
 import com.polygloat.model.Source;
 import org.junit.jupiter.api.Test;
@@ -16,16 +16,16 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.Optional;
 
+import static com.polygloat.controllers.LoggedRequestFactory.loggedDelete;
+import static com.polygloat.controllers.LoggedRequestFactory.loggedPost;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-class FileControllerTest extends AbstractControllerTest {
+class FileControllerTest extends LoggedControllerTest {
 
     private SourceTranslationsDTO getSourceTranslationsDTO() {
         HashMap<String, String> translations = new HashMap<>();
@@ -41,7 +41,7 @@ class FileControllerTest extends AbstractControllerTest {
 
     @Test
     void deleteFile() throws Exception {
-        File root = dbPopulator.createBase("app");
+        File root = dbPopulator.createBase(generateUniqueString());
 
         SourceTranslationsDTO sourceTranslationsDTO = getSourceTranslationsDTO();
         translationService.setTranslations(root.getRepository().getId(), sourceTranslationsDTO);
@@ -58,7 +58,7 @@ class FileControllerTest extends AbstractControllerTest {
         Long sourceId = source.getId();
 
         MvcResult mvcResult = mvc.perform(
-                delete("/api/public/repository/" + root.getRepository().getId() + "/file/" +
+                loggedDelete("/api/repository/" + root.getRepository().getId() + "/file/" +
                         path.getFullPathString()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
 
@@ -73,20 +73,20 @@ class FileControllerTest extends AbstractControllerTest {
 
     @Test
     void setFile() throws Exception {
-        File root = dbPopulator.createBase("app");
+        File root = dbPopulator.createBase(generateUniqueString());
 
         //test move
         fileService.getOrCreatePath(root.getRepository(), PathDTO.fromFullPath("aa.aa.aa"));
         fileService.getOrCreatePath(root.getRepository(), PathDTO.fromFullPath("aa.bb.cc"));
 
         MvcResult mvcResult = mvc.perform(
-                post("/api/public/repository/" + root.getRepository().getId() + "/file")
+                loggedPost("/api/repository/" + root.getRepository().getId() + "/file")
                         .contentType(MediaType.APPLICATION_JSON).content(
                         asJsonString(new SetFileRequestDTO("aa.aa.aa", "aa.bb.cc"))))
                 .andExpect(status().isBadRequest()).andReturn();
 
         mvcResult = mvc.perform(
-                post("/api/public/repository/" + root.getRepository().getId() + "/file")
+                loggedPost("/api/repository/" + root.getRepository().getId() + "/file")
                         .contentType(MediaType.APPLICATION_JSON).content(
                         asJsonString(new SetFileRequestDTO("aa.aa.aa", "aa.bb.cc.aa"))))
                 .andExpect(status().isOk()).andReturn();
@@ -96,13 +96,13 @@ class FileControllerTest extends AbstractControllerTest {
         assertThat(file).isPresent();
 
         mvcResult = mvc.perform(
-                post("/api/public/repository/" + root.getRepository().getId() + "/file")
+                loggedPost("/api/repository/" + root.getRepository().getId() + "/file")
                         .contentType(MediaType.APPLICATION_JSON).content(
                         asJsonString(new SetFileRequestDTO("aa.aa.aa", "aa.aa.aa.aa"))))
                 .andExpect(status().isBadRequest()).andReturn();
 
         mvcResult = mvc.perform(
-                post("/api/public/repository/" + root.getRepository().getId() + "/file")
+                loggedPost("/api/repository/" + root.getRepository().getId() + "/file")
                         .contentType(MediaType.APPLICATION_JSON).content(
                         asJsonString(new SetFileRequestDTO("aa.aa.aa", "aa.ee"))))
                 .andExpect(status().isOk()).andReturn();

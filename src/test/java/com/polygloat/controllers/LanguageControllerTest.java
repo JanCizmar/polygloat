@@ -1,7 +1,7 @@
 package com.polygloat.controllers;
 
-import com.polygloat.DTOs.request.LanguageDTO;
-import com.polygloat.Exceptions.NotFoundException;
+import com.polygloat.dtos.request.LanguageDTO;
+import com.polygloat.exceptions.NotFoundException;
 import com.polygloat.model.File;
 import com.polygloat.model.Language;
 import org.junit.jupiter.api.Test;
@@ -17,15 +17,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.polygloat.controllers.LoggedRequestFactory.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @Transactional
-class LanguageControllerTest extends AbstractControllerTest {
+class LanguageControllerTest extends LoggedControllerTest implements ITest {
 
     private final LanguageDTO languageDTO = new LanguageDTO("en", "en");
     private final LanguageDTO languageDTOBlank = new LanguageDTO(null, "");
@@ -35,7 +35,7 @@ class LanguageControllerTest extends AbstractControllerTest {
     @Test
     @Rollback
     void createLanguage() throws Exception {
-        File test = dbPopulator.createBase("test");
+        File test = dbPopulator.createBase(generateUniqueString());
         createLanguageTestValidation(test.getRepository().getId());
         createLanguageCorrectRequest(test.getRepository().getId());
     }
@@ -43,7 +43,7 @@ class LanguageControllerTest extends AbstractControllerTest {
     @Test
     @Rollback
     void editLanguage() throws Exception {
-        File test = dbPopulator.createBase("test");
+        File test = dbPopulator.createBase(generateUniqueString());
         Language en = test.getRepository().getLanguage("en").orElseThrow(NotFoundException::new);
         LanguageDTO languageDTO = LanguageDTO.fromEntity(en);
 
@@ -64,7 +64,7 @@ class LanguageControllerTest extends AbstractControllerTest {
     @Test
     @Rollback
     void findAllLanguages() throws Exception {
-        File test = dbPopulator.createBase("test");
+        File test = dbPopulator.createBase(generateUniqueString());
         MvcResult mvcResult = performFindAll(test.getRepository().getId()).andExpect(status().isOk()).andReturn();
         assertThat(decodeJson(mvcResult.getResponse().getContentAsString(), Set.class)).hasSize(2);
     }
@@ -72,7 +72,7 @@ class LanguageControllerTest extends AbstractControllerTest {
     @Test
     @Rollback
     void deleteLanguage() throws Exception {
-        File test = dbPopulator.createBase("test");
+        File test = dbPopulator.createBase(generateUniqueString());
         Language en = test.getRepository().getLanguage("en").orElseThrow(NotFoundException::new);
 
         performDelete(test.getRepository().getId(), en.getId()).andExpect(status().isOk());
@@ -114,27 +114,27 @@ class LanguageControllerTest extends AbstractControllerTest {
 
     private ResultActions performCreate(Long repositoryId, LanguageDTO content) throws Exception {
         return mvc.perform(
-                post("/api/public/repository/" + repositoryId + "/languages")
+                loggedPost("/api/repository/" + repositoryId + "/languages")
                         .contentType(MediaType.APPLICATION_JSON).content(
                         asJsonString(content)));
     }
 
     private ResultActions performEdit(Long repositoryId, LanguageDTO content) throws Exception {
         return mvc.perform(
-                post("/api/public/repository/" + repositoryId + "/languages/edit")
+                loggedPost("/api/repository/" + repositoryId + "/languages/edit")
                         .contentType(MediaType.APPLICATION_JSON).content(
                         asJsonString(content)));
     }
 
     private ResultActions performDelete(Long repositoryId, Long languageId) throws Exception {
         return mvc.perform(
-                delete("/api/public/repository/" + repositoryId + "/languages/" + languageId)
+                loggedDelete("/api/repository/" + repositoryId + "/languages/" + languageId)
                         .contentType(MediaType.APPLICATION_JSON));
     }
 
     private ResultActions performFindAll(Long repositoryId) throws Exception {
         return mvc.perform(
-                get("/api/public/repository/" + repositoryId + "/languages")
+                loggedGet("/api/repository/" + repositoryId + "/languages")
                         .contentType(MediaType.APPLICATION_JSON));
     }
 

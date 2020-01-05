@@ -1,8 +1,12 @@
 package com.polygloat.controllers;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.polygloat.DTOs.request.SourceTranslationsDTO;
-import com.polygloat.Exceptions.NotFoundException;
+import com.polygloat.dtos.request.SourceTranslationsDTO;
+import com.polygloat.dtos.response.ViewDataResponse;
+import com.polygloat.dtos.response.translations_view.FileViewDataItem;
+import com.polygloat.dtos.response.translations_view.ResponseParams;
+import com.polygloat.exceptions.NotFoundException;
 import com.polygloat.model.File;
 import com.polygloat.model.Repository;
 import org.junit.jupiter.api.Test;
@@ -16,80 +20,100 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Map;
 
+import static com.polygloat.controllers.LoggedRequestFactory.loggedGet;
+import static com.polygloat.controllers.LoggedRequestFactory.loggedPost;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-class TranslationControllerTest extends AbstractControllerTest {
-
-    @Test
-    @Rollback
-    void getViewData() throws Exception {
-        dbPopulator.populate("app1");
-
-        Repository repository = repositoryService.findByName("app1").orElseThrow(NotFoundException::new);
-
-        MvcResult mvcResult = performGetDataForView(repository.getId(), "").andExpect(status().isOk()).andReturn();
-
-        ObjectMapper mapper = new ObjectMapper();
-
-        List<Map<String, Object>> list = mapper.readValue(mvcResult.getResponse().getContentAsString(), List.class);
-
-        Map<String, Object> first = list.get(0);
-        assertThat(first).containsKeys("fullPath", "translations", "source");
-    }
-
+class TranslationControllerTest extends LoggedControllerTest {
     @Test
     @Rollback
     void getViewDataSearch() throws Exception {
         dbPopulator.populate("app2");
 
-        Repository repository = repositoryService.findByName("app2").orElseThrow(NotFoundException::new);
+        Repository repository = repositoryService.findByName("app2", userAccount).orElseThrow(NotFoundException::new);
 
         String searchString = "This";
 
-        MvcResult mvcResult = performGetDataForView(repository.getId(), "?search=" + searchString).andExpect(status().isOk()).andReturn();
+        ViewDataResponse<LinkedHashSet<FileViewDataItem>, ResponseParams> response = performValidViewRequest(repository, "?search=" + searchString);
 
-        ObjectMapper mapper = new ObjectMapper();
-
-        List<Map<String, Object>> list = mapper.readValue(mvcResult.getResponse().getContentAsString(), List.class);
-
-        Map<String, Object> first = list.get(0);
-        assertThat(first).containsKeys("fullPath", "translations", "source");
-
-        assertSearch(list, searchString);
+        assertSearch(response, searchString);
     }
-
-    private void assertSearch(List<Map<String, Object>> list, String searchString) {
-        for (Map<String, Object> map : list) {
-            assertThat(asJsonString(map)).contains(searchString);
-        }
-    }
-
 
     @Test
     @Rollback
-    void getViewDataLimitOffset() throws Exception {
-        dbPopulator.populate("app3");
+    void getViewDataQueryLanguages() throws Exception {
+        Repository repository = dbPopulator.populate(generateUniqueString()).getRepository();
 
-        Repository repository = repositoryService.findByName("app3").orElseThrow(NotFoundException::new);
+        ViewDataResponse<LinkedHashSet<FileViewDataItem>, ResponseParams> response = performValidViewRequest(repository, "?languages=en");
 
-        MvcResult mvcResult = performGetDataForView(repository.getId(), "").andExpect(status().isOk()).andReturn();
+        assertThat(response.getData().size()).isGreaterThan(10);
+
+        for (FileViewDataItem item : response.getData()) {
+            assertThat(item.getTranslations()).doesNotContainKeys("de");
+        }
+    }
+
+    private ViewDataResponse<LinkedHashSet<FileViewDataItem>, ResponseParams> performValidViewRequest(Repository repository, String queryString) throws Exception {
+        MvcResult mvcResult = performGetDataForView(repository.getId(), queryString).andExpect(status().isOk()).andReturn();
 
         ObjectMapper mapper = new ObjectMapper();
 
-        List<Map<String, Object>> list = mapper.readValue(mvcResult.getResponse().getContentAsString(), List.class);
+        return mapper.readValue(mvcResult.getResponse().getContentAsString(),
+                new TypeReference<ViewDataResponse<LinkedHashSet<FileViewDataItem>, ResponseParams>>() {
+                });
+    }
 
-        Map<String, Object> first = list.get(0);
-        assertThat(first).containsKeys("fullPath", "translations", "source");
+    @Test
+    @Rollback
+    void getViewDataQueryPagination() throws Exception {
+        Repository repository = dbPopulator.populate(generateUniqueString()).getRepository();
+
+        int limit = 5;
+        int allCount = 15;
+
+        ViewDataResponse<LinkedHashSet<FileViewDataItem>, ResponseParams> response = performValidViewRequest(repository, String.format("?limit=%d", limit));
+
+        assertThat(response.getData().size()).isEqualTo(limit);
+        assertThat(response.getPaginationMeta().getAllCount()).isEqualTo(allCount);
+        assertThat(response.getPaginationMeta().getOffset()).isEqualTo(0);
+
+
+        int offset = 3;
+
+        ViewDataResponse<LinkedHashSet<FileViewDataItem>, ResponseParams> responseOffset = performValidViewRequest(repository, String.format("?limit=%d&offset=%d", limit, offset));
+
+        assertThat(responseOffset.getData().size()).isEqualTo(limit);
+        assertThat(responseOffset.getPaginationMeta().getOffset()).isEqualTo(offset);
+
+        response.getData().stream().limit(offset).forEach(i -> assertThat(responseOffset.getData()).doesNotContain(i));
+
+        response.getData().stream().skip(offset).forEach(i -> {
+            assertThat(responseOffset.getData()).contains(i);
+        });
+    }
+
+    @Test
+    @Rollback
+    void getViewDataMetadata() throws Exception {
+        Repository repository = dbPopulator.populate(generateUniqueString()).getRepository();
+        int limit = 5;
+        ViewDataResponse<LinkedHashSet<FileViewDataItem>, ResponseParams> response = performValidViewRequest(repository, String.format("?limit=%d", limit));
+
+        assertThat(response.getParams().getLanguages()).contains("en", "de");
+    }
+
+    private void assertSearch(ViewDataResponse<LinkedHashSet<FileViewDataItem>, ResponseParams> response, String searchString) {
+        for (FileViewDataItem item : response.getData()) {
+            assertThat(asJsonString(item)).contains(searchString);
+        }
     }
 
     @Test
@@ -97,10 +121,10 @@ class TranslationControllerTest extends AbstractControllerTest {
     void getTranslations() throws Exception {
         dbPopulator.populate("app");
 
-        Repository repository = repositoryService.findByName("app").orElseThrow(NotFoundException::new);
+        Repository repository = repositoryService.findByName("app", userAccount).orElseThrow(NotFoundException::new);
 
         MvcResult mvcResult = mvc.perform(
-                get("/api/public/repository/" + repository.getId().toString() + "/translations/en,de")
+                loggedGet("/api/repository/" + repository.getId().toString() + "/translations/en,de")
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn();
 
         ObjectMapper mapper = new ObjectMapper();
@@ -114,10 +138,10 @@ class TranslationControllerTest extends AbstractControllerTest {
     void getSourceTranslations() throws Exception {
         dbPopulator.populate("app4");
 
-        Repository repository = repositoryService.findByName("app4").orElseThrow(NotFoundException::new);
+        Repository repository = repositoryService.findByName("app4", userAccount).orElseThrow(NotFoundException::new);
 
         MvcResult mvcResult = mvc.perform(
-                get("/api/public/repository/" + repository.getId().toString() +
+                loggedGet("/api/repository/" + repository.getId().toString() +
                         "/translations/source/home.news.This_is_another_translation_in_news_folder")
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn();
 
@@ -135,7 +159,7 @@ class TranslationControllerTest extends AbstractControllerTest {
         SourceTranslationsDTO sourceTranslationsDTO = getSourceTranslationsDTO();
 
         MvcResult mvcResult = mvc.perform(
-                post("/api/public/repository/" + app.getRepository().getId() + "/translations")
+                loggedPost("/api/repository/" + app.getRepository().getId() + "/translations")
                         .contentType(MediaType.APPLICATION_JSON).content(asJsonString(sourceTranslationsDTO)))
                 .andExpect(status().isOk()).andReturn();
 
@@ -164,7 +188,7 @@ class TranslationControllerTest extends AbstractControllerTest {
         sourceTranslationsDTO.setNewSourceText("newSourceText");
 
         MvcResult mvcResult = mvc.perform(
-                post("/api/public/repository/" + app.getRepository().getId() + "/translations")
+                loggedPost("/api/repository/" + app.getRepository().getId() + "/translations")
                         .contentType(MediaType.APPLICATION_JSON).content(asJsonString(sourceTranslationsDTO)))
                 .andExpect(status().isOk()).andReturn();
 
@@ -197,7 +221,7 @@ class TranslationControllerTest extends AbstractControllerTest {
 
     private ResultActions performGetDataForView(Long repositoryId, String queryString) throws Exception {
         return mvc.perform(
-                get("/api/public/repository/" + repositoryId + "/translations/view/en,de" + queryString)
+                loggedGet("/api/repository/" + repositoryId + "/translations/view" + queryString)
                         .contentType(MediaType.APPLICATION_JSON));
     }
 

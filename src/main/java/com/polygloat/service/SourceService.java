@@ -1,7 +1,7 @@
 package com.polygloat.service;
 
-import com.polygloat.DTOs.PathDTO;
-import com.polygloat.DTOs.request.SourceTranslationsDTO;
+import com.polygloat.dtos.PathDTO;
+import com.polygloat.dtos.request.SourceTranslationsDTO;
 import com.polygloat.model.File;
 import com.polygloat.model.Repository;
 import com.polygloat.model.Source;

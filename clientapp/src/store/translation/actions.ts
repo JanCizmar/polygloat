@@ -3,18 +3,21 @@ import {container} from 'tsyringe';
 import {translationService} from '../../service/translationService';
 import {Action, PromiseAction} from '../Action';
 import {TranslationsState} from './DTOs/TrasnlationsState';
+import {LanguageResponseType, TranslationsDataResponse} from '../../service/response.types';
+import {languageService} from '../../service/languageService';
 
 const PREFIX = 'TRANSLATION_';
 
 export class Actions {
     private static service = container.resolve(translationService);
+    static loadTranslations = new PromiseAction<TranslationsDataResponse, TranslationsState>('LOAD_TRANSLATIONS',
+        (search: string, langs: string[]) => Actions.service.getTranslations(search, langs));
 
     static onFolderToggle = new Action(PREFIX + 'FOLDER_TOGGLE', (folder: Folder) => folder);
 
     static onEdit = new Action(PREFIX + 'EDIT_START', (t: TranslationType) => t);
     static onEditClose = new Action(PREFIX + 'EDIT_CLOSE', (t: TranslationType) => t);
-    static loadTranslations = new PromiseAction('LOAD_TRANSLATIONS',
-        (search: string, langs: string[]) => Actions.service.getTranslations(search, langs));
+    private static languageService = container.resolve(languageService);
     static onSave = new PromiseAction(PREFIX + 'SAVE',
         (t: TranslationType) => Actions.service.setTranslations(t),
         null,
@@ -33,5 +36,7 @@ export class Actions {
         (oldFolder: Folder, newFolder: Folder) => Actions.service.moveFile(oldFolder, newFolder));
     static onFolderDelete = new Action(PREFIX + 'FOLDER_DELETE',
         (f: Folder) => (f: Folder) => Actions.service.deleteFolder(f));
+    static loadLanguages = new PromiseAction<LanguageResponseType[], TranslationsState>('LOAD_LANGUAGES',
+        (repositoryId: number) => Actions.languageService.getLanguages(repositoryId));
 }
 

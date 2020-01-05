@@ -1,24 +1,19 @@
 package com.polygloat.security;
 
 import com.polygloat.MessageConstants;
-import com.polygloat.security.JwtTokenProvider;
 import com.polygloat.security.payload.ApiResponse;
 import com.polygloat.security.payload.JwtAuthenticationResponse;
 import com.polygloat.security.payload.LoginRequest;
-import com.polygloat.security.payload.ValidateTokenRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/public")

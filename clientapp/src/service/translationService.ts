@@ -2,9 +2,11 @@ import {container, singleton} from 'tsyringe';
 import {Folder, Translation} from '../store/translation/types';
 import {BaseHttpService} from './baseHttpService';
 import {messageService} from './messageService';
+import {TranslationsDataResponse} from './response.types';
 
 const SERVER_URL = 'http://localhost:8080/';
 const REPOSITORY_ID = 1;
+const API_URL = `${SERVER_URL}api/`;
 
 const http = container.resolve(BaseHttpService);
 
@@ -12,13 +14,12 @@ const messaging = container.resolve(messageService);
 
 @singleton()
 export class translationService {
-
-    public getTranslations = async (search, langs: string[]) =>
-        (await http.fetch(`${SERVER_URL}api/public/repository/${REPOSITORY_ID}/translations/view/${langs.join(',')}` +
-            `?search=${search}`)).json();
+    public getTranslations = async (search, langs: string[]): Promise<TranslationsDataResponse> =>
+        (await http.fetch(`${API_URL}repository/${REPOSITORY_ID}/translations/view` +
+            `?search=${search}${langs ? '&languages=' + langs.join(',') : ''}`)).json();
 
     async setTranslations(translationData: Translation): Promise<any> {
-        await http.fetch(`${SERVER_URL}api/public/repository/${REPOSITORY_ID}/translations`, {
+        await http.fetch(`${API_URL}repository/${REPOSITORY_ID}/translations`, {
             body: JSON.stringify({
                 path: translationData.pathString,
                 translations: translationData.translations,
@@ -35,7 +36,7 @@ export class translationService {
     }
 
     async deleteFile(t: Translation): Promise<any> {
-        await http.fetch(`${SERVER_URL}api/public/repository/${REPOSITORY_ID}/file/${t.fullPathString}`, {
+        await http.fetch(`${API_URL}repository/${REPOSITORY_ID}/file/${t.fullPathString}`, {
             method: 'DELETE'
         });
         messaging.success('Translation deleted');
@@ -45,7 +46,7 @@ export class translationService {
     async moveFile(oldFolder: Folder, newFolder: Folder) {
         const fileToBody = (f: Folder) => (f.fullPathString);
 
-        await http.fetch(`${SERVER_URL}api/public/repository/${REPOSITORY_ID}/folders`, {
+        await http.fetch(`${API_URL}repository/${REPOSITORY_ID}/folders`, {
             method: 'POST',
             body: JSON.stringify({
                 oldFileFullPath: fileToBody(oldFolder),
@@ -60,7 +61,7 @@ export class translationService {
     }
 
     async deleteFolder(f: Folder) {
-        await http.fetch(`${SERVER_URL}api/public/repository/${REPOSITORY_ID}/folders/${f.fullPathString}`, {
+        await http.fetch(`${API_URL}repository/${REPOSITORY_ID}/folders/${f.fullPathString}`, {
             method: 'DELETE'
         });
         messaging.success('Folder deleted');

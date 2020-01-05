@@ -3,10 +3,10 @@ import {AbstractState} from '../../abstractState';
 
 export class TranslationsState extends AbstractState {
     translations: Folder = null;
-    translationsLoading: boolean = false;
+    translationsLoading: boolean = true;
     translationsLoaded: boolean = false;
     translationLoadingError: string = null;
-    languages: string[] = ['en', 'de'];
+    allLanguages: string[] = null;
     editingTranslation: Translation = null;
     editLoading: boolean = false;
     editingSaved: boolean = false;
@@ -14,6 +14,8 @@ export class TranslationsState extends AbstractState {
     editingFolder: Folder = null;
     addingFolderIn: Folder = null;
     addingTranslationIn: Folder = null;
+    settingsPanelLoading: boolean = true;
+    selectedLanguages: string[] = [];
 
     modifyTranslation(t: Translation): TranslationsState {
         const {root, folder} = this.clonePath(t.path);
@@ -28,7 +30,7 @@ export class TranslationsState extends AbstractState {
     newTranslation(f: Folder) {
         const {root, folder} = this.clonePath(f.fullPath);
         const translations = {};
-        this.languages.forEach(l => translations[l] = '');
+        this.allLanguages.forEach(l => translations[l] = '');
         const translation = new Translation('', translations, f.fullPath);
         translation.isNew = true;
         this.editingTranslation = translation;

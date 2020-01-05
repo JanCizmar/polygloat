@@ -1,6 +1,5 @@
 package com.polygloat.configuration;
 
-import com.polygloat.security.JwtAuthenticationEntryPoint;
 import com.polygloat.security.JwtTokenFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,29 +17,38 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    //private final JwtAuthenticationEntryPoint unauthorizedHandler;
     private JwtTokenFilter jwtTokenFilter;
+    private AppConfiguration configuration;
 
     @Autowired
-    public WebSecurityConfig(JwtAuthenticationEntryPoint unauthorizedHandler, JwtTokenFilter jwtTokenFilter) {
-        //this.unauthorizedHandler = unauthorizedHandler;
+    public WebSecurityConfig(JwtTokenFilter jwtTokenFilter, AppConfiguration configuration) {
         this.jwtTokenFilter = jwtTokenFilter;
+        this.configuration = configuration;
     }
 
     @Value("${spring.ldap.embedded.port}")
     private String ldapPort;
 
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        if (configuration.isAuthentication()) {
+            http
+                    .csrf().disable()
+                    .cors().disable()
+                    .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
+                    .authorizeRequests()
+                    .antMatchers("/api/public/**").permitAll()
+                    .anyRequest().authenticated()
+                    .and().sessionManagement()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+            return;
+        }
+
         http
                 .csrf().disable()
                 .cors().disable()
-                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
-                .authorizeRequests()
-                .antMatchers("/api/public/**").permitAll()
-                .anyRequest().authenticated()
-                .and().sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .authorizeRequests().anyRequest().permitAll();
     }
 
     @Override

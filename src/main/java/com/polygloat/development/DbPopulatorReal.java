@@ -3,6 +3,7 @@ package com.polygloat.development;
 import com.polygloat.model.*;
 import com.polygloat.repository.RepositoryRepository;
 import com.polygloat.repository.UserAccountRepository;
+import com.polygloat.service.UserAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,15 +17,17 @@ public class DbPopulatorReal {
     private UserAccountRepository userAccountRepository;
 
     private RepositoryRepository repositoryRepository;
+    private UserAccountService userAccountService;
     private Language de;
     private Language en;
 
 
     @Autowired
-    public DbPopulatorReal(EntityManager entityManager, UserAccountRepository userAccountRepository, RepositoryRepository repositoryRepository) {
+    public DbPopulatorReal(EntityManager entityManager, UserAccountRepository userAccountRepository, RepositoryRepository repositoryRepository, UserAccountService userAccountService) {
         this.entityManager = entityManager;
         this.userAccountRepository = userAccountRepository;
         this.repositoryRepository = repositoryRepository;
+        this.userAccountService = userAccountService;
     }
 
     @Transactional
@@ -37,9 +40,15 @@ public class DbPopulatorReal {
 
     @Transactional
     public File createBase(String repositoryName) {
-        UserAccount userAccount = new UserAccount();
-        userAccount.setUsername("user");
-        userAccountRepository.save(userAccount);
+
+        String defaultUsername = "ben";
+
+        UserAccount userAccount = userAccountService.getByUserName(defaultUsername).orElseGet(() -> {
+            UserAccount newUserAccount = new UserAccount();
+            newUserAccount.setUsername(defaultUsername);
+            userAccountService.createUser(newUserAccount);
+            return newUserAccount;
+        });
 
         Repository repository = new Repository();
         repository.setName(repositoryName);
@@ -57,7 +66,7 @@ public class DbPopulatorReal {
     }
 
     @Transactional
-    public void populate(String repositoryName) {
+    public File populate(String repositoryName) {
         File root = createBase(repositoryName);
 
         Repository repository = root.getRepository();
@@ -90,6 +99,8 @@ public class DbPopulatorReal {
                 "Dies ist ein Input mit value.", en, de);
         createTranslation(repository, sampleApp, "This is input with placeholder.",
                 "Dies ist ein Input mit Placeholder.", en, de);
+
+        return root;
     }
 
 

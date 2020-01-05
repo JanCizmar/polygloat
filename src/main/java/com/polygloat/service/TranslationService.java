@@ -1,9 +1,8 @@
 package com.polygloat.service;
 
-import com.polygloat.DTOs.PathDTO;
-import com.polygloat.DTOs.queryResults.FileDTO;
-import com.polygloat.DTOs.request.SourceTranslationsDTO;
-import com.polygloat.Exceptions.NotFoundException;
+import com.polygloat.dtos.PathDTO;
+import com.polygloat.dtos.request.SourceTranslationsDTO;
+import com.polygloat.exceptions.NotFoundException;
 import com.polygloat.model.File;
 import com.polygloat.model.Repository;
 import com.polygloat.model.Source;
@@ -15,7 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -67,14 +69,6 @@ public class TranslationService {
         }
 
         return langTranslations;
-    }
-
-    @Transactional
-    public LinkedHashSet<FileDTO> getViewData(Set<String> langs, Long repositoryId, int offset, int limit, String search) {
-        Repository repository = repositoryRepository.findById(repositoryId).orElseThrow(NotFoundException::new);
-
-        return fileService.getDataForView(repository, langs, offset, limit, search);
-
     }
 
     public Map<String, String> getSourceTranslations(Long repositoryId, PathDTO fullPath) {

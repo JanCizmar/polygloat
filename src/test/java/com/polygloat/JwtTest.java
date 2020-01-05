@@ -1,7 +1,7 @@
 package com.polygloat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.polygloat.security.payload.LoginRequest;
+import com.polygloat.controllers.AbstractControllerTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -14,12 +14,12 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-class JwtTest {
+class JwtTest extends AbstractControllerTest {
 
     @Autowired
     private ObjectMapper mapper;
@@ -44,30 +44,15 @@ class JwtTest {
         assertThat(mvcResult.getResponse().getStatus()).isEqualTo(403);
     }
 
-    private MvcResult doAuthentication(String username, String password) throws Exception {
 
-        LoginRequest request = new LoginRequest();
-
-        request.setUsername(username);
-        request.setPassword(password);
-
-        String jsonRequest = mapper.writeValueAsString(request);
-
-        return mvc.perform(post("/api/public/generatetoken")
-                .content(jsonRequest)
-                .accept(MediaType.ALL)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
-    }
-
-   /* @Test
+    @Test
     void userWithTokenHasAccess() throws Exception {
         String response = doAuthentication("ben", "benspassword")
                 .getResponse().getContentAsString();
 
         String token = (String) mapper.readValue(response, HashMap.class).get("accessToken");
 
-        MvcResult mvcResult = mvc.perform(get("/translations")
+        MvcResult mvcResult = mvc.perform(get("/api/repositories")
                 .accept(MediaType.ALL)
                 .header("Authorization", String.format("Bearer %s", token))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -75,7 +60,7 @@ class JwtTest {
 
         assertThat(mvcResult.getResponse().getStatus()).isEqualTo(200);
 
-    }*/
+    }
 
 
 }

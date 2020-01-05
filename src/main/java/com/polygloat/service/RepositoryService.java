@@ -1,9 +1,9 @@
 package com.polygloat.service;
 
-import com.polygloat.DTOs.request.CreateRepositoryDTO;
-import com.polygloat.DTOs.request.EditRepositoryDTO;
-import com.polygloat.DTOs.request.LanguageDTO;
-import com.polygloat.Exceptions.NotFoundException;
+import com.polygloat.dtos.request.CreateRepositoryDTO;
+import com.polygloat.dtos.request.EditRepositoryDTO;
+import com.polygloat.dtos.request.LanguageDTO;
+import com.polygloat.exceptions.NotFoundException;
 import com.polygloat.model.File;
 import com.polygloat.model.Repository;
 import com.polygloat.model.UserAccount;
@@ -34,8 +34,8 @@ public class RepositoryService {
     }
 
     @Transactional
-    public Optional<Repository> findByName(String name) {
-        return repositoryRepository.findByName(name);
+    public Optional<Repository> findByName(String name, UserAccount userAccount) {
+        return repositoryRepository.findByNameAndCreatedBy(name, userAccount);
     }
 
     @Transactional
@@ -77,8 +77,8 @@ public class RepositoryService {
         return repository;
     }
 
-    public Set<Repository> findAll() {
-        return new LinkedHashSet<>(repositoryRepository.findAll());
+    public Set<Repository> findAll(UserAccount userAccount) {
+        return new LinkedHashSet<>(repositoryRepository.findAllByCreatedBy(userAccount));
     }
 
     @Transactional

@@ -1,11 +1,14 @@
 package com.polygloat.service;
 
 import com.polygloat.AbstractTransactionalTest;
-import com.polygloat.DTOs.PathDTO;
-import com.polygloat.DTOs.queryResults.FileDTO;
-import com.polygloat.Exceptions.InvalidPathException;
-import com.polygloat.Exceptions.NotFoundException;
+import com.polygloat.controllers.ITest;
 import com.polygloat.development.DbPopulatorReal;
+import com.polygloat.dtos.PathDTO;
+import com.polygloat.dtos.response.ViewDataResponse;
+import com.polygloat.dtos.response.translations_view.FileViewDataItem;
+import com.polygloat.dtos.response.translations_view.ResponseParams;
+import com.polygloat.exceptions.InvalidPathException;
+import com.polygloat.exceptions.NotFoundException;
 import com.polygloat.model.File;
 import com.polygloat.model.Repository;
 import com.polygloat.repository.RepositoryRepository;
@@ -28,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @Transactional
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-class FileServiceTest extends AbstractTransactionalTest {
+class FileServiceTest extends AbstractTransactionalTest implements ITest {
     @Autowired
     FileService fileService;
 
@@ -49,7 +52,7 @@ class FileServiceTest extends AbstractTransactionalTest {
 
     void createTestData() {
         commitTransaction();
-        File rootFolder = dbPopulator.createBase("Application");
+        File rootFolder = dbPopulator.createBase(generateUniqueString());
 
         repository = rootFolder.getRepository();
 
@@ -84,16 +87,11 @@ class FileServiceTest extends AbstractTransactionalTest {
 
     @Test
     void getViewData() {
-        dbPopulator.populate("App2");
+        Repository app2 = dbPopulator.populate("App2").getRepository();
 
-        commitTransaction();
-
-        Repository repository = repositoryService.findByName("App2").orElseThrow(NotFoundException::new);
-
-        LinkedHashSet<FileDTO> allInRepository = fileService.getDataForView(
-                repository,
-                new HashSet<>(Arrays.asList("en", "de")), 0, 150, null);
-        assertThat(allInRepository).isNotEmpty();
+        ViewDataResponse<LinkedHashSet<FileViewDataItem>, ResponseParams> viewData = fileService.getViewData(
+                new HashSet<>(Arrays.asList("en", "de")), app2.getId(), 0, 150, null);
+        assertThat(viewData.getData()).isNotEmpty();
     }
 
     @Test

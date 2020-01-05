@@ -1,7 +1,6 @@
 package com.polygloat.model;
 
-import com.polygloat.DTOs.IPathItem;
-import com.polygloat.DTOs.PathDTO;
+import com.polygloat.dtos.PathDTO;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Entity
-public class Source extends AuditModel implements IPathItem {
+public class Source extends AuditModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter

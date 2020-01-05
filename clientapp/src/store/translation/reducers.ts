@@ -3,6 +3,7 @@ import {DataTransformation} from '../../helpers/dataTransformation';
 import {Actions} from './actions';
 import {Action} from '../Action';
 import {TranslationsState} from './DTOs/TrasnlationsState';
+import {LanguageResponseType, TranslationsDataResponse} from '../../service/response.types';
 
 const initialState: TranslationsState = new TranslationsState();
 
@@ -14,11 +15,13 @@ export function translationReducer(
         case Actions.loadTranslations.pendingType:
             return state.modify({translationsLoading: true});
         case Actions.loadTranslations.fulfilledType:
+            const payload = action.payload as TranslationsDataResponse;
             return state.modify({
-                translations: DataTransformation.toFolderStructure(action.payload),
+                translations: DataTransformation.toFolderStructure(payload.data),
                 translationsLoaded: true,
                 translationsLoading: false,
                 translationLoadingError: null,
+                selectedLanguages: payload.params.languages
             });
         case Actions.loadTranslations.rejectedType:
             return state.modify({translationLoadingError: action.payload});
@@ -49,6 +52,11 @@ export function translationReducer(
             return state.modify({...resetAllEdits, ...state.modifyFolder(action.payload as Folder)});
         case Actions.onFolderEditClose.type:
             return state.modify({...resetAllEdits(state)});
+        case Actions.loadLanguages.pendingType:
+            return state.modify({...state, settingsPanelLoading: true});
+        case Actions.loadLanguages.fulfilledType:
+            const allLanguagesPayload: LanguageResponseType[] = action.payload;
+            return state.modify({...state, allLanguages: allLanguagesPayload.map(l => l.abbreviation), settingsPanelLoading: false});
         default:
             for (const key of Object.keys(Actions)) {
                 if (Actions[key] instanceof Action) {

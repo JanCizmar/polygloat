@@ -107,7 +107,7 @@ function Source(props: TranslationProps) {
         Actions.onDelete.dispatch(props.translation);
     };
 
-    const langs = props.translationsState.languages;
+    const langs = props.translationsState.selectedLanguages;
 
     return !(props.translationsState.editingTranslation === props.translation) ? (
         <React.Fragment>

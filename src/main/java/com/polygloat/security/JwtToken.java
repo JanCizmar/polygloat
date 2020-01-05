@@ -2,7 +2,6 @@ package com.polygloat.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.security.Key;
 
@@ -16,7 +15,7 @@ public class JwtToken {
         this.key = key;
     }
 
-    public String getUsername() {
+    public String getContent() {
         Claims claims = Jwts.parser()
                 .setSigningKey(key)
                 .parseClaimsJws(this.value)
@@ -28,5 +27,9 @@ public class JwtToken {
     @Override
     public String toString() {
         return value;
+    }
+
+    public Long getId() {
+        return Long.parseLong(getContent());
     }
 }

@@ -50,90 +50,110 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 function TranslationsTable(props: TranslationsTableProps) {
-    const allLangs = ['en', 'de'];
+    const allLangs = props.translations.allLanguages;
 
-    const [langs, setLangs] = useState(['en', 'de']);
+    const [menuLangs, setMenuLangs] = useState(props.translations.selectedLanguages);
+
+    //update selected languages on redux change
+    useEffect(() => {
+        setMenuLangs(props.translations.selectedLanguages);
+    }, [props.translations.selectedLanguages]);
 
     useEffect(() => {
-        Actions.loadTranslations.dispatch(searchValue, langs);
+        //change param to repository id
+        Actions.loadLanguages.dispatch(1);
+        Actions.loadTranslations.dispatch(searchValue, null);
     }, []);
 
     const classes = useStyles({});
 
     const [searchValue, setSearchValue] = useState('');
+    const [oldSearchValue, setOldSearchValue] = useState('');
 
     useEffect(() => {
-        const handler = setTimeout(() => Actions.loadTranslations.dispatch(searchValue, langs), 1000);
+        const handler = setTimeout(() => {
+            if (oldSearchValue !== searchValue) {
+                Actions.loadTranslations.dispatch(searchValue, menuLangs);
+                setOldSearchValue(searchValue);
+            }
+        }, 1000);
         return () => clearTimeout(handler);
     }, [searchValue]);
 
     function onSearchChange(e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) {
         setSearchValue(e.target.value);
+    }
 
+    function onLanguageMenuExit() {
+        Actions.loadTranslations.dispatch(searchValue, menuLangs);
     }
 
     const MenuProps = {
         PaperProps: {
             style: {
-                //maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+                maxHeight: 300,
                 width: 250,
             },
         },
+        onExit: onLanguageMenuExit
     };
 
     function langsChange(e: React.ChangeEvent<{ name?: string; value: unknown }>) {
-        setLangs(e.target.value as string[]);
+        setMenuLangs(e.target.value as string[]);
     }
 
     return (
         <React.Fragment>
             <Box mb={2}>
                 <Paper>
-                    <Box p={1}>
-                        <TextField value={searchValue} onChange={onSearchChange} label="Search"
-                                   InputProps={{
-                                       startAdornment: (
-                                           <InputAdornment position="start">
-                                               <SearchIcon/>
-                                           </InputAdornment>
-                                       ),
-                                   }}/>
+                    {!props.translations.settingsPanelLoading ?
+                        <Box p={1}>
+                            <TextField value={searchValue} onChange={onSearchChange} label="Search"
+                                       InputProps={{
+                                           startAdornment: (
+                                               <InputAdornment position="start">
+                                                   <SearchIcon/>
+                                               </InputAdornment>
+                                           ),
+                                       }}/>
 
-                        <FormControl>
-                            <InputLabel id="demo-mutiple-checkbox-label">Tag</InputLabel>
-                            <Select
-                                labelId="demo-mutiple-checkbox-label"
-                                id="demo-mutiple-checkbox"
-                                multiple
-                                value={langs}
-                                onChange={e => langsChange(e)}
-                                input={<Input/>}
-                                renderValue={selected => (selected as string[]).join(', ')}
-                                MenuProps={MenuProps}
-                            >
-                                {allLangs.map(lang => (
-                                    <MenuItem key={lang} value={lang}>
-                                        <Checkbox checked={langs.indexOf(lang) > -1}/>
-                                        <ListItemText primary={lang}/>
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Box>
+                            <FormControl>
+                                <InputLabel id="demo-mutiple-checkbox-label">Tag</InputLabel>
+                                <Select
+                                    labelId="demo-mutiple-checkbox-label"
+                                    id="demo-mutiple-checkbox"
+                                    multiple
+                                    value={menuLangs}
+                                    onChange={e => langsChange(e)}
+                                    input={<Input/>}
+                                    renderValue={selected => (selected as string[]).join(', ')}
+                                    MenuProps={MenuProps}
+                                >
+                                    {allLangs.map(lang => (
+                                        <MenuItem key={lang} value={lang}>
+                                            <Checkbox checked={menuLangs.indexOf(lang) > -1}/>
+                                            <ListItemText primary={lang}/>
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Box>
+                        :
+                        <Box className={classes.loading} p={1}><CircularProgress/></Box>}
                 </Paper>
             </Box>
             <Paper className={classes.root}>
-                {props.translations.translationsLoaded ?
+                {!props.translations.translationsLoading ?
                     <Table className={classes.table} aria-label="simple table">
                         <TableHead>
                             <TableRow>
-                                {//props.translations.languages.map(l => <TableCell key={l}>{l}</TableCell>)
+                                {//props.translations.allLanguages.map(l => <TableCell key={l}>{l}</TableCell>)
                                 }
                             </TableRow>
                         </TableHead>
                         <Folder
                             indentCount={0}
-                            languages={props.translations.languages}
+                            languages={props.translations.selectedLanguages}
                             folder={props.translations.translations}
                         />
                     </Table>

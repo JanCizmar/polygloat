@@ -1,8 +1,7 @@
 package com.polygloat.model;
 
-import com.polygloat.DTOs.PathDTO;
+import com.polygloat.dtos.PathDTO;
 import com.polygloat.model.hooks.FileHooks;
-import com.sun.istack.Nullable;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,7 +28,6 @@ public class File extends AuditModel {
     @Setter
     private Source source;
 
-    @Nullable
     @Getter
     @Setter
     @Size(min = 1, max = 200)

@@ -1,7 +1,7 @@
 package com.polygloat.service;
 
-import com.polygloat.DTOs.request.LanguageDTO;
-import com.polygloat.Exceptions.NotFoundException;
+import com.polygloat.dtos.request.LanguageDTO;
+import com.polygloat.exceptions.NotFoundException;
 import com.polygloat.model.Language;
 import com.polygloat.model.Repository;
 import com.polygloat.repository.LanguageRepository;
@@ -13,6 +13,7 @@ import javax.persistence.EntityManager;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class LanguageService {
@@ -69,5 +70,9 @@ public class LanguageService {
 
     public Optional<Language> findByName(String name, Repository repository) {
         return languageRepository.findByNameAndRepository(name, repository);
+    }
+
+    public Set<String> getDefaultLanguagesForView(Repository repository) {
+        return repository.getLanguages().stream().limit(2).map(Language::getAbbreviation).collect(Collectors.toSet());
     }
 }

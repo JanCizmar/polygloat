@@ -1,6 +1,6 @@
 package com.polygloat.model;
 
-import com.polygloat.DTOs.request.LanguageDTO;
+import com.polygloat.dtos.request.LanguageDTO;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Where;

@@ -8,12 +8,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-public class UserAccount {
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"username"}),
+})
+public class UserAccount extends AuditModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter
     @Setter
-    private int id;
+    private Long id;
 
     @Getter
     @Setter

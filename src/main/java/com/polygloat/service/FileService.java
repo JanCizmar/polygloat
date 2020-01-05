@@ -1,22 +1,28 @@
 package com.polygloat.service;
 
-import com.polygloat.DTOs.PathDTO;
-import com.polygloat.DTOs.queryResults.FileDTO;
-import com.polygloat.Exceptions.FileAlreadyExists;
-import com.polygloat.Exceptions.InvalidPathException;
-import com.polygloat.Exceptions.NotFoundException;
+import com.polygloat.dtos.PathDTO;
+import com.polygloat.dtos.query_results.FileDTO;
+import com.polygloat.dtos.response.ViewDataResponse;
+import com.polygloat.dtos.response.translations_view.FileViewDataItem;
+import com.polygloat.dtos.response.translations_view.ResponseParams;
+import com.polygloat.exceptions.FileAlreadyExists;
+import com.polygloat.exceptions.InvalidPathException;
+import com.polygloat.exceptions.NotFoundException;
 import com.polygloat.model.File;
-import com.polygloat.model.File_;
 import com.polygloat.model.Repository;
 import com.polygloat.repository.FileRepository;
 import com.polygloat.repository.RepositoryRepository;
+import com.polygloat.service.query_builders.TranslationsViewBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.*;
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,18 +31,21 @@ public class FileService {
     private FileRepository fileRepository;
     private RepositoryRepository repositoryRepository;
     private EntityManager entityManager;
+    private LanguageService languageService;
 
     @Autowired
     public FileService(FileRepository fileRepository,
                        RepositoryRepository repositoryRepository,
-                       EntityManager entityManager) {
+                       EntityManager entityManager,
+                       LanguageService languageService) {
         this.fileRepository = fileRepository;
         this.repositoryRepository = repositoryRepository;
         this.entityManager = entityManager;
+        this.languageService = languageService;
     }
 
     public File getOrCreatePath(Repository repository, PathDTO path) {
-        LinkedList<String> fullPath = path.getFullPath();
+        List<String> fullPath = path.getFullPath();
 
         File parent = repository.getRootFolder();
 
@@ -131,62 +140,26 @@ public class FileService {
     }
 
     @Transactional
-    public LinkedHashSet<FileDTO> getDataForView(Repository repository, Set<String> abbrs, int offset, int limit, String searchString) {
-        CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+    public ViewDataResponse<LinkedHashSet<FileViewDataItem>, ResponseParams> getViewData(Set<String> languages, Long repositoryId, int offset, int limit, String search) {
+        Repository repository = repositoryRepository.findById(repositoryId).orElseThrow(NotFoundException::new);
 
-        CriteriaQuery<Object> query1 = cb.createQuery();
-        Root<File> file = query1.from(File.class);
-        Join<Object, Object> source = file.join("source", JoinType.LEFT);
-
-        Set<Selection<?>> selection = new LinkedHashSet<>();
-
-        Selection<String> fullPath = cb.concat(file.get("materializedPath"), cb.concat(".", file.get("name"))).alias("fullPath");
-
-        selection.add(fullPath);
-
-        //for isSource property
-        selection.add(file.get("source").get("id"));
-
-        Set<Predicate> restrictions = new HashSet<>();
-
-        Set<Expression<String>> fullTextFields = new HashSet<>();
-
-        for (String abbr : abbrs) {
-            Join<Object, Object> translations = source.join("translations", JoinType.LEFT);
-            Join<Object, Object> language = translations.join("language", JoinType.LEFT);
-
-            restrictions.add(cb.or(cb.equal(language.get("abbreviation"), abbr), cb.isNull(file.get("source"))));
-
-            //query1.orderBy(cb.asc(translations.get("text")));
-            selection.add(language.get("abbreviation"));
-            selection.add(translations.get("text"));
-            fullTextFields.add(translations.get("text"));
+        if (languages == null || languages.isEmpty()) {
+            languages = languageService.getDefaultLanguagesForView(repository);
         }
 
-        fullTextFields.add((Expression<String>) fullPath);
+        TranslationsViewBuilder translationsViewBuilder = new TranslationsViewBuilder(this.entityManager.getCriteriaBuilder(), repository, languages, search);
+        CriteriaQuery<Object> dataQuery = translationsViewBuilder.getDataQuery();
 
-        Selection<?>[] paths = selection.toArray(new Selection<?>[0]);
-
-        query1.multiselect(paths);
-        query1.orderBy(cb.asc((Expression<?>) fullPath));
-        restrictions.add(cb.equal(file.get(File_.repository), repository));
-        restrictions.add(cb.isNotNull(file.get(File_.name)));
-
-        Set<Predicate> fullTextRestrictions = new HashSet<>();
-
-        if (searchString != null && !searchString.isEmpty()) {
-            for (Expression<String> fullTextField : fullTextFields) {
-                fullTextRestrictions.add(cb.like(cb.upper(fullTextField), "%" + searchString.toUpperCase() + "%"));
-            }
-            restrictions.add(cb.or(fullTextRestrictions.toArray(new Predicate[0])));
-        }
-
-        query1.where(restrictions.toArray(new Predicate[0]));
-
-        return this.entityManager.createQuery(query1).setFirstResult(offset).setMaxResults(limit)
+        LinkedHashSet<FileViewDataItem> fileDTOs = this.entityManager.createQuery(dataQuery).setFirstResult(offset).setMaxResults(limit)
                 .getResultList()
-                .stream().map(i -> new FileDTO((Object[]) i))
+                .stream().map(i -> new FileDTO((Object[]) i)).map(FileViewDataItem::new)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        translationsViewBuilder = new TranslationsViewBuilder(this.entityManager.getCriteriaBuilder(), repository, languages, search);
+
+        Long allCount = this.entityManager.createQuery(translationsViewBuilder.getCountQuery()).getSingleResult();
+
+        return new ViewDataResponse<>(fileDTOs, offset, allCount, new ResponseParams(search, languages));
     }
 
     @Transactional

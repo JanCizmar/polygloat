@@ -2,7 +2,10 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-    entry: "./src/index.tsx",
+    entry: {
+        index: "./src/index.tsx",
+        //vendor: "./"
+    },
     devtool: 'inline-source-map',
     output: {
         filename: "app.js",
@@ -24,5 +27,10 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: './src/index.html'
         })
-    ]
+    ],
+    optimization: {
+        splitChunks: {
+            chunks: 'all',
+        },
+    },
 };
