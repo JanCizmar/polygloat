@@ -1,7 +1,8 @@
 import * as React from 'react';
-import Dashboard from './Dashboard';
 import {Actions} from '../store/global/actions';
 import SnackBar from './common/SnackBar';
+import {BrowserRouter, Route, Switch} from 'react-router-dom';
+import {RepositoriesView} from './views/RepositoriesView';
 
 interface Props {
 }
@@ -23,10 +24,14 @@ export class App extends React.Component<Props, null> {
 
     render() {
         return (
-            <React.Fragment>
-                <Dashboard/>
+            <BrowserRouter>
+                <Switch>
+                    <Route path="/repositories">
+                        <RepositoriesView/>
+                    </Route>
+                </Switch>
                 <SnackBar/>
-            </React.Fragment>
+            </BrowserRouter>
         );
     }
 };

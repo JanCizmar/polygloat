@@ -147,6 +147,13 @@ public class FileService {
             languages = languageService.getDefaultLanguagesForView(repository);
         }
 
+        //check language exists
+        for (String language : languages) {
+            if (!languageService.findByAbbreviation(language, repository).isPresent()) {
+                throw new NotFoundException();
+            }
+        }
+
         TranslationsViewBuilder translationsViewBuilder = new TranslationsViewBuilder(this.entityManager.getCriteriaBuilder(), repository, languages, search);
         CriteriaQuery<Object> dataQuery = translationsViewBuilder.getDataQuery();
 

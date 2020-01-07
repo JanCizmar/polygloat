@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -62,6 +63,12 @@ public class TranslationController implements IController {
         if (languages == null) {
             return Optional.empty();
         }
-        return Optional.of(new HashSet<>(Arrays.asList(languages.split(","))));
+        return Optional.of(new HashSet<>(Arrays.stream(
+                languages.split(","))
+                //filter out empty strings
+                .filter(i ->
+                        !i.isEmpty()
+                )
+                .collect(Collectors.toList())));
     }
 }

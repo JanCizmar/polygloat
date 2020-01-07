@@ -46,7 +46,7 @@ export class translationService {
     async moveFile(oldFolder: Folder, newFolder: Folder) {
         const fileToBody = (f: Folder) => (f.fullPathString);
 
-        await http.fetch(`${API_URL}repository/${REPOSITORY_ID}/folders`, {
+        await http.fetch(`${API_URL}repository/${REPOSITORY_ID}/file`, {
             method: 'POST',
             body: JSON.stringify({
                 oldFileFullPath: fileToBody(oldFolder),

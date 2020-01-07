@@ -46,6 +46,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     folder: {
         backgroundColor: theme.palette.grey[50]
+    },
+    languageSelect: {
+        minWidth: 200,
     }
 }));
 
@@ -107,36 +110,42 @@ function TranslationsTable(props: TranslationsTableProps) {
             <Box mb={2}>
                 <Paper>
                     {!props.translations.settingsPanelLoading ?
-                        <Box p={1}>
-                            <TextField value={searchValue} onChange={onSearchChange} label="Search"
-                                       InputProps={{
-                                           startAdornment: (
-                                               <InputAdornment position="start">
-                                                   <SearchIcon/>
-                                               </InputAdornment>
-                                           ),
-                                       }}/>
+                        <Box p={1} display="flex">
+                            <Box flexGrow={1}>
+                                <TextField value={searchValue} onChange={onSearchChange} label="Search"
+                                           InputProps={{
+                                               startAdornment: (
+                                                   <InputAdornment position="start">
+                                                       <SearchIcon/>
+                                                   </InputAdornment>
+                                               ),
+                                           }}/>
 
-                            <FormControl>
-                                <InputLabel id="demo-mutiple-checkbox-label">Tag</InputLabel>
-                                <Select
-                                    labelId="demo-mutiple-checkbox-label"
-                                    id="demo-mutiple-checkbox"
-                                    multiple
-                                    value={menuLangs}
-                                    onChange={e => langsChange(e)}
-                                    input={<Input/>}
-                                    renderValue={selected => (selected as string[]).join(', ')}
-                                    MenuProps={MenuProps}
-                                >
-                                    {allLangs.map(lang => (
-                                        <MenuItem key={lang} value={lang}>
-                                            <Checkbox checked={menuLangs.indexOf(lang) > -1}/>
-                                            <ListItemText primary={lang}/>
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                            </Box>
+                            <Box display="flex" alignItems="right">
+                                <FormControl>
+                                    <InputLabel id="languages">Languages</InputLabel>
+                                    <Select
+                                        labelId="languages"
+                                        id="languages-select"
+                                        multiple
+                                        value={menuLangs}
+                                        onChange={e => langsChange(e)}
+                                        input={<Input/>}
+                                        renderValue={selected => (selected as string[]).join(', ')}
+                                        MenuProps={MenuProps}
+                                        className={classes.languageSelect}
+
+                                    >
+                                        {allLangs.map(lang => (
+                                            <MenuItem key={lang} value={lang}>
+                                                <Checkbox checked={menuLangs.indexOf(lang) > -1}/>
+                                                <ListItemText primary={lang}/>
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </Box>
                         </Box>
                         :
                         <Box className={classes.loading} p={1}><CircularProgress/></Box>}

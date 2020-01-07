@@ -59,6 +59,19 @@ class TranslationControllerTest extends LoggedControllerTest {
         for (FileViewDataItem item : response.getData()) {
             assertThat(item.getTranslations()).doesNotContainKeys("de");
         }
+
+        performGetDataForView(repository.getId(), "?languages=langNotExists").andExpect(status().isNotFound());
+
+        //with starting emtpy string
+        ViewDataResponse<LinkedHashSet<FileViewDataItem>, ResponseParams> response2 = performValidViewRequest(repository, "?languages=,en,de");
+
+        //with trailing empty string
+        ViewDataResponse<LinkedHashSet<FileViewDataItem>, ResponseParams> response3 = performValidViewRequest(repository, "?languages=,en,de,");
+
+        //with same language multiple times
+        ViewDataResponse<LinkedHashSet<FileViewDataItem>, ResponseParams> response4 = performValidViewRequest(repository, "?languages=,en,en,,");
+
+
     }
 
     private ViewDataResponse<LinkedHashSet<FileViewDataItem>, ResponseParams> performValidViewRequest(Repository repository, String queryString) throws Exception {

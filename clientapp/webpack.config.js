@@ -10,6 +10,7 @@ module.exports = {
     output: {
         filename: "app.js",
         path: path.resolve(__dirname, 'dist'),
+        publicPath: '/',
     },
     resolve: {
         extensions: [".webpack.js", ".web.js", ".ts", ".js", ".tsx"]
@@ -22,7 +23,7 @@ module.exports = {
         },
         ]
     },
-    mode: 'production',
+    mode: 'development',
     plugins: [
         new HtmlWebpackPlugin({
             template: './src/index.html'
@@ -33,4 +34,7 @@ module.exports = {
             chunks: 'all',
         },
     },
+    devServer: {
+        historyApiFallback: true,
+    }
 };
