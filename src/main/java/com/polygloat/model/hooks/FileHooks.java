@@ -2,18 +2,21 @@ package com.polygloat.model.hooks;
 
 import com.polygloat.model.File;
 import com.polygloat.service.FileService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.PostLoad;
 import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
 
 @Component
 public class FileHooks {
-
     private static FileService fileService;
 
-    @PreUpdate
+    @Autowired
+    public void setFileService(FileService fileService) {
+        FileHooks.fileService = fileService;
+    }
+
     @PrePersist
     public void updateChildrenMaterializedPaths(File f) {
         if (f.getOldName() != null && f.getName() != null && !f.getOldName().equals(f.getName())) {
