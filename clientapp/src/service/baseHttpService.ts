@@ -15,4 +15,14 @@ export class BaseHttpService {
             reject(r);
         }));
     }
+
+    post(input: RequestInfo, body: {}): Promise<Response> {
+        return this.fetch(input, {
+            body: JSON.stringify(body),
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+    }
 }

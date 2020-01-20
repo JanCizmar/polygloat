@@ -13,7 +13,7 @@ import {AppState} from '../../store';
 import {connect} from 'react-redux';
 import Input from '@material-ui/core/Input';
 import {FolderActions} from './FolderActions';
-import {TranslationsState} from '../../store/translation/DTOs/TrasnlationsState';
+import {TranslationsState} from '../../store/translation/TrasnlationsState';
 
 interface FolderProps {
     folder: FolderType;

@@ -1,5 +1,6 @@
 package com.polygloat.service;
 
+import com.polygloat.exceptions.NotFoundException;
 import com.polygloat.model.UserAccount;
 import com.polygloat.repository.UserAccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,5 +27,9 @@ public class UserAccountService {
 
     public void createUser(UserAccount userAccount) {
         this.userAccountRepository.save(userAccount);
+    }
+
+    public UserAccount getImplicitUser() {
+        return this.userAccountRepository.findAll().stream().findFirst().orElseThrow(NotFoundException::new);
     }
 }

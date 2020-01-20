@@ -2,7 +2,7 @@ import {Folder, Translation as TranslationType, Translation} from './types';
 import {DataTransformation} from '../../helpers/dataTransformation';
 import {Actions} from './actions';
 import {Action} from '../Action';
-import {TranslationsState} from './DTOs/TrasnlationsState';
+import {TranslationsState} from './TrasnlationsState';
 import {LanguageResponseType, TranslationsDataResponse} from '../../service/response.types';
 
 const initialState: TranslationsState = new TranslationsState();
@@ -16,13 +16,14 @@ export function translationReducer(
             return state.modify({translationsLoading: true});
         case Actions.loadTranslations.fulfilledType:
             const payload = action.payload as TranslationsDataResponse;
-            return state.modify({
+            const res = state.modify({
                 translations: DataTransformation.toFolderStructure(payload.data),
                 translationsLoaded: true,
                 translationsLoading: false,
                 translationLoadingError: null,
                 selectedLanguages: payload.params.languages
             });
+            return res;
         case Actions.loadTranslations.rejectedType:
             return state.modify({translationLoadingError: action.payload});
         case Actions.onEdit.type:

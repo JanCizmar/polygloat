@@ -2,7 +2,7 @@ import * as React from 'react';
 import {Actions} from '../store/global/actions';
 import SnackBar from './common/SnackBar';
 import {BrowserRouter, Route, Switch} from 'react-router-dom';
-import {RepositoriesView} from './views/RepositoriesView';
+import {RepositoriesRouter} from './views/repositories/RepositoriesRouter';
 
 interface Props {
 }
@@ -27,7 +27,7 @@ export class App extends React.Component<Props, null> {
             <BrowserRouter>
                 <Switch>
                     <Route path="/repositories">
-                        <RepositoriesView/>
+                        <RepositoriesRouter/>
                     </Route>
                 </Switch>
                 <SnackBar/>

@@ -16,7 +16,7 @@ import {connect} from 'react-redux';
 import {Actions} from '../../store/translation/actions';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import ConfirmationDialog from '../common/ConfirmationDialog';
-import {TranslationsState} from '../../store/translation/DTOs/TrasnlationsState';
+import {TranslationsState} from '../../store/translation/TrasnlationsState';
 
 interface TranslationProps {
     translationsState: TranslationsState

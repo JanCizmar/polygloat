@@ -22,3 +22,8 @@ export type TranslationsDataResponse = {
     }
     data: FileResponse[]
 }
+
+export type RepositoryResponse = {
+    id: number,
+    name: string
+}

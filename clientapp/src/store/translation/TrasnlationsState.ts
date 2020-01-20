@@ -1,5 +1,5 @@
-import {Folder, Translation} from '../types';
-import {AbstractState} from '../../abstractState';
+import {Folder, Translation} from './types';
+import {AbstractState} from '../abstractState';
 
 export class TranslationsState extends AbstractState {
     translations: Folder = null;

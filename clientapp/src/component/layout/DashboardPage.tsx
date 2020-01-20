@@ -6,6 +6,8 @@ import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import MaterialLink from '@material-ui/core/Link';
 import {MainMenu} from './MainMenu';
+import Grid from '@material-ui/core/Grid';
+import Container from '@material-ui/core/Container';
 
 function Copyright() {
     return (
@@ -29,7 +31,11 @@ const useStyles = makeStyles(theme => ({
         flexGrow: 1,
         height: '100vh',
         overflow: 'auto',
-    }
+    },
+    container: {
+        paddingTop: theme.spacing(4),
+        paddingBottom: theme.spacing(4),
+    },
 }));
 
 interface DashboardPageProps {
@@ -45,7 +51,11 @@ export const DashboardPage: FunctionComponent<DashboardPageProps> = ({children, 
             <MainMenu sideMenuItems={sideMenuItems}/>
             <main className={classes.content}>
                 <div className={classes.appBarSpacer}/>
-                {children}
+                <Container maxWidth="lg" className={classes.container}>
+                    <Grid container spacing={3}>
+                        {children}
+                    </Grid>
+                </Container>
                 <Box pt={4}>
                     <Copyright/>
                 </Box>

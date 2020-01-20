@@ -2,7 +2,7 @@ import {Folder, Translation as TranslationType} from './types';
 import {container} from 'tsyringe';
 import {translationService} from '../../service/translationService';
 import {Action, PromiseAction} from '../Action';
-import {TranslationsState} from './DTOs/TrasnlationsState';
+import {TranslationsState} from './TrasnlationsState';
 import {LanguageResponseType, TranslationsDataResponse} from '../../service/response.types';
 import {languageService} from '../../service/languageService';
 
@@ -10,7 +10,7 @@ const PREFIX = 'TRANSLATION_';
 
 export class Actions {
     private static service = container.resolve(translationService);
-    static loadTranslations = new PromiseAction<TranslationsDataResponse, TranslationsState>('LOAD_TRANSLATIONS',
+    static loadTranslations = new PromiseAction<TranslationsDataResponse, any, TranslationsState>('LOAD_TRANSLATIONS',
         (search: string, langs: string[]) => Actions.service.getTranslations(search, langs));
 
     static onFolderToggle = new Action(PREFIX + 'FOLDER_TOGGLE', (folder: Folder) => folder);
@@ -20,11 +20,9 @@ export class Actions {
     private static languageService = container.resolve(languageService);
     static onSave = new PromiseAction(PREFIX + 'SAVE',
         (t: TranslationType) => Actions.service.setTranslations(t),
-        null,
-        'Translation saved'
     );
-    static onDelete = new PromiseAction<any, TranslationsState>(PREFIX + 'DELETE',
-        (t: TranslationType) => Actions.service.deleteFile(t), null, 'Translation deleted');
+    static onDelete = new PromiseAction<any, any, TranslationsState>(PREFIX + 'DELETE',
+        (t: TranslationType) => Actions.service.deleteFile(t));
     static onNewTranslation = new Action<Folder, TranslationsState>(PREFIX + 'NEW', (f: Folder) => f,
         (state, action) => {
             return state.newTranslation(action.payload);
@@ -36,7 +34,7 @@ export class Actions {
         (oldFolder: Folder, newFolder: Folder) => Actions.service.moveFile(oldFolder, newFolder));
     static onFolderDelete = new Action(PREFIX + 'FOLDER_DELETE',
         (f: Folder) => (f: Folder) => Actions.service.deleteFolder(f));
-    static loadLanguages = new PromiseAction<LanguageResponseType[], TranslationsState>('LOAD_LANGUAGES',
+    static loadLanguages = new PromiseAction<LanguageResponseType[], any, TranslationsState>('LOAD_LANGUAGES',
         (repositoryId: number) => Actions.languageService.getLanguages(repositoryId));
 }
 

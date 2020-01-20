@@ -30,18 +30,38 @@ export class Link {
         return new Link(`${link ? link.template : ''}/${itemTemplate}`);
     }
 
-    public build(params: { [key: string]: string | number }): string {
+    public build(params?: { [key: string]: string | number }): string {
         let link = this.template;
+        params = params ? params : {};
         for (const param of Object.keys(params)) {
             let param1 = params[param];
-            link = link.replace(`:${param}`, param1.toString());
+            link = link.replace(`:${param}`, params[param].toString());
         }
         return link;
     }
 }
 
-export const LINKS = {
-    REPOSITORIES: Link.ofRoot('repositories'),
-    REPOSITORY: Link.ofParent(this.REPOSITORIES, ':repositoryId'),
-    REPOSITORY_TRANSLATIONS: Link.ofParent(this.REPOSITORY, 'translations')
+const p = (param: string) => {
+    return `:${param}`;
+};
+
+export enum PARAMS {
+    REPOSITORY_ID = 'repositoryId',
+    LANGUAGE_ID = 'languageId',
+
+}
+
+export class LINKS {
+    static REPOSITORIES = Link.ofRoot('repositories');
+
+    static REPOSITORY = Link.ofParent(LINKS.REPOSITORIES, p(PARAMS.REPOSITORY_ID));
+
+    static REPOSITORY_EDIT = Link.ofParent(LINKS.REPOSITORIES, 'edit/' + p(PARAMS.REPOSITORY_ID));
+
+    static REPOSITORY_LANGUAGES = Link.ofParent(LINKS.REPOSITORY, 'languages');
+
+
+    static REPOSITORY_LANGUAGES_EDIT = Link.ofParent(LINKS.REPOSITORY_LANGUAGES, 'edit/' + p(PARAMS.LANGUAGE_ID));
+
+    static REPOSITORY_TRANSLATIONS = Link.ofParent(LINKS.REPOSITORY, 'translations');
 };

@@ -9,7 +9,7 @@ interface MainMenuProps {
 
 export const MainMenu = ({sideMenuItems}: MainMenuProps) => {
 
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(sideMenuItems && true);
 
     return <>
         <TopBar onSideMenuOpen={() => setOpen(true)} isSideMenu={!!sideMenuItems} open={open}/>

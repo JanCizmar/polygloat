@@ -15,7 +15,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Box from '@material-ui/core/Box';
 import {Theme} from '@material-ui/core/styles/createMuiTheme';
 import {Actions} from '../../store/translation/actions';
-import {TranslationsState} from '../../store/translation/DTOs/TrasnlationsState';
+import {TranslationsState} from '../../store/translation/TrasnlationsState';
 import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import SearchIcon from '@material-ui/icons/Search';
