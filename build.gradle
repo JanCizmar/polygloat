@@ -14,6 +14,7 @@ plugins {
     id 'org.springframework.boot' version '2.2.0.RELEASE'
     id 'java'
     id 'org.liquibase.gradle' version '2.0.1'
+    id "com.moowork.node" version "1.3.1"
 }
 
 
@@ -36,7 +37,7 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
 bootJar {
-    baseName = 'polygloat_server'
+    baseName = 'polygloat'
     version = '0.1.0'
 }
 
@@ -69,6 +70,7 @@ liquibase {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     compile("org.springframework.boot:spring-boot-starter-security")
     compile 'io.sentry:sentry-spring:1.7.27'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -88,7 +90,7 @@ dependencies {
             // Uncomment the next line if you want to use RSASSA-PSS (PS256, PS384, PS512) algorithms:
             //'org.bouncycastle:bcprov-jdk15on:1.60',
             'io.jsonwebtoken:jjwt-jackson:0.10.7'
-    liquibaseRuntime('org.liquibase:liquibase-core:3.6.2')
+    implementation('org.liquibase:liquibase-core:3.6.2')
     liquibaseRuntime 'org.postgresql:postgresql'
     liquibaseRuntime('org.liquibase:liquibase-groovy-dsl:2.0.1')
     liquibaseRuntime('org.liquibase.ext:liquibase-hibernate5:3.6')
@@ -114,8 +116,8 @@ task unpack(type: Copy) {
 
 docker {
     dockerfile file('docker/spring/Dockerfile')
-    name "${bootJar.baseName}"
-    copySpec.from(tasks.unpack.outputs).into("dependency")
+    name "polygloat/polygloat"
+    copySpec.from(tasks.unpack.outputs, 'docker/spring').into("dependency")
     buildArgs(['DEPENDENCY': "dependency"])
 }
 
@@ -127,3 +129,54 @@ dockerCompose {
 test {
     useJUnitPlatform()
 }
+
+node {
+    download = true
+
+    // Set the work directory for unpacking node
+    workDir = file("${project.buildDir}/nodejs")
+
+    // Set the work directory for NPM
+    npmWorkDir = file("${project.buildDir}/npm")
+}
+
+def clientAppBuildDir = "${project.buildDir}/clientapp"
+
+task appNpmInstall(type: NpmTask) {
+    description = "Installs all dependencies from package.json"
+    workingDir = file(clientAppBuildDir)
+    args = ["install"]
+    inputs.files("${clientAppBuildDir}/package.json", "${clientAppBuildDir}/package-lock.json")
+    outputs.dir("${clientAppBuildDir}/node_modules")
+}
+
+task appNpmBuild(type: NpmTask) {
+    description = "Builds production version of the webapp"
+    workingDir = file(clientAppBuildDir)
+    args = ["run", "build"]
+    environment = [
+            'target': 'appbundle'
+    ]
+}
+
+task copyToBuild(type: Copy) {
+    from "${project.projectDir}/clientapp"
+    into clientAppBuildDir
+    inputs.dir("${project.projectDir}/clientapp")
+    outputs.dir(clientAppBuildDir)
+    exclude "node_modules", "lib", "dist"
+}
+
+task copyDist(type: Copy) {
+    from "${clientAppBuildDir}/dist"
+    into 'build/resources/main/static/.'
+    inputs.dir("${project.projectDir}/clientapp")
+    outputs.dir(clientAppBuildDir)
+}
+appNpmInstall.dependsOn copyToBuild
+appNpmBuild.dependsOn appNpmInstall
+copyDist.dependsOn appNpmBuild
+
+task buildProd(dependsOn: ['copyDist', 'bootJar'])
+
+task buildProdDocker(dependsOn: ['buildProd', 'docker'])

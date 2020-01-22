@@ -52,8 +52,8 @@ public class LanguageService {
     }
 
     @Transactional
-    public Set<Language> findAll() {
-        return new LinkedHashSet<>(languageRepository.findAll());
+    public Set<Language> findAll(Long repositoryId) {
+        return new LinkedHashSet<>(languageRepository.findAllByRepositoryId(repositoryId));
     }
 
     public Optional<Language> findById(Long id) {

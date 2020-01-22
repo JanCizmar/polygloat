@@ -43,8 +43,6 @@ export const Folder = connect((state: AppState) => ({translations: state.transla
         setFolder(folder.clone);
     }
 
-    console.log('rendering');
-
     const folderRow = props.folder.name !== null &&
         <TableBody>
             <TableRow className={classes.folder}>

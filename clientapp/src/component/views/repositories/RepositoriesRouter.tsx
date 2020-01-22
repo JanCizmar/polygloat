@@ -1,9 +1,10 @@
 import {Route, Switch, useRouteMatch} from 'react-router-dom';
 import * as React from 'react';
 import {RepositoryListView} from './RepositoryListView';
-import {RepositoryEditView} from './RepositoryEditView';
+import {RepositoryCreateEditView} from './RepositoryCreateEditView';
 import {LanguageListView} from './languages/LanguageListView';
 import {LINKS} from '../../../constants/links';
+import {LanguageEditView} from './languages/LanguageEditView';
 
 export const RepositoriesRouter = () => {
     let match = useRouteMatch();
@@ -21,13 +22,20 @@ export const RepositoriesRouter = () => {
                 <RepositoryListView/>
             </Route>
             <Route exact path={`${match.path}/edit/:repositoryId`}>
-                <RepositoryEditView/>
+                <RepositoryCreateEditView/>
+            </Route>
+
+            <Route exact path={`${LINKS.REPOSITORY_ADD.template}`}>
+                <RepositoryCreateEditView/>
             </Route>
 
             <Route exact path={`${LINKS.REPOSITORY_LANGUAGES.template}`}>
                 <LanguageListView/>
             </Route>
 
+            <Route exact path={`${LINKS.REPOSITORY_LANGUAGE_EDIT.template}`}>
+                <LanguageEditView/>
+            </Route>
 
         </Switch>
     );

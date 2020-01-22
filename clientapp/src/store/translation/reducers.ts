@@ -3,7 +3,7 @@ import {DataTransformation} from '../../helpers/dataTransformation';
 import {Actions} from './actions';
 import {Action} from '../Action';
 import {TranslationsState} from './TrasnlationsState';
-import {LanguageResponseType, TranslationsDataResponse} from '../../service/response.types';
+import {LanguageDTO, TranslationsDataResponse} from '../../service/response.types';
 
 const initialState: TranslationsState = new TranslationsState();
 
@@ -56,7 +56,7 @@ export function translationReducer(
         case Actions.loadLanguages.pendingType:
             return state.modify({...state, settingsPanelLoading: true});
         case Actions.loadLanguages.fulfilledType:
-            const allLanguagesPayload: LanguageResponseType[] = action.payload;
+            const allLanguagesPayload: LanguageDTO[] = action.payload;
             return state.modify({...state, allLanguages: allLanguagesPayload.map(l => l.abbreviation), settingsPanelLoading: false});
         default:
             for (const key of Object.keys(Actions)) {

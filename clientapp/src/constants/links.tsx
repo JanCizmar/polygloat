@@ -58,10 +58,11 @@ export class LINKS {
 
     static REPOSITORY_EDIT = Link.ofParent(LINKS.REPOSITORIES, 'edit/' + p(PARAMS.REPOSITORY_ID));
 
+    static REPOSITORY_ADD = Link.ofParent(LINKS.REPOSITORIES, 'add');
+
     static REPOSITORY_LANGUAGES = Link.ofParent(LINKS.REPOSITORY, 'languages');
 
-
-    static REPOSITORY_LANGUAGES_EDIT = Link.ofParent(LINKS.REPOSITORY_LANGUAGES, 'edit/' + p(PARAMS.LANGUAGE_ID));
+    static REPOSITORY_LANGUAGE_EDIT = Link.ofParent(LINKS.REPOSITORY_LANGUAGES, 'edit/' + p(PARAMS.LANGUAGE_ID));
 
     static REPOSITORY_TRANSLATIONS = Link.ofParent(LINKS.REPOSITORY, 'translations');
 };

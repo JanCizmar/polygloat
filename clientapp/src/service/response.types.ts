@@ -4,7 +4,7 @@ export type FileResponse = {
     translations: { [key: string]: string }
 }
 
-export type LanguageResponseType = {
+export type LanguageDTO = {
     abbreviation: string,
     id: number,
     name: string
@@ -23,7 +23,7 @@ export type TranslationsDataResponse = {
     data: FileResponse[]
 }
 
-export type RepositoryResponse = {
+export type RepositoryDTO = {
     id: number,
     name: string
 }

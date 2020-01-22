@@ -3,10 +3,11 @@ import {Folder, Translation} from '../store/translation/types';
 import {BaseHttpService} from './baseHttpService';
 import {messageService} from './messageService';
 import {TranslationsDataResponse} from './response.types';
+import {CONFIG} from '../config';
 
-const SERVER_URL = 'http://localhost:8080/';
+const API_URL = CONFIG.API_URL;
+
 const REPOSITORY_ID = 1;
-const API_URL = `${SERVER_URL}api/`;
 
 const http = container.resolve(BaseHttpService);
 

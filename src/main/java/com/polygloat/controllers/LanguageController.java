@@ -51,8 +51,8 @@ public class LanguageController implements IController {
     }
 
     @GetMapping(value = "")
-    public Set<LanguageDTO> getAll() {
-        return languageService.findAll().stream().map(LanguageDTO::fromEntity)
+    public Set<LanguageDTO> getAll(@PathVariable("repositoryId") Long repositoryId) {
+        return languageService.findAll(repositoryId).stream().map(LanguageDTO::fromEntity)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 

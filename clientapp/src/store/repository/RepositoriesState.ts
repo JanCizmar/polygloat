@@ -1,8 +1,8 @@
-import {RepositoryResponse} from '../../service/response.types';
+import {RepositoryDTO} from '../../service/response.types';
 
 export class RepositoriesState {
     repositoriesLoading: boolean = true;
-    repositories: RepositoryResponse[];
+    repositories: RepositoryDTO[];
     repositorySaving: boolean = false;
     repositorySaved: boolean = false;
 }

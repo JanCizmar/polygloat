@@ -18,12 +18,12 @@ module.exports = {
     module: {
         rules: [{
             test: /\.tsx?$/,
-            loader: "ts-loader",
+            use: ["ts-loader", 'webpack-conditional-loader'],
             exclude: [/node_modules/, /lib/],
         },
         ]
     },
-    mode: 'development',
+    mode: process.env.mode || 'production',
     plugins: [
         new HtmlWebpackPlugin({
             template: './src/index.html'

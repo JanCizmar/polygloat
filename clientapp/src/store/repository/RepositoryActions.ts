@@ -2,7 +2,7 @@ import {container, singleton} from 'tsyringe';
 
 import {repositoryService} from '../../service/repositoryService';
 import {AbstractActions} from '../AbstractActions';
-import {RepositoryResponse} from '../../service/response.types';
+import {RepositoryDTO} from '../../service/response.types';
 import {RepositoriesState} from './RepositoriesState';
 
 @singleton()
@@ -14,7 +14,7 @@ export class RepositoryActions extends AbstractActions<RepositoriesState> {
     resetEdit = this.createAction('RESET_EDIT', () => {
     }).build.on(state => (<RepositoriesState> {...state, repositorySaved: false, repositorySaving: false}));
     private service = container.resolve(repositoryService);
-    public loadRepositories = this.createPromiseAction<RepositoryResponse[], any>('LOAD_ALL', this.service.getRepositories)
+    public loadRepositories = this.createPromiseAction<RepositoryDTO[], any>('LOAD_ALL', this.service.getRepositories)
         .build.onFullFilled((state, action) => {
             return {...state, repositories: action.payload, repositoriesLoading: false};
         }).build.onPending((state, action) => {
@@ -24,9 +24,12 @@ export class RepositoryActions extends AbstractActions<RepositoriesState> {
         .build.onPending((state) => (<RepositoriesState> {...state, repositorySaving: true}))
         .build.onFullFilled((state) => (<RepositoriesState> {...state, repositorySaved: true, repositorySaving: false}));
 
+    createRepository = this.createPromiseAction('CREATE_REPOSITORY', (values) => this.service.createRepository(values))
+        .build.onPending((state) => (<RepositoriesState> {...state, repositorySaving: true}))
+        .build.onFullFilled((state) => (<RepositoriesState> {...state, repositorySaved: true, repositorySaving: false}));
+
     get prefix(): string {
         return 'REPOSITORIES';
     }
 
 }
-

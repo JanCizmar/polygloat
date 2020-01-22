@@ -3,7 +3,7 @@ import {container} from 'tsyringe';
 import {translationService} from '../../service/translationService';
 import {Action, PromiseAction} from '../Action';
 import {TranslationsState} from './TrasnlationsState';
-import {LanguageResponseType, TranslationsDataResponse} from '../../service/response.types';
+import {LanguageDTO, TranslationsDataResponse} from '../../service/response.types';
 import {languageService} from '../../service/languageService';
 
 const PREFIX = 'TRANSLATION_';
@@ -34,7 +34,7 @@ export class Actions {
         (oldFolder: Folder, newFolder: Folder) => Actions.service.moveFile(oldFolder, newFolder));
     static onFolderDelete = new Action(PREFIX + 'FOLDER_DELETE',
         (f: Folder) => (f: Folder) => Actions.service.deleteFolder(f));
-    static loadLanguages = new PromiseAction<LanguageResponseType[], any, TranslationsState>('LOAD_LANGUAGES',
+    static loadLanguages = new PromiseAction<LanguageDTO[], any, TranslationsState>('LOAD_LANGUAGES',
         (repositoryId: number) => Actions.languageService.getLanguages(repositoryId));
 }
 

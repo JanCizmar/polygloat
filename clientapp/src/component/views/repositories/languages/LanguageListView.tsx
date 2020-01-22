@@ -5,9 +5,9 @@ import Box from '@material-ui/core/Box';
 import {connect} from 'react-redux';
 import {AppState} from '../../../../store';
 import {container} from 'tsyringe';
-import {LanguageResponseType} from '../../../../service/response.types';
+import {LanguageDTO} from '../../../../service/response.types';
 import {LINKS, PARAMS} from '../../../../constants/links';
-import {FabAddButton} from '../../../common/buttons/FabAddButton';
+import {FabAddButtonLink} from '../../../common/buttons/FabAddButtonLink';
 import List from '@material-ui/core/List';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -21,7 +21,7 @@ import Grid from '@material-ui/core/Grid';
 const actions = container.resolve(LanguageActions);
 
 interface Props {
-    languages: LanguageResponseType[];
+    languages: LanguageDTO[];
     loading: boolean;
 }
 
@@ -29,27 +29,26 @@ export const LanguageListView = connect((state: AppState) =>
     ({languages: state.languages.languages, loading: state.languages.languagesLoading}))(
     (props: Props) => {
 
-        useEffect(() => {
-            actions.loadLanguages.dispatch();
-        }, []);
-
         const match = useRouteMatch();
         const repositoryId = match.params[PARAMS.REPOSITORY_ID];
 
+        useEffect(() => {
+            actions.loadLanguages.dispatch(repositoryId);
+        }, []);
 
         return (
             <RepositoryPage id={repositoryId}>
                 <BaseView title="Languages" loading={props.loading}>
                     {() => (
-                        <Grid xs={12} md={6} lg={3}>
+                        <Grid item xs={12} md={6} lg={3}>
                             <List>
                                 {props.languages.map(l => (
-                                    <ListItem>
+                                    <ListItem key={l.id}>
                                         <ListItemText>
                                             {l.name} [{l.abbreviation}]
                                         </ListItemText>
                                         <ListItemSecondaryAction>
-                                            <Link to={LINKS.REPOSITORY_LANGUAGES_EDIT.build(
+                                            <Link to={LINKS.REPOSITORY_LANGUAGE_EDIT.build(
                                                 {
                                                     [PARAMS.REPOSITORY_ID]: repositoryId,
                                                     [PARAMS.LANGUAGE_ID]: l.id
@@ -62,7 +61,7 @@ export const LanguageListView = connect((state: AppState) =>
                                 ))}
                             </List>
                             <Box display="flex" flexDirection="column" alignItems="flex-end" pr={2}>
-                                <FabAddButton/>
+                                <FabAddButtonLink to=""/>
                             </Box>
                         </Grid>
                     )}

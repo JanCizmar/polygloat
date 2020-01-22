@@ -5,7 +5,7 @@ import {DashboardPage} from '../../layout/DashboardPage';
 import {Divider} from '@material-ui/core';
 import List from '@material-ui/core/List';
 import {SideMenuItem} from '../../layout/sideMenu/SideMenuItem';
-import {LINKS} from '../../../constants/links';
+import {LINKS, PARAMS} from '../../../constants/links';
 import DynamicFeedIcon from '@material-ui/icons/DynamicFeed';
 import SettingsIcon from '@material-ui/icons/Settings';
 import LanguageIcon from '@material-ui/icons/Language';
@@ -19,18 +19,19 @@ const SideMenuItems = ({id}: Props) => (
     <div>
         <Divider/>
         <List>
-            <SideMenuItem linkTo={LINKS.REPOSITORIES.build({repositoryId: id})} icon={<DynamicFeedIcon/>} text="Repositories"/>
+            <SideMenuItem linkTo={LINKS.REPOSITORIES.build({[PARAMS.REPOSITORY_ID]: id})}
+                          icon={<DynamicFeedIcon/>} text="Repositories"/>
         </List>
         <Divider/>
         <List>
-            <SideMenuItem linkTo={LINKS.REPOSITORY_TRANSLATIONS.build({repositoryId: id})}
+            <SideMenuItem linkTo={LINKS.REPOSITORY_TRANSLATIONS.build({[PARAMS.REPOSITORY_ID]: id})}
                           icon={<LanguageIcon/>} text="Translations"/>
         </List>
         <Divider/>
         <List>
-            <SideMenuItem linkTo={LINKS.REPOSITORY_EDIT.build({repositoryId: id})}
+            <SideMenuItem linkTo={LINKS.REPOSITORY_EDIT.build({[PARAMS.REPOSITORY_ID]: id})}
                           icon={<SettingsIcon/>} text="Repository settings"/>
-            <SideMenuItem linkTo={LINKS.REPOSITORY_LANGUAGES.build({repositoryId: id})}
+            <SideMenuItem linkTo={LINKS.REPOSITORY_LANGUAGES.build({[PARAMS.REPOSITORY_ID]: id})}
                           icon={<FlagIcon/>} text="Languages"/>
         </List>
     </div>

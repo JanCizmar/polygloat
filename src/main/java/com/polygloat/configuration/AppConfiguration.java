@@ -11,5 +11,4 @@ public class AppConfiguration {
 
     @Value("${polygloat.authentication:true}")
     private boolean authentication;
-
 }

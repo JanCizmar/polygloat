@@ -6,13 +6,13 @@ export type StateModifier<StateType, PayloadType> = (state: StateType, action: A
 
 export abstract class AbstractAction<PayloadType = any, StateType = any> {
     protected constructor(public type: string,
-                          public payloadProvider: (...params: any[]) => PayloadType) {
+                          public payloadProvider?: (...params: any[]) => PayloadType) {
     }
 
     dispatch(...params: any[]) {
         container.resolve(dispatchService).dispatch({
             type: this.type,
-            payload: this.payloadProvider(...params),
+            payload: this.payloadProvider && this.payloadProvider(...params),
         });
     }
 }
@@ -27,7 +27,7 @@ export class Action<PayloadType = any, StateType = any> extends AbstractAction<P
     };
 
     constructor(public type: string,
-                public payloadProvider: (...params: any[]) => PayloadType,
+                public payloadProvider?: (...params: any[]) => PayloadType,
                 public stateModifier?: StateModifier<StateType, PayloadType>,
     ) {
         super(type, payloadProvider);
