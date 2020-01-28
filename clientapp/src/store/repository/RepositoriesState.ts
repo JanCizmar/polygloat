@@ -5,4 +5,6 @@ export class RepositoriesState {
     repositories: RepositoryDTO[];
     repositorySaving: boolean = false;
     repositorySaved: boolean = false;
+    selectedRepository: RepositoryDTO = null;
+    selectedRepositoryLoading: boolean = false;
 }

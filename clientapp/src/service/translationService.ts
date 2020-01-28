@@ -1,26 +1,22 @@
-import {container, singleton} from 'tsyringe';
+import {singleton} from 'tsyringe';
 import {Folder, Translation} from '../store/translation/types';
-import {BaseHttpService} from './baseHttpService';
+import {ApiHttpService} from './apiHttpService';
 import {messageService} from './messageService';
 import {TranslationsDataResponse} from './response.types';
-import {CONFIG} from '../config';
-
-const API_URL = CONFIG.API_URL;
 
 const REPOSITORY_ID = 1;
 
-const http = container.resolve(BaseHttpService);
-
-const messaging = container.resolve(messageService);
-
 @singleton()
 export class translationService {
+    constructor(private http: ApiHttpService, private messaging: messageService) {
+    }
+
     public getTranslations = async (search, langs: string[]): Promise<TranslationsDataResponse> =>
-        (await http.fetch(`${API_URL}repository/${REPOSITORY_ID}/translations/view` +
+        (await this.http.fetch(`repository/${REPOSITORY_ID}/translations/view` +
             `?search=${search}${langs ? '&languages=' + langs.join(',') : ''}`)).json();
 
     async setTranslations(translationData: Translation): Promise<any> {
-        await http.fetch(`${API_URL}repository/${REPOSITORY_ID}/translations`, {
+        await this.http.fetch(`repository/${REPOSITORY_ID}/translations`, {
             body: JSON.stringify({
                 path: translationData.pathString,
                 translations: translationData.translations,
@@ -32,22 +28,22 @@ export class translationService {
                 'Content-Type': 'application/json'
             },
         });
-        messaging.success('Translation saved');
+        this.messaging.success('Translation saved');
         return translationData;
     }
 
     async deleteFile(t: Translation): Promise<any> {
-        await http.fetch(`${API_URL}repository/${REPOSITORY_ID}/file/${t.fullPathString}`, {
+        await this.http.fetch(`repository/${REPOSITORY_ID}/file/${t.fullPathString}`, {
             method: 'DELETE'
         });
-        messaging.success('Translation deleted');
+        this.messaging.success('Translation deleted');
         return t;
     }
 
     async moveFile(oldFolder: Folder, newFolder: Folder) {
         const fileToBody = (f: Folder) => (f.fullPathString);
 
-        await http.fetch(`${API_URL}repository/${REPOSITORY_ID}/file`, {
+        await this.http.fetch(`repository/${REPOSITORY_ID}/file`, {
             method: 'POST',
             body: JSON.stringify({
                 oldFileFullPath: fileToBody(oldFolder),
@@ -57,15 +53,15 @@ export class translationService {
                 'Content-Type': 'application/json'
             }
         });
-        messaging.success('Folder saved');
+        this.messaging.success('Folder saved');
         return newFolder;
     }
 
     async deleteFolder(f: Folder) {
-        await http.fetch(`${API_URL}repository/${REPOSITORY_ID}/folders/${f.fullPathString}`, {
+        await this.http.fetch(`repository/${REPOSITORY_ID}/folders/${f.fullPathString}`, {
             method: 'DELETE'
         });
-        messaging.success('Folder deleted');
+        this.messaging.success('Folder deleted');
         return f;
     }
 }

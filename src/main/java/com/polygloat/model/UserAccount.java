@@ -1,7 +1,6 @@
 package com.polygloat.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -10,27 +9,46 @@ import java.util.Set;
 @Entity
 @Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = {"username"}),
+        @UniqueConstraint(columnNames = {"third_party_auth_type", "third_party_auth_id"}),
+
 })
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
+@Builder
+@AllArgsConstructor
+@Data
+@ToString(of = {"id", "username", "name"})
 public class UserAccount extends AuditModel {
+
     @Id
+    @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Getter
-    @Setter
     private Long id;
 
-    @Getter
-    @Setter
     private String username;
 
+    private String password;
+
+    private String name;
+
     @OneToMany(mappedBy = "createdBy")
-    @Getter
-    @Setter
+    @Builder.Default
     private Set<Repository> createdRepositories = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
-    @Getter
-    @Setter
     private Set<Permission> permissions;
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.USER;
+
+    @Column(name = "third_party_auth_type")
+    private String thirdPartyAuthType;
+
+    @Column(name = "third_party_auth_id")
+    private String thirdPartyAuthId;
+
+    @Column(name = "reset_password_code")
+    private String resetPasswordCode;
 
     public UserAccount() {
     }
@@ -39,4 +57,8 @@ public class UserAccount extends AuditModel {
         this.username = username;
     }
 
+    enum Role {
+        USER,
+        ADMIN
+    }
 }

@@ -16,7 +16,6 @@ public class ValidationException extends RuntimeException {
         this.validationErrors.add(new ValidationError(type, parameters));
     }
 
-
     public ValidationException(Collection<ValidationError> validationErrors) {
         this.validationErrors.addAll(validationErrors);
     }

@@ -28,6 +28,21 @@ export class RepositoryActions extends AbstractActions<RepositoriesState> {
         .build.onPending((state) => (<RepositoriesState> {...state, repositorySaving: true}))
         .build.onFullFilled((state) => (<RepositoriesState> {...state, repositorySaved: true, repositorySaving: false}));
 
+    loadRepository = this.createPromiseAction<RepositoryDTO, any>('SELECT_REPOSITORY',
+        async (id) => {
+            const repositoryDTOS = await this.service.getRepositories();
+            return repositoryDTOS.find(r => r.id === (!Number.isInteger(id) ? parseInt(id) : id));
+        })
+        .build.onFullFilled((state, action) => {
+            return <RepositoriesState> {
+                ...state,
+                selectedRepository: action.payload,
+                selectedRepositoryLoading: false
+            };
+        }).build.onPending((state, action) => {
+            return <RepositoriesState> {...state, selectedRepositoryLoading: true};
+        });
+
     get prefix(): string {
         return 'REPOSITORIES';
     }

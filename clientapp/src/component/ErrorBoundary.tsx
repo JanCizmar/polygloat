@@ -23,4 +23,4 @@ class ErrorBoundary extends React.Component<{ hasGlobalError }, { hasError: bool
     }
 }
 
-export default connect((state: AppState) => ({hasGlobalError: state.global.hasError}))(ErrorBoundary);
+export default connect((state: AppState) => ({hasGlobalError: state.error.hasError}))(ErrorBoundary);

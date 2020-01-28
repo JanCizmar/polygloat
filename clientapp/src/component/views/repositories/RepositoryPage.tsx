@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {FunctionComponent} from 'react';
+import {FunctionComponent, useEffect} from 'react';
 
 import {DashboardPage} from '../../layout/DashboardPage';
 import {Divider} from '@material-ui/core';
@@ -10,6 +10,13 @@ import DynamicFeedIcon from '@material-ui/icons/DynamicFeed';
 import SettingsIcon from '@material-ui/icons/Settings';
 import LanguageIcon from '@material-ui/icons/Language';
 import FlagIcon from '@material-ui/icons/Flag';
+import PersonAddIcon from '@material-ui/icons/PersonAdd';
+import {useSelector} from 'react-redux';
+import {AppState} from '../../../store';
+import {container} from 'tsyringe';
+import {RepositoryActions} from '../../../store/repository/RepositoryActions';
+import {FullPageLoading} from '../../common/FullPageLoading';
+import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
 
 interface Props {
     id: number
@@ -33,13 +40,37 @@ const SideMenuItems = ({id}: Props) => (
                           icon={<SettingsIcon/>} text="Repository settings"/>
             <SideMenuItem linkTo={LINKS.REPOSITORY_LANGUAGES.build({[PARAMS.REPOSITORY_ID]: id})}
                           icon={<FlagIcon/>} text="Languages"/>
+            <SideMenuItem linkTo={LINKS.REPOSITORY_INVITATION.build({[PARAMS.REPOSITORY_ID]: id})}
+                          icon={<PersonAddIcon/>} text="Invite user"/>
+            <SideMenuItem linkTo={LINKS.REPOSITORY_PERMISSIONS.build({[PARAMS.REPOSITORY_ID]: id})}
+                          icon={<SupervisedUserCircleIcon/>} text="Permissions"/>
         </List>
     </div>
 );
 
 export const RepositoryPage: FunctionComponent<Props> = ({children, id}) => {
+    let repositoriesState = useSelector((state: AppState) => state.repositories);
+
+    const actions = container.resolve(RepositoryActions);
+    const repository = repositoriesState.selectedRepository;
+
+    useEffect(() => {
+        if (!repository) {
+            actions.loadRepository.dispatch(id);
+        }
+    }, []);
+
+    if (!repository) {
+        console.log('here');
+        return null;
+    }
+
+    if (repositoriesState.selectedRepositoryLoading) {
+        return <FullPageLoading/>;
+    }
+
     return (
-        <DashboardPage sideMenuItems={<SideMenuItems id={id}/>}>
+        <DashboardPage subtitle={repository.name} sideMenuItems={<SideMenuItems id={id}/>}>
             {children}
         </DashboardPage>
     );

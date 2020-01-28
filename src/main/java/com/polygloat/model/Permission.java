@@ -1,71 +1,36 @@
 package com.polygloat.model;
 
+import lombok.*;
+
 import javax.persistence.*;
 
+@EqualsAndHashCode(callSuper = true, of = {"id"})
 @Entity
+@Builder
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Permission extends AuditModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
-    @ManyToOne
+    @ManyToOne()
     private UserAccount user;
+
+    @OneToOne
+    private Invitation invitation;
 
     @ManyToOne
     private Repository repository;
 
-    private boolean canView;
+    @Enumerated(EnumType.STRING)
+    private RepositoryPermissionType type;
 
-    private boolean canSuggest;
-
-    private boolean canEdit;
-
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public UserAccount getUser() {
-        return user;
-    }
-
-    public void setUser(UserAccount user) {
-        this.user = user;
-    }
-
-    public Repository getRepository() {
-        return repository;
-    }
-
-    public void setRepository(Repository repository) {
-        this.repository = repository;
-    }
-
-    public boolean isCanView() {
-        return canView;
-    }
-
-    public void setCanView(boolean canView) {
-        this.canView = canView;
-    }
-
-    public boolean isCanSuggest() {
-        return canSuggest;
-    }
-
-    public void setCanSuggest(boolean canSuggest) {
-        this.canSuggest = canSuggest;
-    }
-
-    public boolean isCanEdit() {
-        return canEdit;
-    }
-
-    public void setCanEdit(boolean canEdit) {
-        this.canEdit = canEdit;
+    public enum RepositoryPermissionType {
+        VIEW,
+        MANAGE,
+        TRANSLATE,
+        EDIT,
     }
 }

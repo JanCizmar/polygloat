@@ -5,14 +5,15 @@ import {ReactElement, useState} from 'react';
 
 interface MainMenuProps {
     sideMenuItems?: ReactElement;
+    subtitle?: string
 }
 
-export const MainMenu = ({sideMenuItems}: MainMenuProps) => {
+export const MainMenu = ({sideMenuItems, ...props}: MainMenuProps) => {
 
     const [open, setOpen] = useState(sideMenuItems && true);
 
     return <>
-        <TopBar onSideMenuOpen={() => setOpen(true)} isSideMenu={!!sideMenuItems} open={open}/>
+        <TopBar subtitle={props.subtitle} onSideMenuOpen={() => setOpen(true)} isSideMenu={!!sideMenuItems} open={open}/>
 
         {sideMenuItems &&
         <SideMenu onSideMenuClose={() => setOpen(false)} open={open}>

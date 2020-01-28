@@ -11,7 +11,6 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.password.LdapShaPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -29,40 +28,52 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${spring.ldap.embedded.port}")
     private String ldapPort;
 
+    //Getting values from properties file
+    @Value("${polygloat.ldap.url}")
+    private String ldapUrls;
+    @Value("${polygloat.ldap.base.dn}")
+    private String ldapBaseDn;
+    @Value("${polygloat.ldap.username}")
+    private String ldapSecurityPrincipal;
+    @Value("${polygloat.ldap.password}")
+    private String ldapPrincipalPassword;
+    @Value("${polygloat.ldap.user.dn-pattern}")
+    private String ldapUserDnPattern;
+    @Value("${polygloat.ldap.enabled}")
+    private String ldapEnabled;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         if (configuration.isAuthentication()) {
             http
-                    .csrf().disable()
-                    .cors().disable()
+                    .csrf().disable().cors().and()
+                    //if jwt token is provided in header, this filter will manualy authorize user, so the request is not gonna reach the ldap auth
                     .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                     .authorizeRequests()
                     .antMatchers("/api/public/**").permitAll()
                     .anyRequest().authenticated()
                     .and().sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and();
             return;
         }
 
         http
                 .csrf().disable()
-                .cors().disable()
+                .cors().and()
                 .authorizeRequests().anyRequest().permitAll();
     }
 
+
     @Override
-    public void configure(AuthenticationManagerBuilder auth) throws Exception {
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth
                 .ldapAuthentication()
-                .userDnPatterns("uid={0},ou=people")
-                .groupSearchBase("ou=groups")
                 .contextSource()
-                .url("ldap://localhost:" + ldapPort + "/dc=springframework,dc=org")
+                .url(ldapUrls + ldapBaseDn)
+                .managerDn(ldapSecurityPrincipal)
+                .managerPassword(ldapPrincipalPassword)
                 .and()
-                .passwordCompare()
-                .passwordEncoder(new LdapShaPasswordEncoder())
-                .passwordAttribute("userPassword");
+                .userDnPatterns(ldapUserDnPattern);
     }
 
     @Bean(BeanIds.AUTHENTICATION_MANAGER)

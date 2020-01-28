@@ -5,9 +5,8 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
-import Badge from '@material-ui/core/Badge';
 import MenuIcon from '@material-ui/icons/Menu';
-import NotificationsIcon from '@material-ui/icons/Notifications';
+import {UserMenu} from '../security/UserMenu';
 
 const drawerWidth = 240;
 
@@ -36,15 +35,19 @@ const useStyles = makeStyles(theme => ({
     menuButtonHidden: {
         display: 'none',
     },
+    title: {
+        flexGrow: 1
+    }
 }));
 
 interface TopBarProps {
     onSideMenuOpen: () => void;
     open: boolean
     isSideMenu: Boolean
+    subtitle?: string
 }
 
-export function TopBar({onSideMenuOpen, open, isSideMenu}: TopBarProps) {
+export function TopBar({onSideMenuOpen, open, isSideMenu, ...props}: TopBarProps) {
     const classes = useStyles({});
 
 
@@ -64,13 +67,9 @@ export function TopBar({onSideMenuOpen, open, isSideMenu}: TopBarProps) {
                 {/*
                         // @ts-ignore */}
                 <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-                    Polygloat
+                    Polygloat {props.subtitle && '- ' + props.subtitle}
                 </Typography>
-                <IconButton color="inherit">
-                    <Badge badgeContent={4} color="secondary">
-                        <NotificationsIcon/>
-                    </Badge>
-                </IconButton>
+                <UserMenu/>
             </Toolbar>
         </AppBar>
     );

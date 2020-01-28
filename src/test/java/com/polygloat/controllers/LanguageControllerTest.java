@@ -1,17 +1,22 @@
 package com.polygloat.controllers;
 
+import com.polygloat.ExceptionHandlers;
 import com.polygloat.dtos.request.LanguageDTO;
 import com.polygloat.exceptions.NotFoundException;
 import com.polygloat.model.File;
 import com.polygloat.model.Language;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -30,6 +35,16 @@ class LanguageControllerTest extends LoggedControllerTest implements ITest {
     private final LanguageDTO languageDTO = new LanguageDTO("en", "en");
     private final LanguageDTO languageDTOBlank = new LanguageDTO(null, "");
     private final LanguageDTO languageDTOCorrect = new LanguageDTO("Espanol", "es");
+
+
+    @Autowired
+    LanguageController languageController;
+    private MockMvc languageMvc;
+
+    @BeforeEach
+    public void setup() {
+        languageMvc = MockMvcBuilders.standaloneSetup(languageController).setControllerAdvice(new ExceptionHandlers()).build();
+    }
 
 
     @Test
@@ -113,7 +128,7 @@ class LanguageControllerTest extends LoggedControllerTest implements ITest {
     }
 
     private ResultActions performCreate(Long repositoryId, LanguageDTO content) throws Exception {
-        return mvc.perform(
+        return languageMvc.perform(
                 loggedPost("/api/repository/" + repositoryId + "/languages")
                         .contentType(MediaType.APPLICATION_JSON).content(
                         asJsonString(content)));

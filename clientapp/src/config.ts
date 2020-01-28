@@ -10,5 +10,5 @@ url = DEVELOPMENT_API_URL;
 // #endif
 
 export const CONFIG = {
-    API_URL: url
+    API_URL: url,
 };

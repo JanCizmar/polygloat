@@ -39,6 +39,10 @@ export class Link {
         }
         return link;
     }
+
+    buildWithOrigin(params?: { [key: string]: string | number }) {
+        return window.origin + this.build(params);
+    }
 }
 
 const p = (param: string) => {
@@ -46,6 +50,9 @@ const p = (param: string) => {
 };
 
 export enum PARAMS {
+    INVITATION_CODE = 'invitation_code',
+    ENCODED_EMAIL_AND_CODE = 'email_and_code',
+    SERVICE_TYPE = 'serviceType',
     REPOSITORY_ID = 'repositoryId',
     LANGUAGE_ID = 'languageId',
 
@@ -65,4 +72,24 @@ export class LINKS {
     static REPOSITORY_LANGUAGE_EDIT = Link.ofParent(LINKS.REPOSITORY_LANGUAGES, 'edit/' + p(PARAMS.LANGUAGE_ID));
 
     static REPOSITORY_TRANSLATIONS = Link.ofParent(LINKS.REPOSITORY, 'translations');
-};
+
+    static LOGIN = Link.ofRoot('login');
+
+    static OAUTH_RESPONSE = Link.ofParent(LINKS.LOGIN, 'auth_callback/' + p(PARAMS.SERVICE_TYPE));
+
+    static AFTER_LOGIN = LINKS.REPOSITORIES;
+
+    static RESET_PASSWORD_REQUEST = Link.ofRoot('reset_password_request');
+
+    static RESET_PASSWORD = Link.ofRoot('reset_password');
+
+    static RESET_PASSWORD_WITH_PARAMS = Link.ofParent(LINKS.RESET_PASSWORD, p(PARAMS.ENCODED_EMAIL_AND_CODE));
+
+    static SIGN_UP = Link.ofRoot('sign_up');
+
+    static REPOSITORY_INVITATION = Link.ofParent(LINKS.REPOSITORY, 'invite');
+
+    static ACCEPT_INVITATION = Link.ofRoot('accept_invitation/' + p(PARAMS.INVITATION_CODE));
+
+    static REPOSITORY_PERMISSIONS = Link.ofParent(LINKS.REPOSITORY, 'permissions');
+}

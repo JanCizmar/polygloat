@@ -1,13 +1,11 @@
 package com.polygloat.dtos.request;
 
-import com.polygloat.dtos.request.validators.annotations.RepositoryRequest;
 import com.polygloat.model.Language;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 
-@RepositoryRequest
 public class LanguageDTO {
     @Getter
     private Long id;

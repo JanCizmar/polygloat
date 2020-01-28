@@ -8,6 +8,7 @@ import com.polygloat.model.File;
 import com.polygloat.model.Repository;
 import com.polygloat.model.UserAccount;
 import com.polygloat.repository.RepositoryRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,20 +19,14 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+
 public class RepositoryService {
 
-    private RepositoryRepository repositoryRepository;
-    private EntityManager entityManager;
-    private LanguageService languageService;
-
-    @Autowired
-    public RepositoryService(RepositoryRepository repositoryRepository,
-                             EntityManager entityManager,
-                             LanguageService languageService) {
-        this.repositoryRepository = repositoryRepository;
-        this.entityManager = entityManager;
-        this.languageService = languageService;
-    }
+    private final RepositoryRepository repositoryRepository;
+    private final EntityManager entityManager;
+    private final LanguageService languageService;
+    private final SecurityService securityService;
 
     @Transactional
     public Optional<Repository> findByName(String name, UserAccount userAccount) {
@@ -45,11 +40,6 @@ public class RepositoryService {
 
 
     @Transactional
-    public Set<Repository> getRepositories(UserAccount userAccount) {
-        return userAccount.getCreatedRepositories();
-    }
-
-    @Transactional
     public Repository createRepository(CreateRepositoryDTO dto, UserAccount createdBy) {
         Repository repository = new Repository();
         repository.setName(dto.getName());
@@ -58,6 +48,8 @@ public class RepositoryService {
         File root = new File();
         root.setRepository(repository);
         repository.setRootFolder(root);
+
+        securityService.grantFullAccessToRepo(repository);
 
         for (LanguageDTO language : dto.getLanguages()) {
             languageService.createLanguage(language, repository);
@@ -77,8 +69,9 @@ public class RepositoryService {
         return repository;
     }
 
-    public Set<Repository> findAll(UserAccount userAccount) {
-        return new LinkedHashSet<>(repositoryRepository.findAllByCreatedBy(userAccount));
+    @Transactional
+    public Set<Repository> findAllPermitted(UserAccount userAccount) {
+        return new LinkedHashSet<>(repositoryRepository.findAllPermitted(userAccount));
     }
 
     @Transactional

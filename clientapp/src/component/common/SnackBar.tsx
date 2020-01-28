@@ -4,10 +4,11 @@ import Button from '@material-ui/core/Button';
 import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
-import {Actions} from '../../store/global/actions';
+import {MessageActions} from '../../store/global/messageActions';
 import {Message} from '../../store/global/types';
 import {connect} from 'react-redux';
 import {AppState} from '../../store';
+import {container} from 'tsyringe';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -21,6 +22,8 @@ interface Props {
     message?: Message;
 }
 
+const messageActions = container.resolve(MessageActions);
+
 function SnackBar(props: Props) {
     const classes = useStyles({});
 
@@ -28,11 +31,11 @@ function SnackBar(props: Props) {
         if (reason === 'clickaway') {
             return;
         }
-        Actions.messageExited.dispatch(props.message);
+        messageActions.messageExited.dispatch(props.message);
     };
 
     const handleExited = () => {
-        Actions.messageExited.dispatch(props.message);
+        messageActions.messageExited.dispatch(props.message);
     };
 
     const actions = [
@@ -78,4 +81,4 @@ function SnackBar(props: Props) {
     );
 }
 
-export default connect((state: AppState) => ({message: state.global.activeMessage}))(SnackBar);
+export default connect((state: AppState) => ({message: state.message.activeMessage}))(SnackBar);

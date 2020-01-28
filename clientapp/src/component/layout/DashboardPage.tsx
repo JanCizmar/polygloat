@@ -40,15 +40,16 @@ const useStyles = makeStyles(theme => ({
 
 interface DashboardPageProps {
     sideMenuItems?: ReactElement;
+    subtitle?: string;
 }
 
-export const DashboardPage: FunctionComponent<DashboardPageProps> = ({children, sideMenuItems}) => {
+export const DashboardPage: FunctionComponent<DashboardPageProps> = ({children, sideMenuItems, ...props}) => {
     const classes = useStyles({});
 
     return (
         <div className={classes.root}>
             <CssBaseline/>
-            <MainMenu sideMenuItems={sideMenuItems}/>
+            <MainMenu subtitle={props.subtitle} sideMenuItems={sideMenuItems}/>
             <main className={classes.content}>
                 <div className={classes.appBarSpacer}/>
                 <Container maxWidth="lg" className={classes.container}>

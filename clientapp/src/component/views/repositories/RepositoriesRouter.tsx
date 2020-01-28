@@ -5,6 +5,8 @@ import {RepositoryCreateEditView} from './RepositoryCreateEditView';
 import {LanguageListView} from './languages/LanguageListView';
 import {LINKS} from '../../../constants/links';
 import {LanguageEditView} from './languages/LanguageEditView';
+import {RepositoryInviteView} from './RepositoryInviteView';
+import {RepositoryPermissionsView} from './RepositoryPermissionsVIew';
 
 export const RepositoriesRouter = () => {
     let match = useRouteMatch();
@@ -36,7 +38,12 @@ export const RepositoriesRouter = () => {
             <Route exact path={`${LINKS.REPOSITORY_LANGUAGE_EDIT.template}`}>
                 <LanguageEditView/>
             </Route>
-
+            <Route exact path={`${LINKS.REPOSITORY_INVITATION.template}`}>
+                <RepositoryInviteView/>
+            </Route>
+            <Route exact path={`${LINKS.REPOSITORY_PERMISSIONS.template}`}>
+                <RepositoryPermissionsView/>
+            </Route>
         </Switch>
     );
 };

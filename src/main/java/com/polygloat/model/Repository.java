@@ -38,7 +38,8 @@ public class Repository extends AuditModel {
     @Getter
     @Setter
     @OneToMany(mappedBy = "repository")
-    private Set<Permission> permissions;
+    private Set<Permission> permissions = new LinkedHashSet<>();
+    ;
 
     @Getter
     @Setter

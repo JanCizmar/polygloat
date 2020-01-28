@@ -18,7 +18,7 @@ export const BaseFormView: FunctionComponent<BaseFormViewProps & BaseViewProps> 
         <BaseView {...props}>
             <StandardForm initialValues={props.initialValues} onSubmit={props.onSubmit}
                           onCancel={props.onCancel}
-                          saving={props.saving}
+                          loading={props.saving}
                           validationSchema={props.validationSchema}>
                 {props.children}
             </StandardForm>

@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.ldap.userdetails.LdapUserDetailsImpl;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,20 +35,11 @@ public class JwtTokenProvider {
         this.userAccountService = userAccountService;
     }
 
-    public JwtToken generateToken(Authentication authentication) {
-        LdapUserDetailsImpl userPrincipal = (LdapUserDetailsImpl) authentication.getPrincipal();
-
-        UserAccount userAccountEntity = userAccountService.getByUserName(userPrincipal.getUsername()).orElseGet(() -> {
-            UserAccount userAccount = new UserAccount();
-            userAccount.setUsername(userPrincipal.getUsername());
-            userAccountService.createUser(userAccount);
-            return userAccount;
-        });
-
+    public JwtToken generateToken(Long userId) {
         Date now = new Date();
 
         return new JwtToken(Jwts.builder()
-                .setSubject(userAccountEntity.getId().toString())
+                .setSubject(userId.toString())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(now.getTime() + properties.getJwtExpirationInMs()))
                 .signWith(properties.getKey())
