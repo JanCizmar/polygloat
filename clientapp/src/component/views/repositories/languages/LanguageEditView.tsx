@@ -1,80 +1,90 @@
 import * as React from 'react';
-import {useEffect, useState} from 'react';
-import {connect} from 'react-redux';
-import {AppState} from '../../../../store';
+import {useState} from 'react';
 import {container} from 'tsyringe';
-import {LanguageDTO} from '../../../../service/response.types';
 import {LINKS, PARAMS} from '../../../../constants/links';
-import {Redirect, useRouteMatch} from 'react-router-dom';
+import {useRouteMatch} from 'react-router-dom';
 import * as Yup from 'yup';
 import {TextField} from '../../../common/form/fields/TextField';
 import {RepositoryPage} from '../RepositoryPage';
 import {BaseFormView} from '../../BaseFormView';
 import {LanguageActions} from '../../../../store/languages/LanguageActions';
+import {Button} from "@material-ui/core";
+import {useConfirmation} from "../../../../hooks/useConfirmation";
+import {LanguageDTO} from "../../../../service/response.types";
+import {useRedirect} from "../../../../hooks/useRedirect";
 
 const actions = container.resolve(LanguageActions);
 
-interface Props {
-    languages: LanguageDTO[];
-    loading: boolean;
-    saving: boolean,
-    saved: boolean
-}
+export const LanguageEditView = () => {
 
-export const LanguageEditView = connect((state: AppState) =>
-    ({
-        languages: state.languages.languages,
-        loading: state.languages.languagesLoading,
-        saving: state.languages.languageSaving,
-        saved: state.languages.languageSaved,
-    }))(
-    ({languages, loading, saving, saved}: Props) => {
+    let confirmation = useConfirmation({title: "Delete language"});
 
-        let match = useRouteMatch();
+    let match = useRouteMatch();
 
-        const repositoryId = match.params[PARAMS.REPOSITORY_ID];
-        const languageId = match.params[PARAMS.LANGUAGE_ID];
 
-        const language = languages !== undefined ? languages.find(r => r.id === parseInt(languageId)) : null;
+    const repositoryId = match.params[PARAMS.REPOSITORY_ID];
+    const languageId = match.params[PARAMS.LANGUAGE_ID];
 
-        const [cancelled, setCancelled] = useState(false);
+    const [cancelled, setCancelled] = useState(false);
 
-        useEffect(() => {
-            if (languages === undefined) {
-                actions.loadLanguages.dispatch(repositoryId);
-            }
-        }, [languages]);
+    let languageLoadable = actions.useSelector(s => s.loadables.language);
+    let editLoadable = actions.useSelector(s => s.loadables.edit);
+    let deleteLoadable = actions.useSelector(s => s.loadables.delete);
 
-        const onSubmit = (values) => {
-            actions.editLanguage.dispatch(repositoryId, languageId, values);
+    if (!languageLoadable.loaded && !languageLoadable.loading) {
+        actions.loadableActions.language.dispatch(repositoryId, languageId);
+    }
+
+    const onSubmit = (values) => {
+        const dto: LanguageDTO = {
+            ...values,
+            id: languageId
         };
+        actions.loadableActions.edit.dispatch(repositoryId, dto);
+    };
 
-        if (saved || cancelled) {
-            actions.resetEdit.dispatch();
-            return <Redirect to={LINKS.REPOSITORY_LANGUAGES.build({[PARAMS.REPOSITORY_ID]: repositoryId})}/>;
-        }
+    if (editLoadable.loaded || cancelled || deleteLoadable.loaded) {
+        setCancelled(false);
+        actions.loadableReset.edit.dispatch();
+        actions.loadableReset.delete.dispatch();
+        useRedirect(LINKS.REPOSITORY_LANGUAGES, {[PARAMS.REPOSITORY_ID]: repositoryId});
+    }
 
-        return (
-            <RepositoryPage id={repositoryId}>
-                <BaseFormView
-                    lg={8} md={10} xs={12}
-                    title={'Edit repository'}
-                    initialValues={!loading && {...language}}
-                    onSubmit={onSubmit}
-                    onCancel={() => setCancelled(true)}
-                    saving={saving}
-                    loading={loading}
-                    validationSchema={Yup.object().shape(
-                        {
-                            name: Yup.string().required().max(100),
-                            abbreviation: Yup.string().required().max(20)
-                        })}
-                >
-                    <>
-                        <TextField label="Name" name="name" required={true}/>
-                        <TextField label="Abbreviation" name="abbreviation" required={true}/>
-                    </>
-                </BaseFormView>
-            </RepositoryPage>
-        );
-    });
+    return (
+        <RepositoryPage>
+            <BaseFormView
+                lg={6} md={8} xs={10}
+                title={'Language settings'}
+                initialValues={languageLoadable.data}
+                onSubmit={onSubmit}
+                onCancel={() => setCancelled(true)}
+                saveActionLoadable={editLoadable}
+                resourceLoadable={languageLoadable}
+                validationSchema={Yup.object().shape(
+                    {
+                        name: Yup.string().required().max(100),
+                        abbreviation: Yup.string().required().max(20)
+                    })}
+                customActions={
+                    <Button variant="outlined" color="secondary"
+                            onClick={() => confirmation({
+                                message: "Are you sure you want to delete languageLoadable " + languageLoadable.data.name + "?",
+                                hardModeText: languageLoadable.data.name.toUpperCase(),
+                                confirmButtonText: "Delete",
+                                confirmButtonColor: "secondary",
+                                onConfirm: () => {
+                                    actions.loadableActions.delete.dispatch(repositoryId, languageId)
+                                }
+                            })}
+                    >
+                        Delete language
+                    </Button>}
+            >
+                <>
+                    <TextField label="Name" name="name" required={true}/>
+                    <TextField label="Abbreviation" name="abbreviation" required={true}/>
+                </>
+            </BaseFormView>
+        </RepositoryPage>
+    );
+};

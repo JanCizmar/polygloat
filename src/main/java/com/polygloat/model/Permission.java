@@ -27,10 +27,14 @@ public class Permission extends AuditModel {
     @Enumerated(EnumType.STRING)
     private RepositoryPermissionType type;
 
+    @AllArgsConstructor
     public enum RepositoryPermissionType {
-        VIEW,
-        MANAGE,
-        TRANSLATE,
-        EDIT,
+        VIEW(1),
+        TRANSLATE(2),
+        EDIT(3),
+        MANAGE(4);
+
+        @Getter
+        private final int power;
     }
 }

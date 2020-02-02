@@ -1,21 +1,15 @@
-import {AbstractActions, createLoadable} from '../../AbstractActions';
 import {singleton} from 'tsyringe';
 import {repositoryService} from '../../../service/repositoryService';
 import {InvitationDTO} from '../../../service/response.types';
+import {AbstractLoadableActions, StateWithLoadables} from "../../AbstractLoadableActions";
 
-const invitationsLoadName = 'invitationsLoad';
-const invitationsDeleteName = 'invitationDelete';
-
-export class RepositoryInvitationState {
+export class RepositoryInvitationState extends StateWithLoadables<RepositoryInvitationActions> {
     invitationLoading: boolean = false;
     invitationCode: string = null;
-    [invitationsLoadName] = createLoadable<InvitationDTO[]>();
-    [invitationsDeleteName] = createLoadable<number>();
-
 }
 
 @singleton()
-export class RepositoryInvitationActions extends AbstractActions<RepositoryInvitationState> {
+export class RepositoryInvitationActions extends AbstractLoadableActions<RepositoryInvitationState> {
 
     generateCode = this.createPromiseAction('GENERATE_CODE',
         (repositoryId, type) => this.repositoryService.generateInvitationCode(repositoryId, type))
@@ -26,16 +20,21 @@ export class RepositoryInvitationActions extends AbstractActions<RepositoryInvit
         }).build.onRejected((state, action) => {
             return {...state, invitationCode: null, invitationLoading: false};
         });
+
     acceptInvitation = this.createPromiseAction('ACCEPT_INVITATION',
         (code) => this.repositoryService.acceptInvitation(code));
-    loadList = this.createLoadableAction(invitationsLoadName, this.repositoryService.getInvitations);
-    delete = this.createDeleteAction(invitationsDeleteName, invitationsLoadName, async (id) => {
-        await this.repositoryService.deleteInvitation(id);
-        return id;
-    });
+
+
+    loadableDefinitions = {
+        list: this.createLoadableDefinition(this.repositoryService.getInvitations),
+        delete: this.createDeleteDefinition("list", async (id) => {
+            await this.repositoryService.deleteInvitation(id);
+            return id;
+        })
+    };
 
     constructor(private repositoryService: repositoryService) {
-        super();
+        super(new RepositoryInvitationState());
     }
 
     get prefix(): string {

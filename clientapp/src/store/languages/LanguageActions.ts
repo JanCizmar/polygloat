@@ -1,34 +1,39 @@
 import {container, singleton} from 'tsyringe';
-import {AbstractActions} from '../AbstractActions';
-import {LanguageDTO} from '../../service/response.types';
-import {LanguagesState} from './LanguagesState';
+
 import {languageService} from '../../service/languageService';
+import {LanguageDTO} from '../../service/response.types';
+import {AbstractLoadableActions, StateWithLoadables} from "../AbstractLoadableActions";
+import {useSelector} from "react-redux";
+import {AppState} from "../index";
+
+export class LanguagesState extends StateWithLoadables<LanguageActions> {
+    languages: LanguageDTO[] = undefined;
+}
 
 @singleton()
-export class LanguageActions extends AbstractActions<LanguagesState> {
+export class LanguageActions extends AbstractLoadableActions<LanguagesState> {
     private service = container.resolve(languageService);
 
+    constructor() {
+        super(new LanguagesState());
+    }
 
-    resetEdit = this.createAction<void>('RESET_EDIT', null)
-        .build.on(state => (<LanguagesState> {
-            ...state,
-            languageSaved: false,
-            languagesLoading: false
-        }));
+    get loadableDefinitions() {
+        return {
+            list: this.createLoadableDefinition(this.service.getLanguages),
+            language: this.createLoadableDefinition(this.service.get),
+            create: this.createLoadableDefinition(this.service.create, null, "Language created"),
+            edit: this.createLoadableDefinition(this.service.editLanguage, null, "Language saved"),
+            delete: this.createLoadableDefinition(this.service.delete, null, "Language deleted"),
+        };
+    }
 
-    loadLanguages = this.createPromiseAction<LanguageDTO[], any>('LOAD_LANGUAGES',
-        (repositoryId: number) => this.service.getLanguages(repositoryId))
-        .build.onFullFilled((state, action) => {
-            return {...state, languages: action.payload, languagesLoading: false};
-        }).build.onPending((state, action) => ({...state, languagesLoading: true}));
+    useSelector<T>(selector: (state: LanguagesState) => T): T {
+        return useSelector((state: AppState) => selector(state.languages))
+    }
 
-    editLanguage = this.createPromiseAction('EDIT_LANGUAGE',
-        (repositoryId, languageId, values) => this.service.editLanguage(repositoryId, {...values, id: languageId}))
-        .build.onPending((state, action) => ({...state, languageSaving: true}))
-        .build.onFullFilled((state, action) => (
-            {...state, languageSaved: true, languageSaving: false}));
-
-    get prefix(): string {
+    get prefix():
+        string {
         return 'LANGUAGES';
     }
 

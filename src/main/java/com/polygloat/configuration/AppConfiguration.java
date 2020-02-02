@@ -44,6 +44,21 @@ public class AppConfiguration {
     @Value("${polygloat.ldap.enabled:false}")
     private boolean ldapAuthentication;
 
+    @Value("${spring.ldap.embedded.port:#{null}}")
+    private String ldapPort;
+    //Getting values from properties file
+    @Value("${polygloat.ldap.url:#{null}}")
+    private String ldapUrls;
+    @Value("${polygloat.ldap.base.dn:#{null}}")
+    private String ldapBaseDn;
+    @Value("${polygloat.ldap.username:#{null}}")
+    private String ldapSecurityPrincipal;
+    @Value("${polygloat.ldap.password:#{null}}")
+    private String ldapPrincipalPassword;
+    @Value("${polygloat.ldap.user.dn-pattern:#{null}}")
+    private String ldapUserDnPattern;
+
+
     /**
      * Mail configuration
      */

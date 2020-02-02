@@ -1,7 +1,7 @@
 import {default as React, FunctionComponent} from 'react';
-import MUITextField, {TextFieldProps} from '@material-ui/core/TextField';
+import {createStyles, makeStyles} from '@material-ui/core/styles';
+import {TextField as MUITextField, TextFieldProps, Theme} from '@material-ui/core';
 import {useField} from 'formik';
-import {createStyles, makeStyles, Theme} from '@material-ui/core';
 
 interface PGTextFieldProps {
     name: string;

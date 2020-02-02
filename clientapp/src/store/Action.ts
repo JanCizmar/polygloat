@@ -1,17 +1,20 @@
 import {container} from 'tsyringe';
 import {dispatchService} from '../service/dispatchService';
 
-export type ActionType<PayloadType> = { type: string, payload: PayloadType };
+export type ActionType<PayloadType> = { type: string, payload: PayloadType, meta?: any, params?: any[] };
 export type StateModifier<StateType, PayloadType> = (state: StateType, action: ActionType<PayloadType>) => StateType;
+
+export type PayloadProvider<PayloadType, F extends Function> = F extends (...params: infer A) => PayloadType ? A : never;
 
 export abstract class AbstractAction<PayloadType = any, StateType = any> {
     protected constructor(public type: string,
-                          public payloadProvider?: (...params: any[]) => PayloadType) {
+                          public payloadProvider?: (...params: any[]) => PayloadType, public meta?: object) {
     }
 
-    dispatch(...params: any[]) {
+    dispatch(...params: Parameters<this['payloadProvider']>) {
         container.resolve(dispatchService).dispatch({
             type: this.type,
+            meta: {...this.meta, params: params},
             payload: this.payloadProvider && this.payloadProvider(...params),
         });
     }
@@ -72,7 +75,7 @@ export class PromiseAction<PayloadType, ErrorType, StateType> extends AbstractAc
         }
     };
 
-    constructor(type: string, payloadProvider: (...params: any[]) => Promise<PayloadType>) {
-        super(type, payloadProvider);
+    constructor(type: string, payloadProvider: (...params: any[]) => Promise<PayloadType>, meta?: object) {
+        super(type, payloadProvider, meta);
     }
 }

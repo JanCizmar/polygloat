@@ -43,7 +43,12 @@ public class UserAccountService {
     }
 
     public UserAccount getImplicitUser() {
-        return this.userAccountRepository.findAll().stream().findFirst().orElseThrow(NotFoundException::new);
+        final String username = "___implicit_user";
+        return this.userAccountRepository.findByUsername(username).orElseGet(() -> {
+            UserAccount account = UserAccount.builder().name("No auth user").username(username).role(UserAccount.Role.ADMIN).build();
+            this.createUser(account);
+            return account;
+        });
     }
 
     public Optional<UserAccount> findByThirdParty(String type, String id) {

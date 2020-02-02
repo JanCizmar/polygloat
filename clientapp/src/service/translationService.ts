@@ -1,67 +1,30 @@
 import {singleton} from 'tsyringe';
-import {Folder, Translation} from '../store/translation/types';
 import {ApiHttpService} from './apiHttpService';
 import {messageService} from './messageService';
-import {TranslationsDataResponse} from './response.types';
+import {TranslationsDataResponse, TranslationsObject} from './response.types';
+import {TranslationCreationValue} from "../component/Translations/TranslationCreationDialog";
 
-const REPOSITORY_ID = 1;
 
 @singleton()
 export class translationService {
     constructor(private http: ApiHttpService, private messaging: messageService) {
     }
 
-    public getTranslations = async (search, langs: string[]): Promise<TranslationsDataResponse> =>
-        (await this.http.fetch(`repository/${REPOSITORY_ID}/translations/view` +
-            `?search=${search}${langs ? '&languages=' + langs.join(',') : ''}`)).json();
+    public getTranslations = async (repositoryId: number, langs?: string[], search?: string, limit?: number, offset?: number): Promise<TranslationsDataResponse> =>
+        (await this.http.get(`repository/${repositoryId}/translations/view`,
+            {search, languages: langs ? langs.join(',') : null, limit, offset}));
 
-    async setTranslations(translationData: Translation): Promise<any> {
-        await this.http.fetch(`repository/${REPOSITORY_ID}/translations`, {
-            body: JSON.stringify({
-                path: translationData.pathString,
-                translations: translationData.translations,
-                oldSourceText: translationData.oldName,
-                newSourceText: translationData.name
-            }),
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        });
-        this.messaging.success('Translation saved');
-        return translationData;
-    }
+    createSource = (repositoryId: number, value: TranslationCreationValue) => this.http.post(`repository/${repositoryId}/sources/create`, {
+        sourceFullPath: value.source,
+        translations: value.translations
+    });
 
-    async deleteFile(t: Translation): Promise<any> {
-        await this.http.fetch(`repository/${REPOSITORY_ID}/file/${t.fullPathString}`, {
-            method: 'DELETE'
-        });
-        this.messaging.success('Translation deleted');
-        return t;
-    }
+    set = (repositoryId: number, dto: { sourceFullPath: string, translations: { [abbreviation: string]: string } }) =>
+        this.http.post(`repository/${repositoryId}/translations`, dto);
 
-    async moveFile(oldFolder: Folder, newFolder: Folder) {
-        const fileToBody = (f: Folder) => (f.fullPathString);
+    editSource = (repositoryId: number, dto: { oldFullPathString: string, newFullPathString: string }) =>
+        this.http.post(`repository/${repositoryId}/sources/edit`, dto);
 
-        await this.http.fetch(`repository/${REPOSITORY_ID}/file`, {
-            method: 'POST',
-            body: JSON.stringify({
-                oldFileFullPath: fileToBody(oldFolder),
-                newFileFullPath: fileToBody(newFolder)
-            }),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        this.messaging.success('Folder saved');
-        return newFolder;
-    }
-
-    async deleteFolder(f: Folder) {
-        await this.http.fetch(`repository/${REPOSITORY_ID}/folders/${f.fullPathString}`, {
-            method: 'DELETE'
-        });
-        this.messaging.success('Folder deleted');
-        return f;
-    }
+    setTranslations = (repositoryId: number, dto: { sourceFullPath: string, translations: TranslationsObject}) =>
+        this.http.post(`repository/${repositoryId}/translations/set`, dto);
 }

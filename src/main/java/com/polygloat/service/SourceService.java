@@ -1,78 +1,98 @@
 package com.polygloat.service;
 
+import com.polygloat.constants.Message;
 import com.polygloat.dtos.PathDTO;
-import com.polygloat.dtos.request.SourceTranslationsDTO;
-import com.polygloat.model.File;
+import com.polygloat.dtos.request.EditSourceDTO;
+import com.polygloat.dtos.request.SetTranslationsDTO;
+import com.polygloat.dtos.response.SourceDTO;
+import com.polygloat.dtos.request.validators.exceptions.ValidationException;
+import com.polygloat.exceptions.NotFoundException;
 import com.polygloat.model.Repository;
 import com.polygloat.model.Source;
-import com.polygloat.repository.RepositoryRepository;
 import com.polygloat.repository.SourceRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class SourceService {
 
+    private final SourceRepository sourceRepository;
+    private final EntityManager entityManager;
 
-    private SourceRepository sourceRepository;
-    private FileService fileService;
-    private RepositoryRepository repositoryRepository;
-    private EntityManager entityManager;
+    //circular dependency
+    @Setter(onMethod = @__({@Autowired}))
+    private TranslationService translationService;
 
-    @Autowired
-    public SourceService(SourceRepository sourceRepository,
-                         FileService fileService,
-                         RepositoryRepository repositoryRepository,
-                         EntityManager entityManager) {
-        this.sourceRepository = sourceRepository;
-        this.fileService = fileService;
-        this.repositoryRepository = repositoryRepository;
-        this.entityManager = entityManager;
-    }
+    public Source getOrCreateSource(Repository repository, PathDTO path) {
 
-    private Source getOrCreateSource(Repository repository, PathDTO path) {
-        File file = fileService.getOrCreatePath(repository, path);
+        Source source = getSource(repository, path)
+                .orElseGet(() ->
+                        Source.builder()
+                                .name(path.getFullPathString())
+                                .repository(repository)
+                                .build());
 
-        if (file.isFolder() && file.getChildren() != null && !file.getChildren().isEmpty()) {
-            throw new IllegalArgumentException("Requested file is folder");
-        }
-
-        Source source = file.getSource();
-
-        if (source == null) {
-            source = new Source();
-            source.setFile(file);
-            file.setSource(source);
-            return source;
-        }
-
-        entityManager.persist(file);
         entityManager.persist(source);
 
         return source;
     }
 
-    public Source getCreateOrModifySource(Repository repository, SourceTranslationsDTO data) {
-        //if creating new translation old source info is null
+    public Optional<Source> getSource(Long repositoryId, PathDTO pathDTO) {
+        return sourceRepository.getByNameAndRepositoryId(pathDTO.getFullPathString(), repositoryId);
+    }
 
-        PathDTO sourceToRetrieve = data.getNewSourcePath();
-        if (data.getOldSourcePath() != null) {
-            //if old source (modifying a source), retrieve old one
-            sourceToRetrieve = data.getOldSourcePath();
+    public Optional<Source> getSource(Repository repository, PathDTO pathDTO) {
+        return sourceRepository.getByNameAndRepository(pathDTO.getFullPathString(), repository);
+    }
+
+    public Optional<Source> getSource(Long id) {
+        return sourceRepository.findById(id);
+    }
+
+    public void createSource(Repository repository, SourceDTO dto) {
+        if (this.getSource(repository, dto.getPathDto()).isPresent()) {
+            throw new ValidationException(Message.SOURCE_EXISTS);
+        }
+        Source source = Source.builder().name(dto.getFullPathString()).repository(repository).build();
+        sourceRepository.save(source);
+    }
+
+    public void editSource(Repository repository, EditSourceDTO dto) {
+        //do nothing on no change
+        if (dto.getNewFullPathString().equals(dto.getOldFullPathString())) {
+            return;
         }
 
-        Source source = getOrCreateSource(repository, sourceToRetrieve);
+        if (getSource(repository, dto.getNewPathDto()).isPresent()) {
+            throw new ValidationException(Message.SOURCE_EXISTS);
+        }
 
-        File file = source.getFile();
-
-        //new source info is always set, so setting the new name
-        file.setName(data.getNewSourceText());
-
-        entityManager.persist(file);
+        Source source = getSource(repository, dto.getOldPathDto()).orElseThrow(NotFoundException::new);
+        source.setName(dto.getNewFullPathString());
         sourceRepository.save(source);
+    }
 
-        return source;
+    public void deleteSource(Long id) {
+        Source source = getSource(id).orElseThrow(NotFoundException::new);
+        sourceRepository.delete(source);
+    }
+
+    @Transactional
+    public void createSource(Repository repository, SetTranslationsDTO dto) {
+        if (this.getSource(repository, PathDTO.fromFullPath(dto.getSourceFullPath())).isPresent()) {
+            throw new ValidationException(Message.SOURCE_EXISTS);
+        }
+
+        Source source = Source.builder().name(dto.getSourceFullPath()).repository(repository).build();
+
+        sourceRepository.save(source);
+        translationService.setForSource(source, dto.getTranslations());
     }
 }

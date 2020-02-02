@@ -1,5 +1,6 @@
 package com.polygloat.dtos.request.validators;
 
+import com.polygloat.constants.Message;
 import lombok.Getter;
 
 public class ValidationError {
@@ -9,8 +10,12 @@ public class ValidationError {
     @Getter
     private ValidationErrorType type;
 
-    public ValidationError(ValidationErrorType type, String... parameters) {
+    @Getter
+    private Message message;
+
+    public ValidationError(ValidationErrorType type, Message message, String... parameters) {
         this.parameters = parameters;
+        this.message = message;
         this.type = type;
     }
 }

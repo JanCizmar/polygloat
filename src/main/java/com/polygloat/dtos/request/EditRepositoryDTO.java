@@ -2,6 +2,7 @@ package com.polygloat.dtos.request;
 
 import com.polygloat.dtos.request.validators.annotations.RepositoryRequest;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;

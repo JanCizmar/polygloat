@@ -1,5 +1,6 @@
 package com.polygloat.security;
 
+import com.polygloat.exceptions.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -30,10 +31,14 @@ public class JwtTokenFilter extends GenericFilterBean {
         JwtToken token = jwtTokenProvider.resolveToken((HttpServletRequest) req);
 
         if (token != null && jwtTokenProvider.validateToken(token)) {
-            Authentication auth = jwtTokenProvider.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(auth);
+            try {
+                Authentication auth = jwtTokenProvider.getAuthentication(token);
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            } catch (Exception e) {
+                logger.error(e);
+                filterChain.doFilter(req, res);
+            }
         }
-
         filterChain.doFilter(req, res);
     }
 }

@@ -41,6 +41,7 @@ const useStyles = makeStyles(theme => ({
 interface DashboardPageProps {
     sideMenuItems?: ReactElement;
     subtitle?: string;
+    fullWidth?: boolean
 }
 
 export const DashboardPage: FunctionComponent<DashboardPageProps> = ({children, sideMenuItems, ...props}) => {
@@ -52,7 +53,7 @@ export const DashboardPage: FunctionComponent<DashboardPageProps> = ({children, 
             <MainMenu subtitle={props.subtitle} sideMenuItems={sideMenuItems}/>
             <main className={classes.content}>
                 <div className={classes.appBarSpacer}/>
-                <Container maxWidth="lg" className={classes.container}>
+                <Container maxWidth={props.fullWidth ? false : "lg"} className={classes.container}>
                     <Grid container spacing={3}>
                         {children}
                     </Grid>

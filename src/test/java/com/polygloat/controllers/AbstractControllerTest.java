@@ -8,7 +8,10 @@ import com.polygloat.exceptions.NotFoundException;
 import com.polygloat.model.UserAccount;
 import com.polygloat.repository.SourceRepository;
 import com.polygloat.security.payload.LoginRequest;
-import com.polygloat.service.*;
+import com.polygloat.service.LanguageService;
+import com.polygloat.service.RepositoryService;
+import com.polygloat.service.TranslationService;
+import com.polygloat.service.UserAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,8 +29,7 @@ public abstract class AbstractControllerTest extends AbstractTransactionalTest i
     DbPopulatorReal dbPopulator;
     @Autowired
     RepositoryService repositoryService;
-    @Autowired
-    FileService fileService;
+
     @Autowired
     TranslationService translationService;
 

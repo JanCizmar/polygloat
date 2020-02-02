@@ -7,12 +7,12 @@ import com.polygloat.service.SecurityService;
 import com.polygloat.service.UserAccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 
-@Component
+@Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class DbPopulatorReal {
     private final EntityManager entityManager;
@@ -33,7 +33,7 @@ public class DbPopulatorReal {
     }
 
     @Transactional
-    public File createBase(String repositoryName) {
+    public Repository createBase(String repositoryName) {
 
         String defaultUsername = "ben";
 
@@ -48,55 +48,47 @@ public class DbPopulatorReal {
         repository.setName(repositoryName);
         repository.setCreatedBy(userAccount);
 
-        File root = createFolder(null, repository, null);
-        repository.setRootFolder(root);
-
         en = createLanguage("en", repository);
         de = createLanguage("de", repository);
 
         securityService.grantFullAccessToRepo(userAccount, repository);
 
-        repositoryRepository.save(repository);
+        entityManager.persist(repository);
 
-        return root;
+        return repository;
     }
 
     @Transactional
-    public File populate(String repositoryName) {
-        File root = createBase(repositoryName);
+    public Repository populate(String repositoryName) {
+        Repository repository = createBase(repositoryName);
 
-        Repository repository = root.getRepository();
+        createTranslation(repository, "Hello world!", "Hallo Welt!", en, de);
+        createTranslation(repository, "English text one.", "Deutsch text einz.", en, de);
 
-        createTranslation(repository, root, "Hello world!", "Hallo Welt!", en, de);
-        createTranslation(repository, root, "English text one.", "Deutsch text einz.", en, de);
-
-        File home = createFolder(root, repository, "home");
-        createTranslation(repository, home, "This is translation in home folder",
+        createTranslation(repository, "This is translation in home folder",
                 "Das ist die Übersetzung im Home-Ordner", en, de);
 
-        File news = createFolder(home, repository, "news");
-        createTranslation(repository, news, "This is translation in news folder",
+        createTranslation(repository, "This is translation in news folder",
                 "Das ist die Übersetzung im News-Ordner", en, de);
-        createTranslation(repository, news, "This is another translation in news folder",
+        createTranslation(repository, "This is another translation in news folder",
                 "Das ist eine weitere Übersetzung im Nachrichtenordner", en, de);
 
-        File sampleApp = createFolder(root, repository, "sampleApp");
-        createTranslation(repository, sampleApp, "This is standard text somewhere in DOM.",
+        createTranslation(repository, "This is standard text somewhere in DOM.",
                 "Das ist Standardtext irgendwo im DOM.", en, de);
-        createTranslation(repository, sampleApp, "This is another standard text somewhere in DOM.",
+        createTranslation(repository, "This is another standard text somewhere in DOM.",
                 "Das ist ein weiterer Standardtext irgendwo in DOM.", en, de);
-        createTranslation(repository, sampleApp, "This is translation retrieved by service.",
+        createTranslation(repository, "This is translation retrieved by service.",
                 "Dase Übersetzung wird vom Service abgerufen.", en, de);
-        createTranslation(repository, sampleApp, "This is textarea with placeholder and value.",
+        createTranslation(repository, "This is textarea with placeholder and value.",
                 "Das ist ein Textarea mit Placeholder und Value.", en, de);
-        createTranslation(repository, sampleApp, "This is textarea with placeholder.",
+        createTranslation(repository, "This is textarea with placeholder.",
                 "Das ist ein Textarea mit Placeholder.", en, de);
-        createTranslation(repository, sampleApp, "This is input with value.",
+        createTranslation(repository, "This is input with value.",
                 "Das ist ein Input mit value.", en, de);
-        createTranslation(repository, sampleApp, "This is input with placeholder.",
+        createTranslation(repository, "This is input with placeholder.",
                 "Das ist ein Input mit Placeholder.", en, de);
 
-        return root;
+        return repository;
     }
 
 
@@ -112,32 +104,18 @@ public class DbPopulatorReal {
         return language;
     }
 
-    private void createTranslation(Repository repository, File parent, String english,
+    private void createTranslation(Repository repository, String english,
                                    String deutsch, Language en, Language de) {
 
 
-        File file = new File();
-        file.setParent(parent);
-        file.setName(english.replaceAll("[^\\w\\d]", "_")
-                .replaceAll("^_*(.*?)_*$", "$1"));
-
-        Source source = new Source();
-        file.setSource(source);
-        file.setRepository(repository);
-
-        entityManager.persist(file);
-
-        source.setFile(file);
-
-        entityManager.persist(source);
-
+        Source source = Source.builder().name(english.replace(" ", "_").toLowerCase()).repository(repository).build();
 
         Translation translation = new Translation();
         translation.setLanguage(en);
         translation.setSource(source);
         translation.setText(english);
 
-
+        source.getTranslations().add(translation);
         source.getTranslations().add(translation);
 
         entityManager.persist(translation);
@@ -149,16 +127,11 @@ public class DbPopulatorReal {
 
         source.getTranslations().add(translationDe);
 
-        entityManager.persist(translationDe);
-    }
 
-    private File createFolder(File parent, Repository repository, String name) {
-        File folder = new File();
-        folder.setName(name);
-        folder.setRepository(repository);
-        folder.setParent(parent);
-        entityManager.persist(folder);
-        return folder;
+        entityManager.persist(translationDe);
+
+        entityManager.persist(source);
+
     }
 
 

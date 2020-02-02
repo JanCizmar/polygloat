@@ -1,12 +1,21 @@
-import {AbstractAction, Action, PromiseAction, StateModifier} from './Action';
+import {AbstractAction, Action, PromiseAction} from './Action';
 import {ErrorResponseDTO} from '../service/response.types';
+import {Link} from "../constants/links";
 
 export abstract class AbstractActions<StateType> {
     private actions = new Map<string, AbstractAction>();
 
+    protected readonly _initialState: StateType = null;
+
+    public get initialState(): StateType {
+        return {...this._initialState};
+    }
+
     abstract get prefix(): string;
 
-    constructor() {
+
+    constructor(initialState: StateType) {
+        this._initialState = initialState;
     }
 
     createAction<PayloadType>(type: string, payloadProvider?: (...params: any[]) => PayloadType): Action {
@@ -16,9 +25,16 @@ export abstract class AbstractActions<StateType> {
     }
 
     createPromiseAction<PayloadType, ErrorType = ErrorResponseDTO>(type: string,
-                                                                   payloadProvider: (...params: any[]) => Promise<PayloadType>):
+                                                                   payloadProvider: (...params: any[]) => Promise<PayloadType>,
+                                                                   successMessage?: string,
+                                                                   redirectAfter?: Link):
         PromiseAction<PayloadType, ErrorType, StateType> {
-        let promiseAction = new PromiseAction<PayloadType, ErrorType, StateType>(`${this.prefix}_${type}`, payloadProvider);
+        let promiseAction = new PromiseAction<PayloadType, ErrorType, StateType>(`${this.prefix}_${type}`,
+            payloadProvider,
+            {
+                successMessage,
+                redirectAfter
+            });
         this.register(promiseAction);
         return promiseAction;
     }
@@ -37,69 +53,4 @@ export abstract class AbstractActions<StateType> {
             this.actions.set(action.rejectedType, action);
         }
     }
-
-    createLoadableAction<PayloadType>(loadableName,
-                                      payloadProvider: (...params: any[]) => Promise<any>,
-                                      then?: StateModifier<StateType, PayloadType>):
-        PromiseAction<PayloadType, ErrorResponseDTO, StateType> {
-        return this.createPromiseAction(loadableName.toUpperCase(), payloadProvider)
-            .build.onPending((state, action) => {
-                return {
-                    ...state,
-                    [loadableName]: <Loadable<PayloadType>> {...state[loadableName], loading: true, error: null, errorParams: null}
-                };
-            }).build.onFullFilled((state, action) => {
-                const newState = {
-                    ...state,
-                    [loadableName]: <Loadable<PayloadType>> {
-                        ...state[loadableName],
-                        loading: false,
-                        data: action.payload,
-                        error: null,
-                        errorParams: null
-                    }
-                };
-                return typeof then === 'function' ? then(newState, action) : newState;
-            })
-            .build.onRejected((state, action) => {
-                return {
-                    ...state,
-                    [loadableName]: <Loadable<PayloadType>> {
-                        ...state[loadableName],
-                        loading: true,
-                        data: null,
-                        error: action.payload.code,
-                        errorParams: action.payload.params
-                    }
-                };
-            });
-    }
-
-    createDeleteAction = (deleteLoadableName, listLoadableName, payloadProvider: (id: number) => Promise<number>) =>
-        this.createLoadableAction(deleteLoadableName, payloadProvider, (state, action) => {
-            const data = [...state[listLoadableName].data];
-            let index = data.findIndex(i => i.id === action.payload);
-            if (index > -1) {
-                data.splice(index, 1);
-            }
-            state[listLoadableName].data = data;
-            return state;
-        });
 }
-
-export interface Loadable<DataType> {
-    __discriminator: 'loadable',
-    data: DataType,
-    dispatchParams: any[]
-    loading: boolean,
-    error?: string,
-    errorParams?: any[]
-}
-
-export const createLoadable = <DataType>(): Loadable<DataType> => ({
-    __discriminator: 'loadable',
-    data: null,
-    loading: true,
-    dispatchParams: null
-});
-

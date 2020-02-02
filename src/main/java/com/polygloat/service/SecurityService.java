@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -31,21 +32,28 @@ public class SecurityService {
         grantFullAccessToRepo(getActiveUser(), repository);
     }
 
-    public boolean canEditRepository(Repository repository) {
-        return repository.getCreatedBy().equals(authenticationFacade.getUserAccount());
+    public Optional<Permission> getRepositoryPermission(Long repositoryId) {
+        return this.permissionRepository.findOneByRepositoryIdAndUserId(repositoryId, getActiveUser().getId());
     }
 
-    public Set<Permission> getRepositoryPermissions(Long repositoryId) {
-        return this.permissionRepository.findAllByRepositoryIdAndUserId(repositoryId, getActiveUser().getId());
-    }
-
-    public void checkManageRepositoryPermission(Long repositoryId) {
-        if (getRepositoryPermissions(repositoryId).stream()
-                .anyMatch(p -> p.getType() == Permission.RepositoryPermissionType.MANAGE)) {
-            return;
+    public Permission getAnyRepositoryPermission(Long repositoryId) {
+        Optional<Permission> repositoryPermission = getRepositoryPermission(repositoryId);
+        if (repositoryPermission.isEmpty()) {
+            throw new PermissionException();
         }
-        throw new PermissionException();
+
+        return repositoryPermission.get();
     }
+
+
+    public Permission checkRepositoryPermission(Long repositoryId, Permission.RepositoryPermissionType requiredPermission) {
+        Permission usersPermission = getAnyRepositoryPermission(repositoryId);
+        if (requiredPermission.getPower() > usersPermission.getType().getPower()) {
+            throw new PermissionException();
+        }
+        return usersPermission;
+    }
+
 
     private UserAccount getActiveUser() {
         return this.authenticationFacade.getUserAccount();

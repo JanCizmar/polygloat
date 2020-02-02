@@ -2,7 +2,7 @@ import {AbstractActions} from '../AbstractActions';
 import {singleton} from 'tsyringe';
 import {signUpService} from '../../service/signUpService';
 
-export class SignUpState {
+export class SignUpState{
     signUpLoading = false;
     signUpError = null;
 }
@@ -20,7 +20,7 @@ export class SignUpActions extends AbstractActions<SignUpState> {
         });
 
     constructor(private service: signUpService) {
-        super();
+        super(new SignUpState());
     }
 
     get prefix(): string {

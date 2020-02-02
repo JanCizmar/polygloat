@@ -1,5 +1,6 @@
 import * as React from 'react';
-import {makeStyles, Theme} from '@material-ui/core';
+import {makeStyles} from '@material-ui/core/styles';
+import {Theme} from '@material-ui/core';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import Box from '@material-ui/core/Box';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';

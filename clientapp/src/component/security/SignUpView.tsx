@@ -15,6 +15,7 @@ import {SetPasswordFields, setPasswordValidationSchema} from './SetPasswordField
 import {SignUpActions} from '../../store/global/signUpActions';
 import {TextField} from '../common/form/fields/TextField';
 import {signUpService} from '../../service/signUpService';
+import {useConfig} from "../../hooks/useConfig";
 
 const actions = container.resolve(SignUpActions);
 const service = container.resolve(signUpService);
@@ -43,10 +44,11 @@ const validationSchema = Yup.object().shape({
         })
 });
 
-export const SignUpView: FunctionComponent = () => {
+const SignUpView: FunctionComponent = () => {
     const security = useSelector((state: AppState) => state.global.security);
-    const remoteConfig = useSelector((state: AppState) => state.global.remoteConfig);
     const state = useSelector((state: AppState) => state.signUp);
+
+    const remoteConfig = useConfig();
 
     if (!remoteConfig.authentication || security.allowPrivate || !remoteConfig.allowRegistrations) {
         return (<Redirect to={LINKS.AFTER_LOGIN.build()}/>);
@@ -83,3 +85,5 @@ export const SignUpView: FunctionComponent = () => {
         </DashboardPage>
     );
 };
+
+export default SignUpView;

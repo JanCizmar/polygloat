@@ -59,25 +59,14 @@ export enum PARAMS {
 }
 
 export class LINKS {
-    static REPOSITORIES = Link.ofRoot('repositories');
 
-    static REPOSITORY = Link.ofParent(LINKS.REPOSITORIES, p(PARAMS.REPOSITORY_ID));
-
-    static REPOSITORY_EDIT = Link.ofParent(LINKS.REPOSITORIES, 'edit/' + p(PARAMS.REPOSITORY_ID));
-
-    static REPOSITORY_ADD = Link.ofParent(LINKS.REPOSITORIES, 'add');
-
-    static REPOSITORY_LANGUAGES = Link.ofParent(LINKS.REPOSITORY, 'languages');
-
-    static REPOSITORY_LANGUAGE_EDIT = Link.ofParent(LINKS.REPOSITORY_LANGUAGES, 'edit/' + p(PARAMS.LANGUAGE_ID));
-
-    static REPOSITORY_TRANSLATIONS = Link.ofParent(LINKS.REPOSITORY, 'translations');
+    /**
+     * Authentication
+     */
 
     static LOGIN = Link.ofRoot('login');
 
     static OAUTH_RESPONSE = Link.ofParent(LINKS.LOGIN, 'auth_callback/' + p(PARAMS.SERVICE_TYPE));
-
-    static AFTER_LOGIN = LINKS.REPOSITORIES;
 
     static RESET_PASSWORD_REQUEST = Link.ofRoot('reset_password_request');
 
@@ -87,9 +76,43 @@ export class LINKS {
 
     static SIGN_UP = Link.ofRoot('sign_up');
 
-    static REPOSITORY_INVITATION = Link.ofParent(LINKS.REPOSITORY, 'invite');
-
     static ACCEPT_INVITATION = Link.ofRoot('accept_invitation/' + p(PARAMS.INVITATION_CODE));
 
-    static REPOSITORY_PERMISSIONS = Link.ofParent(LINKS.REPOSITORY, 'permissions');
+    /**
+     * Visible with view permissions
+     */
+
+    static REPOSITORIES = Link.ofRoot('repositories');
+
+    static AFTER_LOGIN = LINKS.REPOSITORIES;
+
+    static REPOSITORY = Link.ofParent(LINKS.REPOSITORIES, p(PARAMS.REPOSITORY_ID));
+
+    static REPOSITORY_ADD = Link.ofParent(LINKS.REPOSITORIES, 'add');
+
+    static REPOSITORY_TRANSLATIONS = Link.ofParent(LINKS.REPOSITORY, 'translations');
+
+    /**
+     * Visible with edit permissions
+     */
+
+    static REPOSITORY_TRANSLATIONS_ADD = Link.ofParent(LINKS.REPOSITORY_TRANSLATIONS, "add");
+
+    /**
+     * Visible with manage permissions
+     */
+
+    static REPOSITORY_MANAGE = Link.ofParent(LINKS.REPOSITORY, "manage");
+
+    static REPOSITORY_EDIT = Link.ofParent(LINKS.REPOSITORY_MANAGE, "edit");
+
+    static REPOSITORY_LANGUAGES = Link.ofParent(LINKS.REPOSITORY_MANAGE, 'languages');
+
+    static REPOSITORY_LANGUAGE_EDIT = Link.ofParent(LINKS.REPOSITORY_LANGUAGES, 'edit/' + p(PARAMS.LANGUAGE_ID));
+
+    static REPOSITORY_INVITATION = Link.ofParent(LINKS.REPOSITORY_MANAGE, 'invite');
+
+    static REPOSITORY_PERMISSIONS = Link.ofParent(LINKS.REPOSITORY_MANAGE, 'permissions');
+
+    static REPOSITORY_LANGUAGES_CREATE = Link.ofParent(LINKS.REPOSITORY_LANGUAGES, 'add');
 }

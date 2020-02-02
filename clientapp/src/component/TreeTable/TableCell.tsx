@@ -1,5 +1,6 @@
 import * as React from 'react';
-import {styled, TableCell as MUITableCell} from '@material-ui/core';
+import {styled} from '@material-ui/core/styles';
+import {TableCell as MUITableCell} from '@material-ui/core';
 
 
 export const TableCell = styled(MUITableCell)({

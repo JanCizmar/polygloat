@@ -1,10 +1,15 @@
 package com.polygloat.service.query_builders;
 
 import com.polygloat.model.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 public class TranslationsViewBuilder {
@@ -24,32 +29,31 @@ public class TranslationsViewBuilder {
     }
 
     public <T> CriteriaQuery<T> getBaseQuery(CriteriaQuery<T> query1) {
-        Root<File> file = query1.from(File.class);
-        Join<File, Source> source = file.join(File_.source, JoinType.LEFT);
+        Root<Source> source = query1.from(Source.class);
 
-        Selection<String> fullPath = getFullPath(file);
+        Expression<String> fullPath = source.get(Source_.name);
 
         selection.add(fullPath);
-        //for isSource property
-        selection.add(file.get(File_.source).get(Source_.id));
+
+        Join<Source, Repository> repository = source.join(Source_.repository);
 
         for (String abbr : abbrs) {
+            SetJoin<Repository, Language> languages = repository.join(Repository_.languages);
+            languages.on(cb.equal(languages.get(Language_.abbreviation), abbr));
+
             SetJoin<Source, Translation> translations = source.join(Source_.translations, JoinType.LEFT);
-            Join<Translation, Language> language = translations.join(Translation_.language, JoinType.LEFT);
+            translations.on(cb.equal(translations.get(Translation_.language), languages));
 
-            restrictions.add(cb.or(cb.equal(language.get(Language_.abbreviation), abbr), cb.isNull(file.get(File_.source))));
-
-            selection.add(language.get(Language_.abbreviation));
+            selection.add(languages.get(Language_.abbreviation));
             selection.add(translations.get(Translation_.text));
             fullTextFields.add(translations.get(Translation_.text));
         }
 
-        restrictions.add(cb.equal(file.get(File_.repository), repository));
-        restrictions.add(cb.isNotNull(file.get(File_.name)));
+        restrictions.add(cb.equal(source.get(Source_.repository), repository));
 
         Set<Predicate> fullTextRestrictions = new HashSet<>();
 
-        fullTextFields.add((Expression<String>) fullPath);
+        fullTextFields.add(fullPath);
 
         if (searchString != null && !searchString.isEmpty()) {
             for (Expression<String> fullTextField : fullTextFields) {
@@ -67,9 +71,9 @@ public class TranslationsViewBuilder {
     public CriteriaQuery<Object> getDataQuery() {
         CriteriaQuery<Object> query1 = getBaseQuery(cb.createQuery());
 
-        Root<File> file = (Root<File>) query1.getRoots().iterator().next();
+        Root<Source> source = (Root<Source>) query1.getRoots().iterator().next();
 
-        Selection<String> fullPath = getFullPath(file);
+        Selection<String> fullPath = source.get(Source_.name);
 
         Selection<?>[] paths = selection.toArray(new Selection<?>[0]);
 
@@ -82,15 +86,25 @@ public class TranslationsViewBuilder {
     public CriteriaQuery<Long> getCountQuery() {
         CriteriaQuery<Long> query = getBaseQuery(cb.createQuery(Long.class));
 
-        Root<File> file = (Root<File>) query.getRoots().iterator().next();
+        Root<Source> file = (Root<Source>) query.getRoots().iterator().next();
 
         query.select(cb.count(file));
         return query;
     }
 
-
-    private Selection<String> getFullPath(Root<File> file) {
-        return cb.concat(file.get(File_.materializedPath), cb.concat(".", file.get(File_.name)));
+    public static Result getData(EntityManager em, Repository repository, Set<String> abbrs, String searchString, int limit, int offset) {
+        TranslationsViewBuilder translationsViewBuilder = new TranslationsViewBuilder(em.getCriteriaBuilder(), repository, abbrs, searchString);
+        Long count = em.createQuery(translationsViewBuilder.getCountQuery()).getSingleResult();
+        translationsViewBuilder = new TranslationsViewBuilder(em.getCriteriaBuilder(), repository, abbrs, searchString);
+        TypedQuery<Object> query = em.createQuery(translationsViewBuilder.getDataQuery()).setFirstResult(offset).setMaxResults(limit);
+        List<Object> resultList = query.getResultList();
+        return new Result(count, resultList);
     }
 
+    @Data
+    @AllArgsConstructor
+    public static class Result {
+        private Long count;
+        private List<Object> data;
+    }
 }

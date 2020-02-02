@@ -18,7 +18,6 @@ export const PrivateRoute: FunctionComponent<PrivateRouteProps & React.Component
         const afterLoginLink = ss.getAfterLoginLink();
 
         if (allowPrivate && afterLoginLink) {
-            console.log(afterLoginLink);
             ss.removeAfterLoginLink();
             children = <Redirect to={afterLoginLink}/>;
         }

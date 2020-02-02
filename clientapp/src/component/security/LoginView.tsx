@@ -14,6 +14,7 @@ import {container} from 'tsyringe';
 import {GlobalActions} from '../../store/global/globalActions';
 import {Alert} from '../common/Alert';
 import {securityService} from '../../service/securityService';
+import {useConfig} from "../../hooks/useConfig";
 
 interface LoginProps {
 
@@ -25,7 +26,11 @@ const securityServiceIns = container.resolve(securityService);
 export const LoginView: FunctionComponent<LoginProps> = (props) => {
 
     const security = useSelector((state: AppState) => state.global.security);
-    const remoteConfig = useSelector((state: AppState) => state.global.remoteConfig);
+    const remoteConfig = useConfig();
+
+    if (!remoteConfig.authentication || security.allowPrivate) {
+        return (<Redirect to={LINKS.AFTER_LOGIN.build()}/>);
+    }
 
     const githubBase = 'https://github.com/login/oauth/authorize';
     const githubRedirectUri = LINKS.OAUTH_RESPONSE.buildWithOrigin({[PARAMS.SERVICE_TYPE]: 'github'});
@@ -35,10 +40,6 @@ export const LoginView: FunctionComponent<LoginProps> = (props) => {
     const history = useHistory();
     if (history.location.state && history.location.state.from) {
         securityServiceIns.saveAfterLoginLink(history.location.state.from);
-    }
-
-    if (!remoteConfig.authentication || security.allowPrivate) {
-        return (<Redirect to={LINKS.AFTER_LOGIN.build()}/>);
     }
 
     return (

@@ -2,12 +2,11 @@ package com.polygloat.controllers;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.polygloat.dtos.request.SourceTranslationsDTO;
+import com.polygloat.dtos.query_results.SourceDTO;
+import com.polygloat.dtos.response.SourceResponseDTO;
 import com.polygloat.dtos.response.ViewDataResponse;
-import com.polygloat.dtos.response.translations_view.FileViewDataItem;
 import com.polygloat.dtos.response.translations_view.ResponseParams;
 import com.polygloat.exceptions.NotFoundException;
-import com.polygloat.model.File;
 import com.polygloat.model.Repository;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -17,18 +16,14 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
 import static com.polygloat.controllers.LoggedRequestFactory.loggedGet;
-import static com.polygloat.controllers.LoggedRequestFactory.loggedPost;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
@@ -42,7 +37,7 @@ class TranslationControllerTest extends LoggedControllerTest {
 
         String searchString = "This";
 
-        ViewDataResponse<LinkedHashSet<FileViewDataItem>, ResponseParams> response = performValidViewRequest(repository, "?search=" + searchString);
+        ViewDataResponse<LinkedHashSet<SourceResponseDTO>, ResponseParams> response = performValidViewRequest(repository, "?search=" + searchString);
 
         assertSearch(response, searchString);
     }
@@ -50,49 +45,49 @@ class TranslationControllerTest extends LoggedControllerTest {
     @Test
     @Rollback
     void getViewDataQueryLanguages() throws Exception {
-        Repository repository = dbPopulator.populate(generateUniqueString()).getRepository();
+        Repository repository = dbPopulator.populate(generateUniqueString());
 
-        ViewDataResponse<LinkedHashSet<FileViewDataItem>, ResponseParams> response = performValidViewRequest(repository, "?languages=en");
+        ViewDataResponse<LinkedHashSet<SourceResponseDTO>, ResponseParams> response = performValidViewRequest(repository, "?languages=en");
 
         assertThat(response.getData().size()).isGreaterThan(10);
 
-        for (FileViewDataItem item : response.getData()) {
+        for (SourceResponseDTO item : response.getData()) {
             assertThat(item.getTranslations()).doesNotContainKeys("de");
         }
 
         performGetDataForView(repository.getId(), "?languages=langNotExists").andExpect(status().isNotFound());
 
         //with starting emtpy string
-        ViewDataResponse<LinkedHashSet<FileViewDataItem>, ResponseParams> response2 = performValidViewRequest(repository, "?languages=,en,de");
+        ViewDataResponse<LinkedHashSet<SourceResponseDTO>, ResponseParams> response2 = performValidViewRequest(repository, "?languages=,en,de");
 
         //with trailing empty string
-        ViewDataResponse<LinkedHashSet<FileViewDataItem>, ResponseParams> response3 = performValidViewRequest(repository, "?languages=,en,de,");
+        ViewDataResponse<LinkedHashSet<SourceResponseDTO>, ResponseParams> response3 = performValidViewRequest(repository, "?languages=,en,de,");
 
         //with same language multiple times
-        ViewDataResponse<LinkedHashSet<FileViewDataItem>, ResponseParams> response4 = performValidViewRequest(repository, "?languages=,en,en,,");
+        ViewDataResponse<LinkedHashSet<SourceResponseDTO>, ResponseParams> response4 = performValidViewRequest(repository, "?languages=,en,en,,");
 
 
     }
 
-    private ViewDataResponse<LinkedHashSet<FileViewDataItem>, ResponseParams> performValidViewRequest(Repository repository, String queryString) throws Exception {
+    private ViewDataResponse<LinkedHashSet<SourceResponseDTO>, ResponseParams> performValidViewRequest(Repository repository, String queryString) throws Exception {
         MvcResult mvcResult = performGetDataForView(repository.getId(), queryString).andExpect(status().isOk()).andReturn();
 
         ObjectMapper mapper = new ObjectMapper();
 
         return mapper.readValue(mvcResult.getResponse().getContentAsString(),
-                new TypeReference<ViewDataResponse<LinkedHashSet<FileViewDataItem>, ResponseParams>>() {
+                new TypeReference<ViewDataResponse<LinkedHashSet<SourceResponseDTO>, ResponseParams>>() {
                 });
     }
 
     @Test
     @Rollback
     void getViewDataQueryPagination() throws Exception {
-        Repository repository = dbPopulator.populate(generateUniqueString()).getRepository();
+        Repository repository = dbPopulator.populate(generateUniqueString());
 
         int limit = 5;
         int allCount = 15;
 
-        ViewDataResponse<LinkedHashSet<FileViewDataItem>, ResponseParams> response = performValidViewRequest(repository, String.format("?limit=%d", limit));
+        ViewDataResponse<LinkedHashSet<SourceResponseDTO>, ResponseParams> response = performValidViewRequest(repository, String.format("?limit=%d", limit));
 
         assertThat(response.getData().size()).isEqualTo(limit);
         assertThat(response.getPaginationMeta().getAllCount()).isEqualTo(allCount);
@@ -101,7 +96,7 @@ class TranslationControllerTest extends LoggedControllerTest {
 
         int offset = 3;
 
-        ViewDataResponse<LinkedHashSet<FileViewDataItem>, ResponseParams> responseOffset = performValidViewRequest(repository, String.format("?limit=%d&offset=%d", limit, offset));
+        ViewDataResponse<LinkedHashSet<SourceResponseDTO>, ResponseParams> responseOffset = performValidViewRequest(repository, String.format("?limit=%d&offset=%d", limit, offset));
 
         assertThat(responseOffset.getData().size()).isEqualTo(limit);
         assertThat(responseOffset.getPaginationMeta().getOffset()).isEqualTo(offset);
@@ -116,15 +111,15 @@ class TranslationControllerTest extends LoggedControllerTest {
     @Test
     @Rollback
     void getViewDataMetadata() throws Exception {
-        Repository repository = dbPopulator.populate(generateUniqueString()).getRepository();
+        Repository repository = dbPopulator.populate(generateUniqueString());
         int limit = 5;
-        ViewDataResponse<LinkedHashSet<FileViewDataItem>, ResponseParams> response = performValidViewRequest(repository, String.format("?limit=%d", limit));
+        ViewDataResponse<LinkedHashSet<SourceResponseDTO>, ResponseParams> response = performValidViewRequest(repository, String.format("?limit=%d", limit));
 
         assertThat(response.getParams().getLanguages()).contains("en", "de");
     }
 
-    private void assertSearch(ViewDataResponse<LinkedHashSet<FileViewDataItem>, ResponseParams> response, String searchString) {
-        for (FileViewDataItem item : response.getData()) {
+    private void assertSearch(ViewDataResponse<LinkedHashSet<SourceResponseDTO>, ResponseParams> response, String searchString) {
+        for (SourceResponseDTO item : response.getData()) {
             assertThat(asJsonString(item)).contains(searchString);
         }
     }
@@ -162,74 +157,6 @@ class TranslationControllerTest extends LoggedControllerTest {
 
         Map<String, Object> result = mapper.readValue(mvcResult.getResponse().getContentAsString(), Map.class);
         assertThat(result).containsKeys("en", "de");
-    }
-
-    @Test
-    @Rollback
-    void setTranslations() throws Exception {
-        File app = dbPopulator.createBase("app5");
-
-        SourceTranslationsDTO sourceTranslationsDTO = getSourceTranslationsDTO();
-
-        MvcResult mvcResult = mvc.perform(
-                loggedPost("/api/repository/" + app.getRepository().getId() + "/translations")
-                        .contentType(MediaType.APPLICATION_JSON).content(asJsonString(sourceTranslationsDTO)))
-                .andExpect(status().isOk()).andReturn();
-
-        File file = fileService.evaluatePath(app.getRepository(), sourceTranslationsDTO.getNewSourcePath()).orElse(null);
-
-        assertThat(file).isNotNull();
-        assertThat(file.getSource()).isNotNull();
-
-        commitTransaction();
-    }
-
-    @Test
-    @Rollback
-    void setTranslationsModify() throws Exception {
-        File app = dbPopulator.createBase("app6");
-
-        SourceTranslationsDTO sourceTranslationsDTO = getSourceTranslationsDTO();
-
-        //create old tranlation
-        translationService.setTranslations(app.getRepository().getId(), sourceTranslationsDTO);
-
-        commitTransaction();
-
-        //modify source text
-        sourceTranslationsDTO.setOldSourceText(sourceTranslationsDTO.getNewSourceText());
-        sourceTranslationsDTO.setNewSourceText("newSourceText");
-
-        MvcResult mvcResult = mvc.perform(
-                loggedPost("/api/repository/" + app.getRepository().getId() + "/translations")
-                        .contentType(MediaType.APPLICATION_JSON).content(asJsonString(sourceTranslationsDTO)))
-                .andExpect(status().isOk()).andReturn();
-
-
-        commitTransaction();
-
-        //evaluate new path
-        File file = fileService.evaluatePath(app.getRepository(), sourceTranslationsDTO.getNewSourcePath()).orElse(null);
-
-        //should be present
-        assertThat(file).isNotNull();
-        assertThat(file.getSource()).isNotNull();
-
-        //old path should not be present
-        file = fileService.evaluatePath(app.getRepository(), sourceTranslationsDTO.getOldSourcePath()).orElse(null);
-        assertThat(file).isNull();
-    }
-
-    private SourceTranslationsDTO getSourceTranslationsDTO() {
-        HashMap<String, String> translations = new HashMap<>();
-        translations.put("en", "en text");
-        translations.put("de", "de text");
-
-        return new SourceTranslationsDTO(
-                "home.news",
-                translations,
-                null,
-                "This_is_another_translation_in_news_folder");
     }
 
     private ResultActions performGetDataForView(Long repositoryId, String queryString) throws Exception {

@@ -6,7 +6,6 @@ import com.polygloat.dtos.request.CreateRepositoryDTO;
 import com.polygloat.dtos.request.EditRepositoryDTO;
 import com.polygloat.dtos.request.LanguageDTO;
 import com.polygloat.dtos.response.RepositoryDTO;
-import com.polygloat.model.File;
 import com.polygloat.model.Language;
 import com.polygloat.model.Repository;
 import org.junit.jupiter.api.Test;
@@ -70,8 +69,6 @@ class RepositoryControllerTest extends LoggedControllerTest {
         assertThat(language.getAbbreviation()).isEqualTo("en");
 
         assertThat(language.getName()).isEqualTo("English");
-
-        assertThat(repository.getRootFolder()).isNotNull();
     }
 
     private void testCreateValidationSize() throws Exception {
@@ -108,15 +105,14 @@ class RepositoryControllerTest extends LoggedControllerTest {
     @Test
     @Rollback
     void editRepository() throws Exception {
-        File test = dbPopulator.createBase("test");
-        File test2 = dbPopulator.createBase("test2");
+        Repository test = dbPopulator.createBase("test");
+        Repository test2 = dbPopulator.createBase("test2");
 
-        testEditValidationUniqueness(test2.getRepository().getId());
-
+        testEditValidationUniqueness(test2.getId());
         testEditCorrectRequest(test);
     }
 
-    private void testEditCorrectRequest(File test) throws Exception {
+    private void testEditCorrectRequest(Repository test) throws Exception {
         AbstractRepositoryDTO request = new EditRepositoryDTO(test.getId(), "new test");
 
         MvcResult mvcResult = mvc.perform(
@@ -154,17 +150,17 @@ class RepositoryControllerTest extends LoggedControllerTest {
     @Test
     @Rollback
     void deleteRepository() throws Exception {
-        File test = dbPopulator.createBase("test");
+        Repository test = dbPopulator.createBase("test");
 
         MvcResult mvcResult = mvc.perform(
-                loggedDelete("/api/repositories/" + test.getRepository().getId())
+                loggedDelete("/api/repositories/" + test.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
 
         commitTransaction();
 
-        Optional<Repository> repository = repositoryService.findById(test.getRepository().getId());
+        Optional<Repository> repository = repositoryService.findById(test.getId());
 
         assertThat(repository).isEmpty();
     }
@@ -173,9 +169,9 @@ class RepositoryControllerTest extends LoggedControllerTest {
     @Test
     @Rollback
     void findAll() throws Exception {
-        File test = dbPopulator.createBase("test");
-        File test1 = dbPopulator.createBase("test1");
-        File test2 = dbPopulator.createBase("test2");
+        dbPopulator.createBase("test");
+        dbPopulator.createBase("test1");
+        dbPopulator.createBase("test2");
 
         MvcResult mvcResult = mvc.perform(
                 loggedGet("/api/repositories/")

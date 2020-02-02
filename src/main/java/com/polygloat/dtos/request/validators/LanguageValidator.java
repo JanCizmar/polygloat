@@ -1,5 +1,6 @@
 package com.polygloat.dtos.request.validators;
 
+import com.polygloat.constants.Message;
 import com.polygloat.dtos.request.LanguageDTO;
 import com.polygloat.dtos.request.validators.exceptions.ValidationException;
 import com.polygloat.exceptions.NotFoundException;
@@ -55,14 +56,14 @@ public class LanguageValidator {
 
     private Optional<ValidationError> validateNameUniqueness(LanguageDTO dto, Repository repository) {
         if (languageService.findByName(dto.getName(), repository).isPresent()) {
-            return Optional.of(new ValidationError(ValidationErrorType.LANGUAGE_EXISTING_NAME));
+            return Optional.of(new ValidationError(ValidationErrorType.CUSTOM_VALIDATION, Message.LANGUAGE_NAME_EXISTS));
         }
         return Optional.empty();
     }
 
     private Optional<ValidationError> validateAbbreviationUniqueness(LanguageDTO dto, Repository repository) {
         if (languageService.findByAbbreviation(dto.getAbbreviation(), repository).isPresent()) {
-            return Optional.of(new ValidationError(ValidationErrorType.LANGUAGE_EXISTING_ABBREVIATION));
+            return Optional.of(new ValidationError(ValidationErrorType.CUSTOM_VALIDATION, Message.LANGUAGE_ABBREVIATION_EXISTS));
         }
         return Optional.empty();
     }

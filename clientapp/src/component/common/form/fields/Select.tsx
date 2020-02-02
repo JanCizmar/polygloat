@@ -1,10 +1,8 @@
 import {default as React, FunctionComponent, ReactNode} from 'react';
-import MUISelect from '@material-ui/core/Select';
+import {makeStyles, createStyles} from '@material-ui/core/styles';
+import {FormControl, FormControlProps, FormHelperText, InputLabel, Select as MUISelect, Theme} from '@material-ui/core';
 import {useField} from 'formik';
-import {createStyles, FormControlProps, makeStyles, Theme} from '@material-ui/core';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import FormHelperText from '@material-ui/core/FormHelperText';
+
 
 interface PGSelectProps {
     name: string;

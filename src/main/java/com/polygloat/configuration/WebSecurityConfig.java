@@ -25,22 +25,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         this.configuration = configuration;
     }
 
-    @Value("${spring.ldap.embedded.port}")
-    private String ldapPort;
-
-    //Getting values from properties file
-    @Value("${polygloat.ldap.url}")
-    private String ldapUrls;
-    @Value("${polygloat.ldap.base.dn}")
-    private String ldapBaseDn;
-    @Value("${polygloat.ldap.username}")
-    private String ldapSecurityPrincipal;
-    @Value("${polygloat.ldap.password}")
-    private String ldapPrincipalPassword;
-    @Value("${polygloat.ldap.user.dn-pattern}")
-    private String ldapUserDnPattern;
-    @Value("${polygloat.ldap.enabled}")
-    private String ldapEnabled;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -66,14 +50,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth
-                .ldapAuthentication()
-                .contextSource()
-                .url(ldapUrls + ldapBaseDn)
-                .managerDn(ldapSecurityPrincipal)
-                .managerPassword(ldapPrincipalPassword)
-                .and()
-                .userDnPatterns(ldapUserDnPattern);
+        if (configuration.isLdapAuthentication()) {
+            auth
+                    .ldapAuthentication()
+                    .contextSource()
+                    .url(configuration.getLdapUrls() + configuration.getLdapBaseDn())
+                    .managerDn(configuration.getLdapSecurityPrincipal())
+                    .managerPassword(configuration.getLdapPrincipalPassword())
+                    .and()
+                    .userDnPatterns(configuration.getLdapUserDnPattern());
+        return;
+        }
     }
 
     @Bean(BeanIds.AUTHENTICATION_MANAGER)

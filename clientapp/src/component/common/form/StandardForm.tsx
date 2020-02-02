@@ -11,6 +11,7 @@ interface FormProps<T = { [key: string]: any }> {
     loading?: boolean;
     validationSchema?: ObjectSchema;
     submitButtons?: ReactNode
+    customActions?: ReactNode
 }
 
 export const StandardForm: FunctionComponent<FormProps> = ({initialValues, validationSchema, ...props}) => {
@@ -18,16 +19,18 @@ export const StandardForm: FunctionComponent<FormProps> = ({initialValues, valid
         <Formik initialValues={initialValues} onSubmit={props.onSubmit} validationSchema={validationSchema}>
             {(formikProps: FormikProps<any>) => (
                 <Form>
-                    {props.children}
+                    {typeof props.children === "function" && (!props.loading && props.children()) || props.children}
                     {props.loading && <CircularProgress/>}
                     {!props.loading && (props.submitButtons || (
-                        <Box mt={2} display="flex" justifyContent="flex-end" flexDirection="row">
-
-                            <>
-                                <Button color="primary" disabled={props.loading} type="submit">Save</Button>
-                                <Button disabled={props.loading || Object.values(formikProps.errors).length > 0}
-                                        onClick={props.onCancel}>Cancel</Button>
-                            </>
+                        <Box mt={2} display="flex" justifyContent="flex-end">
+                            <React.Fragment>
+                                {props.customActions && <Box flexGrow={1}>{props.customActions}</Box>}
+                                <Box>
+                                    <Button color="primary" disabled={props.loading || Object.values(formikProps.errors).length > 0} type="submit">Save</Button>
+                                    <Button disabled={props.loading}
+                                            onClick={props.onCancel}>Cancel</Button>
+                                </Box>
+                            </React.Fragment>
                         </Box>))}
                 </Form>
             )}

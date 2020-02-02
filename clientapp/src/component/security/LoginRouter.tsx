@@ -8,7 +8,7 @@ interface LoginRouterProps {
 
 }
 
-export const LoginRouter: FunctionComponent<LoginRouterProps> = (props) => {
+const LoginRouter: FunctionComponent<LoginRouterProps> = (props) => {
     return (
         <Switch>
             <Route exact path={LINKS.LOGIN.template}>
@@ -20,3 +20,4 @@ export const LoginRouter: FunctionComponent<LoginRouterProps> = (props) => {
         </Switch>
     );
 };
+export default LoginRouter;

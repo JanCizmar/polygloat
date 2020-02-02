@@ -7,6 +7,8 @@ import com.polygloat.model.Language;
 import com.polygloat.model.Repository;
 import com.polygloat.service.LanguageService;
 import com.polygloat.service.RepositoryService;
+import com.polygloat.service.SecurityService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,20 +19,13 @@ import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(origins = "*")
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 @RequestMapping("/api/repository/{repositoryId}/languages")
 public class LanguageController implements IController {
-    private LanguageService languageService;
-    private RepositoryService repositoryService;
-    private LanguageValidator languageValidator;
-
-    @Autowired
-    public LanguageController(LanguageService languageService,
-                              RepositoryService repositoryService,
-                              LanguageValidator languageValidator) {
-        this.languageService = languageService;
-        this.repositoryService = repositoryService;
-        this.languageValidator = languageValidator;
-    }
+    private final LanguageService languageService;
+    private final RepositoryService repositoryService;
+    private final LanguageValidator languageValidator;
+    private final SecurityService securityService;
 
     @PostMapping(value = "")
     public LanguageDTO createLanguage(@PathVariable("repositoryId") Long repositoryId,
@@ -54,6 +49,13 @@ public class LanguageController implements IController {
     public Set<LanguageDTO> getAll(@PathVariable("repositoryId") Long repositoryId) {
         return languageService.findAll(repositoryId).stream().map(LanguageDTO::fromEntity)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    @GetMapping(value = "{id}")
+    public LanguageDTO get(@PathVariable("id") Long id) {
+        Language language = languageService.findById(id).orElseThrow(NotFoundException::new);
+        securityService.getAnyRepositoryPermission(language.getRepository().getId());
+        return LanguageDTO.fromEntity(language);
     }
 
     @DeleteMapping(value = "/{id}")

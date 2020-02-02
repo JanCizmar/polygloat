@@ -9,6 +9,10 @@ export class RedirectionState {
 @singleton()
 export class RedirectionActions extends AbstractActions<RedirectionState> {
 
+    constructor() {
+        super(new RedirectionState());
+    }
+
     redirect = this.createAction('DO', to => to).build.on(
         (state, action) => ({...state, to: action.payload})
     );

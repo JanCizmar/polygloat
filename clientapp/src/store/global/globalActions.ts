@@ -1,13 +1,14 @@
 import {SecurityDTO} from './types';
-import {AbstractActions} from '../AbstractActions';
 import {singleton} from 'tsyringe';
 import {remoteConfigService} from '../../service/remoteConfigService';
 import {securityService} from '../../service/securityService';
-import {ErrorResponseDTO, RemoteConfigurationDTO, TokenDTO} from '../../service/response.types';
+import {ErrorResponseDTO, RemoteConfigurationDTO, TokenDTO, UserDTO} from '../../service/response.types';
+import {userService} from "../../service/userService";
+import {ConfirmationDialogProps} from "../../component/common/ConfirmationDialog";
+import {AbstractLoadableActions, createLoadable, StateWithLoadables} from "../AbstractLoadableActions";
 
-export class GlobalState {
-    remoteConfig: RemoteConfigurationDTO = null;
-    remoteConfigLoading: boolean = true;
+export class GlobalState extends StateWithLoadables<GlobalActions> {
+    authLoading: boolean = false;
     security: SecurityDTO = {
         allowPrivate: !!localStorage.getItem('jwtToken'),
         jwtToken: localStorage.getItem('jwtToken') || null,
@@ -20,43 +21,33 @@ export class GlobalState {
     passwordResetSetValidated = false;
     passwordResetSetError = null;
     passwordResetSetSucceed = false;
-    confirmationDialog = {
-        open: false,
-        title: 'Confirmation',
-        content: null,
-        onConfirm: () => {
-        }
-    };
+    confirmationDialog: ConfirmationDialogProps = null;
 }
 
 
 @singleton()
-export class GlobalActions extends AbstractActions<GlobalState> {
-    loadRemoteConfig = this.createPromiseAction('LOAD_REMOTE_CONFIG', () => this.configService.getConfiguration())
-        .build.onFullFilled((state, action) =>
-            (
-                {
-                    ...state, remoteConfig: action.payload, remoteConfigLoading: false,
-                    security: {...state.security, allowPrivate: !action.payload.authentication ? true : state.security.allowPrivate}
-                })
-        ).build.onPending((state, action) => (
-            {...state, remoteConfigLoading: true}
-        ));
+export class GlobalActions extends AbstractLoadableActions<GlobalState> {
+    constructor(private configService: remoteConfigService, private securityService: securityService, private userService: userService) {
+        super(new GlobalState());
+    }
+
     oAuthSuccessful = this.buildLoginAction('AUTHORIZE_OAUTH',
         (serviceType, code) => this.securityService.authorizeOAuthLogin(serviceType, code));
+
+
     logout = this.createAction('LOGOUT', () => this.securityService.logout()).build.on(
         (state, action) => (
-            {...state, security: <SecurityDTO> {...state.security, jwtToken: null, allowPrivate: false}}
+            {...state, security: <SecurityDTO>{...state.security, jwtToken: null, allowPrivate: false}}
         ));
     login = this.buildLoginAction('LOGIN', v => this.securityService.login(v));
     resetPasswordRequest = this.createPromiseAction('PASSWORD_RESET_REQUEST',
         (email) => this.securityService.resetPasswordRequest(email))
         .build.onPending((state, action) => {
-            return <GlobalState> {...state, passwordResetLoading: true, passwordResetSent: false, passwordResetError: null};
+            return <GlobalState>{...state, passwordResetLoading: true, passwordResetSent: false, passwordResetError: null};
         }).build.onFullFilled((state, action) => {
-            return <GlobalState> {...state, passwordResetSent: true, passwordResetLoading: false, passwordResetError: null};
+            return <GlobalState>{...state, passwordResetSent: true, passwordResetLoading: false, passwordResetError: null};
         }).build.onRejected((state, action) => {
-            return <GlobalState> {
+            return <GlobalState>{
                 ...state,
                 passwordResetSent: false,
                 passwordResetLoading: false,
@@ -70,7 +61,7 @@ export class GlobalActions extends AbstractActions<GlobalState> {
         }).build.onFullFilled((state, action) => {
             return {...state, passwordResetSetLoading: false, passwordResetSetValidated: true};
         }).build.onRejected((state, action) => {
-            return <GlobalState> {
+            return <GlobalState>{
                 ...state,
                 passwordResetSetValidated: false,
                 passwordResetSetError: action.payload.code,
@@ -80,16 +71,17 @@ export class GlobalActions extends AbstractActions<GlobalState> {
     resetPasswordSet = this.createPromiseAction<void, ErrorResponseDTO>('RESET_PASSWORD_SET',
         this.securityService.resetPasswordSet)
         .build.onPending((state, action) => {
-            return <GlobalState> {...state, passwordResetSetLoading: true, passwordResetSetSucceed: false};
+            return <GlobalState>{...state, passwordResetSetLoading: true, passwordResetSetSucceed: false};
         }).build.onFullFilled((state, action) => {
-            return <GlobalState> {...state, passwordResetSetSucceed: true};
+            return <GlobalState>{...state, passwordResetSetSucceed: true};
         }).build.onRejected((state, action) => {
-            return <GlobalState> {
+            return <GlobalState>{
                 ...state, passwordResetSetError: action.payload.code,
                 passwordResetSetSucceed: false,
                 passwordResetSetLoading: false
             };
         });
+
     setJWTToken = this.createAction('SET_JWT', token => token).build.on(
         (state, action) => {
             return {
@@ -97,36 +89,29 @@ export class GlobalActions extends AbstractActions<GlobalState> {
                 security: {...state.security, allowPrivate: true, jwtToken: action.payload.accessToken, loginErrorCode: null}
             };
         });
+
+
     openConfirmation = this.createAction('OPEN_CONFIRMATION',
-        (title, content, onConfirm) => ({title, content, onConfirm}))
+        (options: ConfirmationDialogProps) => (options))
         .build.on((state, action) =>
-            (<GlobalState> {
+            (<GlobalState>{
                 ...state,
-                confirmationDialog: <typeof state.confirmationDialog> {
-                    ...state.confirmationDialog,
-                    open: true,
-                    title: action.payload.title,
-                    content: action.payload.title,
-                    onConfirm: action.payload.onConfirm
-                }
-            }));
-    closeConfirmation = this.createAction('CLOSE_CONFIRMATION', null)
-        .build.on((state, action) =>
-            (<GlobalState> {
-                ...state,
-                confirmationDialog: <typeof state.confirmationDialog> {
-                    ...state.confirmationDialog,
-                    open: false,
-                    title: '',
-                    content: '',
-                    onConfirm: () => {
-                    }
-                }
+                confirmationDialog: action.payload
             }));
 
-    constructor(private configService: remoteConfigService, private securityService: securityService) {
-        super();
-    }
+    closeConfirmation = this.createAction('CLOSE_CONFIRMATION', null)
+        .build.on((state, action) =>
+            (<GlobalState>{
+                ...state,
+                confirmationDialog: null
+            }));
+
+    get loadableDefinitions() {
+        return {
+            userData: this.createLoadableDefinition<UserDTO>(this.userService.getUserData),
+            remoteConfig: this.createLoadableDefinition<RemoteConfigurationDTO>(() => this.configService.getConfiguration())
+        }
+    };
 
     get prefix(): string {
         return 'GLOBAL';
@@ -138,13 +123,15 @@ export class GlobalActions extends AbstractActions<GlobalState> {
                 {...state, authLoading: true}
             ))
             .build.onFullFilled((state, action) => (
-                <GlobalState> {
+                <GlobalState>{
                     ...state,
+                    authLoading: false,
                     security: {...state.security, allowPrivate: true, jwtToken: action.payload.accessToken, loginErrorCode: null}
                 }
             )).build.onRejected((state, action) => ({
                 ...state,
-                security: <SecurityDTO> {loginErrorCode: action.payload.code}
+                authLoading: false,
+                security: <SecurityDTO>{loginErrorCode: action.payload.code}
             }));
     }
 }

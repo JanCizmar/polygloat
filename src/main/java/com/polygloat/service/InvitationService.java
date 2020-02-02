@@ -50,13 +50,16 @@ public class InvitationService {
 
         Permission permission = invitation.getPermission();
 
-        if (!this.permissionRepository.findAllByRepositoryIdAndUserId(permission.getRepository().getId(), authenticationFacade.getUserAccount().getId()).isEmpty()) {
+        if (!this.permissionRepository.findOneByRepositoryIdAndUserId(permission.getRepository().getId(), authenticationFacade.getUserAccount().getId()).isEmpty()) {
             throw new BadRequestException(Message.USER_ALREADY_HAS_PERMISSIONS);
         }
 
         permission.setInvitation(null);
         permission.setUser(authenticationFacade.getUserAccount());
         permissionRepository.save(permission);
+
+        //avoid cascade delete
+        invitation.setPermission(null);
         invitationRepository.delete(invitation);
     }
 

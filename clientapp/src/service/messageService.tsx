@@ -7,6 +7,7 @@ import {green, red} from '@material-ui/core/colors';
 import CheckCircleTwoToneIcon from '@material-ui/icons/CheckCircleTwoTone';
 import ErrorTwoToneIcon from '@material-ui/icons/ErrorTwoTone';
 import {MessageActions} from '../store/global/messageActions';
+import {ErrorResponseDTO} from "./response.types";
 
 @singleton()
 export class messageService {
@@ -30,6 +31,7 @@ export class messageService {
                 <Box display="inline" mr={1}><ErrorTwoToneIcon htmlColor={red['500']}/></Box>{message}
             </Box>);
     }
+
 }
 
 

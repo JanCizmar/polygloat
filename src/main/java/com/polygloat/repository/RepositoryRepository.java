@@ -14,6 +14,6 @@ public interface RepositoryRepository extends JpaRepository<com.polygloat.model.
 
     LinkedHashSet<com.polygloat.model.Repository> findAllByCreatedBy(UserAccount userAccount);
 
-    @Query("from Repository r join fetch Permission p on p.repository = r where p.user = ?1 order by r.name")
+    @Query("from Repository r join Permission p on p.repository = r where p.user = ?1 order by r.name")
     LinkedHashSet<com.polygloat.model.Repository> findAllPermitted(UserAccount userAccount);
 }

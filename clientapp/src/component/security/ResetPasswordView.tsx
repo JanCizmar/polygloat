@@ -13,6 +13,7 @@ import {container} from 'tsyringe';
 import {GlobalActions} from '../../store/global/globalActions';
 import {Alert} from '../common/Alert';
 import * as Yup from 'yup';
+import {useConfig} from "../../hooks/useConfig";
 
 
 interface LoginProps {
@@ -25,16 +26,14 @@ type ValueType = {
     email: string;
 }
 
-export const PasswordResetView: FunctionComponent<LoginProps> = (props) => {
+const PasswordResetView: FunctionComponent<LoginProps> = (props) => {
 
     const security = useSelector((state: AppState) => state.global.security);
-    const remoteConfig = useSelector((state: AppState) => state.global.remoteConfig);
+    const remoteConfig = useConfig();
 
     const loading = useSelector((state: AppState) => state.global.passwordResetLoading);
     const error = useSelector((state: AppState) => state.global.passwordResetError);
     const sent = useSelector((state: AppState) => state.global.passwordResetSent);
-
-    console.log(sent);
 
     if (!remoteConfig.authentication || security.allowPrivate || !remoteConfig.passwordResettable) {
         return (<Redirect to={LINKS.AFTER_LOGIN.build()}/>);
@@ -75,3 +74,5 @@ export const PasswordResetView: FunctionComponent<LoginProps> = (props) => {
         </DashboardPage>
     );
 };
+
+export default PasswordResetView;

@@ -3,10 +3,11 @@ package com.polygloat.service;
 import com.polygloat.dtos.request.CreateRepositoryDTO;
 import com.polygloat.dtos.request.EditRepositoryDTO;
 import com.polygloat.dtos.request.LanguageDTO;
+import com.polygloat.dtos.response.RepositoryDTO;
 import com.polygloat.exceptions.NotFoundException;
-import com.polygloat.model.File;
 import com.polygloat.model.Repository;
 import com.polygloat.model.UserAccount;
+import com.polygloat.repository.PermissionRepository;
 import com.polygloat.repository.RepositoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import javax.persistence.EntityManager;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -27,6 +29,7 @@ public class RepositoryService {
     private final EntityManager entityManager;
     private final LanguageService languageService;
     private final SecurityService securityService;
+    private final PermissionRepository permissionRepository;
 
     @Transactional
     public Optional<Repository> findByName(String name, UserAccount userAccount) {
@@ -45,17 +48,12 @@ public class RepositoryService {
         repository.setName(dto.getName());
         repository.setCreatedBy(createdBy);
 
-        File root = new File();
-        root.setRepository(repository);
-        repository.setRootFolder(root);
-
         securityService.grantFullAccessToRepo(repository);
 
         for (LanguageDTO language : dto.getLanguages()) {
             languageService.createLanguage(language, repository);
         }
 
-        entityManager.persist(root);
         entityManager.persist(repository);
         return repository;
     }
@@ -69,9 +67,12 @@ public class RepositoryService {
         return repository;
     }
 
+
     @Transactional
-    public Set<Repository> findAllPermitted(UserAccount userAccount) {
-        return new LinkedHashSet<>(repositoryRepository.findAllPermitted(userAccount));
+    public Set<RepositoryDTO> findAllPermitted(UserAccount userAccount) {
+        return permissionRepository.findAllByUser(userAccount).stream()
+                .map(permission -> RepositoryDTO.fromEntityAndPermission(permission.getRepository(), permission))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     @Transactional
@@ -80,5 +81,4 @@ public class RepositoryService {
         repository.setDeleted(true);
         entityManager.persist(repository);
     }
-
 }

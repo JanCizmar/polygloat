@@ -4,7 +4,9 @@ import com.polygloat.dtos.request.CreateRepositoryDTO;
 import com.polygloat.dtos.request.EditRepositoryDTO;
 import com.polygloat.dtos.request.InviteUser;
 import com.polygloat.dtos.response.RepositoryDTO;
+import com.polygloat.exceptions.InvalidStateException;
 import com.polygloat.exceptions.NotFoundException;
+import com.polygloat.model.Permission;
 import com.polygloat.model.Repository;
 import com.polygloat.model.UserAccount;
 import com.polygloat.repository.UserAccountRepository;
@@ -18,9 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController("_repositoryController")
 @CrossOrigin(origins = "*")
@@ -40,33 +40,37 @@ public class RepositoryController implements IController {
     public RepositoryDTO createRepository(@RequestBody @Valid CreateRepositoryDTO dto) {
         UserAccount userAccount = authenticationFacade.getUserAccount();
         Repository repository = repositoryService.createRepository(dto, userAccount);
-        return RepositoryDTO.fromEntity(repository);
+        return RepositoryDTO.fromEntityAndPermission(repository, repository.getPermissions().stream().findAny().orElseThrow(InvalidStateException::new));
     }
+
+    @GetMapping(value = "/{id}")
+    public RepositoryDTO getRepository(@PathVariable("id") Long id) {
+        Permission permission = securityService.getAnyRepositoryPermission(id);
+        return RepositoryDTO.fromEntityAndPermission(repositoryService.findById(id).orElseThrow(null), permission);
+    }
+
 
     @PostMapping(value = "/edit")
     public RepositoryDTO editRepository(@RequestBody @Valid EditRepositoryDTO dto) {
-
-        //todo: handle permissions
-        //securityService.canEditRepository(dto.getRepositoryId());
-
+        Permission permission = securityService.checkRepositoryPermission(dto.getRepositoryId(), Permission.RepositoryPermissionType.MANAGE);
         Repository repository = repositoryService.editRepository(dto);
-        return RepositoryDTO.fromEntity(repository);
+        return RepositoryDTO.fromEntityAndPermission(repository, permission);
     }
 
     @GetMapping(value = "")
     public Set<RepositoryDTO> getAll() {
-        return repositoryService.findAllPermitted(authenticationFacade.getUserAccount()).stream().map(RepositoryDTO::fromEntity)
-                .collect(Collectors.toCollection(LinkedHashSet::new));
+        return repositoryService.findAllPermitted(authenticationFacade.getUserAccount());
     }
 
     @DeleteMapping(value = "/{id}")
     public void deleteRepository(@PathVariable Long id) {
+        securityService.checkRepositoryPermission(id, Permission.RepositoryPermissionType.MANAGE);
         repositoryService.deleteRepository(id);
     }
 
     @PostMapping("/invite")
     public String inviteUser(@RequestBody InviteUser invitation) {
-        securityService.checkManageRepositoryPermission(invitation.getRepositoryId());
+        securityService.checkRepositoryPermission(invitation.getRepositoryId(), Permission.RepositoryPermissionType.MANAGE);
         Repository repository = repositoryService.findById(invitation.getRepositoryId()).orElseThrow(NotFoundException::new);
         return invitationService.create(repository, invitation.getType());
     }

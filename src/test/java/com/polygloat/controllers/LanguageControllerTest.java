@@ -3,8 +3,8 @@ package com.polygloat.controllers;
 import com.polygloat.ExceptionHandlers;
 import com.polygloat.dtos.request.LanguageDTO;
 import com.polygloat.exceptions.NotFoundException;
-import com.polygloat.model.File;
 import com.polygloat.model.Language;
+import com.polygloat.model.Repository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,28 +50,28 @@ class LanguageControllerTest extends LoggedControllerTest implements ITest {
     @Test
     @Rollback
     void createLanguage() throws Exception {
-        File test = dbPopulator.createBase(generateUniqueString());
-        createLanguageTestValidation(test.getRepository().getId());
-        createLanguageCorrectRequest(test.getRepository().getId());
+        Repository test = dbPopulator.createBase(generateUniqueString());
+        createLanguageTestValidation(test.getId());
+        createLanguageCorrectRequest(test.getId());
     }
 
     @Test
     @Rollback
     void editLanguage() throws Exception {
-        File test = dbPopulator.createBase(generateUniqueString());
-        Language en = test.getRepository().getLanguage("en").orElseThrow(NotFoundException::new);
+        Repository test = dbPopulator.createBase(generateUniqueString());
+        Language en = test.getLanguage("en").orElseThrow(NotFoundException::new);
         LanguageDTO languageDTO = LanguageDTO.fromEntity(en);
 
         languageDTO.setName("newEnglish");
         languageDTO.setAbbreviation("newEn");
-        MvcResult mvcResult = performEdit(test.getRepository().getId(), languageDTO)
+        MvcResult mvcResult = performEdit(test.getId(), languageDTO)
                 .andExpect(status().isOk()).andReturn();
 
         LanguageDTO languageDTORes = decodeJson(mvcResult.getResponse().getContentAsString(), LanguageDTO.class);
         assertThat(languageDTORes.getName()).isEqualTo(languageDTO.getName());
         assertThat(languageDTORes.getAbbreviation()).isEqualTo(languageDTO.getAbbreviation());
 
-        Optional<Language> dbLanguage = languageService.findByAbbreviation(languageDTO.getAbbreviation(), test.getRepository());
+        Optional<Language> dbLanguage = languageService.findByAbbreviation(languageDTO.getAbbreviation(), test.getId());
         assertThat(dbLanguage).isPresent();
         assertThat(dbLanguage.get().getName()).isEqualTo(languageDTO.getName());
     }
@@ -79,18 +79,18 @@ class LanguageControllerTest extends LoggedControllerTest implements ITest {
     @Test
     @Rollback
     void findAllLanguages() throws Exception {
-        File test = dbPopulator.createBase(generateUniqueString());
-        MvcResult mvcResult = performFindAll(test.getRepository().getId()).andExpect(status().isOk()).andReturn();
+        Repository test = dbPopulator.createBase(generateUniqueString());
+        MvcResult mvcResult = performFindAll(test.getId()).andExpect(status().isOk()).andReturn();
         assertThat(decodeJson(mvcResult.getResponse().getContentAsString(), Set.class)).hasSize(2);
     }
 
     @Test
     @Rollback
     void deleteLanguage() throws Exception {
-        File test = dbPopulator.createBase(generateUniqueString());
-        Language en = test.getRepository().getLanguage("en").orElseThrow(NotFoundException::new);
+        Repository test = dbPopulator.createBase(generateUniqueString());
+        Language en = test.getLanguage("en").orElseThrow(NotFoundException::new);
 
-        performDelete(test.getRepository().getId(), en.getId()).andExpect(status().isOk());
+        performDelete(test.getId(), en.getId()).andExpect(status().isOk());
 
         commitTransaction();
 
@@ -114,8 +114,8 @@ class LanguageControllerTest extends LoggedControllerTest implements ITest {
         MvcResult mvcResult = performCreate(repoId, languageDTO)
                 .andExpect(status().isBadRequest()).andReturn();
 
-        assertThat(mvcResult.getResponse().getContentAsString()).contains("LANGUAGE_EXISTING_ABBREVIATION");
-        assertThat(mvcResult.getResponse().getContentAsString()).contains("LANGUAGE_EXISTING_NAME");
+        assertThat(mvcResult.getResponse().getContentAsString()).contains("language_abbreviation_exists");
+        assertThat(mvcResult.getResponse().getContentAsString()).contains("language_name_exists");
 
         mvcResult = performCreate(repoId, languageDTOBlank)
                 .andExpect(status().isBadRequest()).andReturn();

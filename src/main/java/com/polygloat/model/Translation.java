@@ -1,16 +1,29 @@
 package com.polygloat.model;
 
+import lombok.*;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+
 import javax.persistence.*;
 
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = {"source_id", "language_id"}),
 })
+@Data
+@Indexed
 public class Translation extends AuditModel {
     @Id
+    @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Field
+    @EqualsAndHashCode.Include
     @Column(columnDefinition = "text")
     private String text;
 
@@ -20,36 +33,4 @@ public class Translation extends AuditModel {
     @ManyToOne
     private Language language;
 
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public Source getSource() {
-        return source;
-    }
-
-    public void setSource(Source source) {
-        this.source = source;
-    }
-
-    public Language getLanguage() {
-        return language;
-    }
-
-    public void setLanguage(Language language) {
-        this.language = language;
-    }
 }

@@ -3,6 +3,7 @@ package com.polygloat.security.controllers;
 import com.polygloat.dtos.response.InvitationDTO;
 import com.polygloat.exceptions.NotFoundException;
 import com.polygloat.model.Invitation;
+import com.polygloat.model.Permission;
 import com.polygloat.model.Repository;
 import com.polygloat.service.InvitationService;
 import com.polygloat.service.RepositoryService;
@@ -33,14 +34,14 @@ public class InvitationController {
     @GetMapping("/list/{repositoryId}")
     public Set<InvitationDTO> getRepositoryInvitations(@PathVariable("repositoryId") Long id) {
         Repository repository = repositoryService.findById(id).orElseThrow(NotFoundException::new);
-        securityService.checkManageRepositoryPermission(id);
+        securityService.checkRepositoryPermission(id, Permission.RepositoryPermissionType.MANAGE);
         return invitationService.getForRepository(repository).stream().map(InvitationDTO::fromEntity).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     @DeleteMapping("/{invitationId}")
     public void deleteInvitation(@PathVariable("invitationId") Long id) {
         Invitation invitation = invitationService.findById(id).orElseThrow(NotFoundException::new);
-        securityService.checkManageRepositoryPermission(invitation.getPermission().getRepository().getId());
+        securityService.checkRepositoryPermission(invitation.getPermission().getRepository().getId(), Permission.RepositoryPermissionType.MANAGE);
         invitationService.delete(invitation);
     }
 }

@@ -4,26 +4,24 @@ import {AbstractActions} from './AbstractActions';
 
 @singleton()
 export class implicitReducer {
-    create = <StateType>(initialState: StateType, actions: AbstractActions<any>,
+    create = <StateType>(actions: AbstractActions<StateType>,
                          customReducers?: (state: StateType, action: ActionType<any>) => StateType) =>
-        (state = initialState, action: ActionType<any>): StateType => {
+        (state = actions.initialState, action: ActionType<any>): StateType => {
             let abstractActionDef = actions.getAction(action.type);
 
             if (abstractActionDef instanceof PromiseAction) {
-                let promiseActionDef = (abstractActionDef as PromiseAction<any, any, typeof initialState>);
-                if (action.type === promiseActionDef.pendingType && typeof promiseActionDef.reducePending === 'function') {
-                    return promiseActionDef.reducePending(state, action);
+                if (action.type === abstractActionDef.pendingType && typeof abstractActionDef.reducePending === 'function') {
+                    return abstractActionDef.reducePending(state, action);
                 }
-                if (action.type === promiseActionDef.rejectedType && typeof promiseActionDef.reduceRejected === 'function') {
-                    return promiseActionDef.reduceRejected(state, action);
+                if (action.type === abstractActionDef.rejectedType && typeof abstractActionDef.reduceRejected === 'function') {
+                    return abstractActionDef.reduceRejected(state, action);
                 }
-                if (action.type === promiseActionDef.fulfilledType && typeof promiseActionDef.reduceFulfilled === 'function') {
-                    return promiseActionDef.reduceFulfilled(state, action);
+                if (action.type === abstractActionDef.fulfilledType && typeof abstractActionDef.reduceFulfilled === 'function') {
+                    return abstractActionDef.reduceFulfilled(state, action);
                 }
             } else if (abstractActionDef instanceof Action) {
-                let actionDef = (abstractActionDef as Action);
-                if (action.type === actionDef.type && typeof actionDef.stateModifier === 'function') {
-                    return actionDef.stateModifier(state, action);
+                if (action.type === abstractActionDef.type && typeof abstractActionDef.stateModifier === 'function') {
+                    return abstractActionDef.stateModifier(state, action);
                 }
             }
 

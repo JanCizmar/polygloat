@@ -1,30 +1,43 @@
 package com.polygloat.model;
 
 import com.polygloat.dtos.PathDTO;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
+import org.hibernate.search.annotations.*;
 
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+@EqualsAndHashCode(exclude = {"translations", "repository"}, callSuper = true)
 @Entity
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Indexed
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"repository_id", "name"}),
+})
 public class Source extends AuditModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Getter
-    @Setter
     private Long id;
 
-    @OneToOne(mappedBy = "source", optional = false, orphanRemoval = true)
-    @Getter
-    @Setter
-    private File file;
+    @Field
+    //@Analyzer(impl = Analyzer.class)
+    private String name;
 
+    @ManyToOne
+    @IndexedEmbedded(depth = 1)
+    private Repository repository;
+
+    @Builder.Default
+    @IndexedEmbedded(includePaths = {"text"})
     @OneToMany(mappedBy = "source", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    @Getter
-    @Setter
     private Set<Translation> translations = new HashSet<>();
 
     public Optional<Translation> getTranslation(String abbr) {
@@ -32,10 +45,7 @@ public class Source extends AuditModel {
     }
 
     public PathDTO getPath() {
-        return PathDTO.fromPathAndName(this.getFile().getPath().getFullPath(), getFile().getName());
+        return PathDTO.fromFullPath(this.getName());
     }
 
-    public String getText() {
-        return getFile().getName();
-    }
 }

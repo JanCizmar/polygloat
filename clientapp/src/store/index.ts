@@ -1,21 +1,21 @@
 import {applyMiddleware, combineReducers, createStore} from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import {composeWithDevTools} from 'redux-devtools-extension';
-import {translationReducer} from './translation/reducers';
 import promise from 'redux-promise-middleware';
 import {container} from 'tsyringe';
 import {implicitReducer as ir} from './implicitReducer';
-import {RepositoriesState} from './repository/RepositoriesState';
 import {RepositoryActions} from './repository/RepositoryActions';
-import {LanguagesState} from './languages/LanguagesState';
 import {LanguageActions} from './languages/LanguageActions';
-import {GlobalActions, GlobalState} from './global/globalActions';
-import {ErrorActions, ErrorState} from './global/errorActions';
-import {RedirectionActions, RedirectionState} from './global/redirectionActions';
-import {MessageActions, MessageState} from './global/messageActions';
-import {SignUpActions, SignUpState} from './global/signUpActions';
-import {RepositoryInvitationActions, RepositoryInvitationState} from './repository/invitations/repositoryInvitationActions';
-import {RepositoryPermissionActions, RepositoryPermissionState} from './repository/invitations/repositoryPermissionActions';
+import {GlobalActions} from './global/globalActions';
+import {ErrorActions} from './global/errorActions';
+import {RedirectionActions} from './global/redirectionActions';
+import {MessageActions} from './global/messageActions';
+import {SignUpActions} from './global/signUpActions';
+import {RepositoryInvitationActions} from './repository/invitations/repositoryInvitationActions';
+import {RepositoryPermissionActions} from './repository/invitations/repositoryPermissionActions';
+import {securityService} from "../service/securityService";
+import {messageService} from "../service/messageService";
+import {TranslationActions} from "./repository/TranslationActions";
 
 const implicitReducer = container.resolve(ir);
 const repositoryActionsIns = container.resolve(RepositoryActions);
@@ -24,23 +24,52 @@ const globalActionsIns = container.resolve(GlobalActions);
 const errorActionsIns = container.resolve(ErrorActions);
 const redirectionActionsIns = container.resolve(RedirectionActions);
 
-const rootReducer = combineReducers({
-    translations: translationReducer,
-    global: implicitReducer.create(new GlobalState(), globalActionsIns),
-    repositories: implicitReducer.create(new RepositoriesState(), repositoryActionsIns),
-    languages: implicitReducer.create(new LanguagesState(), languageActionsIns),
-    error: implicitReducer.create(new ErrorState(), errorActionsIns),
-    redirection: implicitReducer.create(new RedirectionState(), redirectionActionsIns),
-    message: implicitReducer.create(new MessageState(), container.resolve(MessageActions)),
-    signUp: implicitReducer.create(new SignUpState(), container.resolve(SignUpActions)),
-    repositoryInvitation: implicitReducer.create(new RepositoryInvitationState(), container.resolve(RepositoryInvitationActions)),
-    repositoryPermission: implicitReducer.create(new RepositoryPermissionState(), container.resolve(RepositoryPermissionActions)),
+const appReducer = combineReducers({
+    translations: implicitReducer.create(container.resolve(TranslationActions)),
+    global: implicitReducer.create(globalActionsIns),
+    repositories: implicitReducer.create(repositoryActionsIns),
+    languages: implicitReducer.create(languageActionsIns),
+    error: implicitReducer.create(errorActionsIns),
+    redirection: implicitReducer.create(redirectionActionsIns),
+    message: implicitReducer.create(container.resolve(MessageActions)),
+    signUp: implicitReducer.create(container.resolve(SignUpActions)),
+    repositoryInvitation: implicitReducer.create(container.resolve(RepositoryInvitationActions)),
+    repositoryPermission: implicitReducer.create(container.resolve(RepositoryPermissionActions)),
 });
 
-export type AppState = ReturnType<typeof rootReducer>;
+const rootReducer = (state, action): ReturnType<typeof appReducer> => {
+    /**
+     * reset state on logout
+     */
+    if (action.type === globalActionsIns.logout.type) {
+        state = undefined;
+        //remove after login link to avoid buggy behaviour
+        container.resolve(securityService).setLogoutMark();
+    }
+
+    return appReducer(state, action);
+};
+
+const successMessageMiddleware = store => next => action => {
+    if (action.meta && action.meta.successMessage && action.type.indexOf("_PENDING") <= -1 && action.type.indexOf("_REJECTED") <= -1) {
+        container.resolve(messageService).success(action.meta.successMessage);
+    }
+
+    next(action);
+};
+
+const redirectAfterMiddleware = store => next => action => {
+    if (action.meta && action.meta.redirectAfter && action.type.indexOf("_PENDING") <= -1 && action.type.indexOf("_REJECTED") <= -1) {
+        redirectionActionsIns.redirect.dispatch(action.meta.redirectAfter);
+    }
+
+    next(action);
+};
+
+export type AppState = ReturnType<typeof appReducer>;
 
 export default function configureStore() {
-    const middlewares = [thunkMiddleware, promise];
+    const middlewares = [thunkMiddleware, promise, redirectAfterMiddleware, successMessageMiddleware];
     const middleWareEnhancer = applyMiddleware(...middlewares);
 
     return createStore(

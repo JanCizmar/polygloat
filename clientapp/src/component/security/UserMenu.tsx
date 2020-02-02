@@ -1,9 +1,13 @@
-import {default as React, FunctionComponent} from 'react';
+import {default as React, FunctionComponent, useState} from 'react';
 import {Button} from '@material-ui/core';
 import {container} from 'tsyringe';
 import {GlobalActions} from '../../store/global/globalActions';
 import {useSelector} from 'react-redux';
 import {AppState} from '../../store';
+import {useConfig} from "../../hooks/useConfig";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
+import {useUser} from "../../hooks/useUser";
 
 interface UserMenuProps {
 
@@ -13,18 +17,52 @@ const globalActions = container.resolve(GlobalActions);
 
 export const UserMenu: FunctionComponent<UserMenuProps> = (props) => {
 
-    const authentication = useSelector((state: AppState) => state.global.remoteConfig.authentication);
     const userLogged = useSelector((state: AppState) => state.global.security.allowPrivate);
 
-    //const authentication = useSelector((state: AppState) => state.global.remoteConfig.authentication);
+    const authentication = useConfig().authentication;
 
-    if (!authentication) {
+    const handleOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+
+    const [anchorEl, setAnchorEl] = useState(null);
+
+    const user = useUser();
+
+    if (!authentication || !user) {
         return null;
     }
 
     return (
         <>
-            {userLogged && <Button color="inherit" onClick={() => globalActions.logout.dispatch()}>Logout</Button>}
+            {userLogged &&
+            <div>
+                <Button color="inherit" aria-controls="user-menu" aria-haspopup="true"
+                        onClick={handleOpen}>{user.name}</Button>
+                <Menu id="user-menu" keepMounted
+                      elevation={0}
+                      getContentAnchorEl={null}
+                      open={!!anchorEl}
+                      anchorEl={anchorEl}
+                      onClose={handleClose}
+                      anchorOrigin={{
+                          vertical: 'bottom',
+                          horizontal: 'right',
+                      }}
+                      transformOrigin={{
+                          vertical: 'top',
+                          horizontal: 'right',
+                      }}>
+                    <MenuItem onClick={() => globalActions.logout.dispatch()}>Logout</MenuItem>
+                </Menu>
+            </div>
+            }
         </>
     );
+    return null;
 };

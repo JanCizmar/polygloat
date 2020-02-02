@@ -50,6 +50,7 @@ public class UserAccount extends AuditModel {
     @Column(name = "reset_password_code")
     private String resetPasswordCode;
 
+
     public UserAccount() {
     }
 
@@ -57,7 +58,7 @@ public class UserAccount extends AuditModel {
         this.username = username;
     }
 
-    enum Role {
+    public enum Role {
         USER,
         ADMIN
     }

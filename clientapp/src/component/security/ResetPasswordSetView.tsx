@@ -13,6 +13,7 @@ import {GlobalActions} from '../../store/global/globalActions';
 import {Alert} from '../common/Alert';
 import * as Yup from 'yup';
 import {SetPasswordFields, setPasswordValidationSchema} from './SetPasswordFields';
+import {useConfig} from "../../hooks/useConfig";
 
 const globalActions = container.resolve(GlobalActions);
 
@@ -23,11 +24,11 @@ type ValueType = {
 
 const validationSchema = Yup.object().shape(setPasswordValidationSchema);
 
-export const PasswordResetSetView: FunctionComponent = () => {
+const PasswordResetSetView: FunctionComponent = () => {
 
     const match = useRouteMatch();
     const encodedData = match.params[PARAMS.ENCODED_EMAIL_AND_CODE];
-    const [code, email] = (atob(encodedData) as string).split(',');
+    const [code, email] = atob(encodedData).split(',');
 
     useEffect(() => {
         globalActions.resetPasswordValidate.dispatch(email, code);
@@ -39,7 +40,7 @@ export const PasswordResetSetView: FunctionComponent = () => {
     const success = useSelector((state: AppState) => state.global.passwordResetSetSucceed);
 
     const security = useSelector((state: AppState) => state.global.security);
-    const remoteConfig = useSelector((state: AppState) => state.global.remoteConfig);
+    const remoteConfig = useConfig();
 
     if (!remoteConfig.authentication || security.allowPrivate || !remoteConfig.passwordResettable || success) {
         return (<Redirect to={LINKS.AFTER_LOGIN.build()}/>);
@@ -76,3 +77,5 @@ export const PasswordResetSetView: FunctionComponent = () => {
         </DashboardPage>
     );
 };
+
+export default PasswordResetSetView;

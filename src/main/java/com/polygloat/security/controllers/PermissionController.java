@@ -1,9 +1,12 @@
 package com.polygloat.security.controllers;
 
+import com.polygloat.constants.Message;
 import com.polygloat.dtos.response.PermissionDTO;
+import com.polygloat.exceptions.BadRequestException;
 import com.polygloat.exceptions.NotFoundException;
 import com.polygloat.model.Permission;
 import com.polygloat.model.Repository;
+import com.polygloat.security.AuthenticationFacade;
 import com.polygloat.service.PermissionService;
 import com.polygloat.service.RepositoryService;
 import com.polygloat.service.SecurityService;
@@ -23,18 +26,22 @@ public class PermissionController {
     private final SecurityService securityService;
     private final RepositoryService repositoryService;
     private final PermissionService permissionService;
+    private final AuthenticationFacade authenticationFacade;
 
     @GetMapping("/list/{repositoryId}")
     public Set<PermissionDTO> getRepositoryPermissions(@PathVariable("repositoryId") Long id) {
         Repository repository = repositoryService.findById(id).orElseThrow(NotFoundException::new);
-        securityService.checkManageRepositoryPermission(id);
+        securityService.checkRepositoryPermission(id, Permission.RepositoryPermissionType.MANAGE);
         return permissionService.getAllOfRepository(repository).stream().map(PermissionDTO::fromEntity).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     @DeleteMapping("/{permissionId}")
     public void deletePermission(@PathVariable("permissionId") Long id) {
         Permission permission = permissionService.findById(id).orElseThrow(NotFoundException::new);
-        securityService.checkManageRepositoryPermission(permission.getRepository().getId());
+        securityService.checkRepositoryPermission(permission.getRepository().getId(), Permission.RepositoryPermissionType.MANAGE);
+        if (permission.getUser().getId().equals(authenticationFacade.getUserAccount().getId())) {
+            throw new BadRequestException(Message.CAN_NOT_REVOKE_OWN_PERMISSIONS);
+        }
         permissionService.delete(permission);
     }
 }

@@ -28,6 +28,7 @@ export class securityService {
     };
 
     logout() {
+        this.removeAfterLoginLink();
         this.tokenService.disposeToken();
     }
 
@@ -55,15 +56,30 @@ export class securityService {
 
     public resetPasswordSet = async (email: string, code: string, password: string): Promise<void> => {
         const url = `${API_LINKS.RESET_PASSWORD_SET}`;
-        const res = await this.http.post<never>(url, <ResetPasswordPostRequest> {
+        const res = await this.http.post<never>(url, <ResetPasswordPostRequest>{
             email, code, password
         });
         this.messageService.success('Password successfully reset');
         return res;
     };
 
+    public setLogoutMark = () => {
+        localStorage.setItem('logoutMark', "true");
+    };
+
+    public isLogoutMark = () => {
+        return !!localStorage.getItem('logoutMark');
+    };
+
+    public disposeLogoutMark = () => {
+        localStorage.removeItem('logoutMark');
+    };
+
     public saveAfterLoginLink = (afterLoginLink: object) => {
-        localStorage.setItem('afterLoginLink', JSON.stringify(afterLoginLink));
+        if (!this.isLogoutMark()) {
+            localStorage.setItem('afterLoginLink', JSON.stringify(afterLoginLink));
+        }
+        this.disposeLogoutMark();
     };
 
     public getAfterLoginLink = (): object => {
@@ -80,7 +96,7 @@ export class securityService {
 
     private async handleLoginResponse(response): Promise<TokenDTO> {
         if (response.status >= 400) {
-            throw <ErrorResponseDTO> await response.json();
+            throw <ErrorResponseDTO>await response.json();
         }
 
         const tokenDTO: TokenDTO = await response.json();

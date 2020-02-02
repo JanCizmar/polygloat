@@ -1,15 +1,11 @@
 import {container} from 'tsyringe';
 import {GlobalActions} from '../store/global/globalActions';
+import {ConfirmationDialogProps} from "../component/common/ConfirmationDialog";
 
-export const useConfirmation = (content: string, title: string) => {
+export const useConfirmation = (defaultOptions: ConfirmationDialogProps) => {
     const globalActions = container.resolve(GlobalActions);
 
-    const onConfirmed = (callback: () => void) => {
-        console.log('calling hook');
-        globalActions.openConfirmation.dispatch(title, content, callback);
-    };
-
-    return {
-        confirm: onConfirmed
+    return (options: ConfirmationDialogProps) => {
+        globalActions.openConfirmation.dispatch({...options, ...defaultOptions});
     };
 };

@@ -1,5 +1,6 @@
 package com.polygloat;
 
+import com.polygloat.constants.Message;
 import com.polygloat.dtos.request.validators.ValidationError;
 import com.polygloat.dtos.request.validators.ValidationErrorType;
 import com.polygloat.dtos.request.validators.exceptions.ValidationException;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.*;
 
 @ControllerAdvice
@@ -28,16 +30,21 @@ public class ExceptionHandlers {
     }
 
     @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<Map<String, List<String>>> handleCustomValidationExceptions(ValidationException ex) {
+    public ResponseEntity<Map<String, Map<String, List<String>>>> handleCustomValidationExceptions(ValidationException ex) {
         Map<String, List<String>> errors = new HashMap<>();
         for (ValidationError validationError : ex.getValidationErrors()) {
-            errors.put(validationError.getType().name(), Arrays.asList(validationError.getParameters()));
+            errors.put(validationError.getMessage().getCode(), Arrays.asList(validationError.getParameters()));
         }
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(Collections.singletonMap(ValidationErrorType.CUSTOM_VALIDATION.name(), errors), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ErrorException.class)
     public ResponseEntity<ErrorResponseBody> handleServerError(ErrorException ex) {
         return new ResponseEntity<>(ex.getErrorResponseBody(), ex.getHttpStatus());
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ErrorResponseBody> handleServerError(EntityNotFoundException ex) {
+        return new ResponseEntity<>(new ErrorResponseBody(Message.RESOURCE_NOT_FOUND.getCode(), null), HttpStatus.NOT_FOUND);
     }
 }

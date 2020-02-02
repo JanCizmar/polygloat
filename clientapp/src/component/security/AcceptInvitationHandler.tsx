@@ -3,14 +3,13 @@ import {useRouteMatch} from 'react-router-dom';
 import {PARAMS} from '../../constants/links';
 import {container} from 'tsyringe';
 import {RepositoryInvitationActions} from '../../store/repository/invitations/repositoryInvitationActions';
-import {FullPageLoading} from '../common/FullPageLoading';
+import FullPageLoading from "../common/FullPageLoading";
 
 interface AcceptInvitationHandlerProps {
 
 }
 
-
-export const AcceptInvitationHandler: FunctionComponent<AcceptInvitationHandlerProps> = (props) => {
+const AcceptInvitationHandler: FunctionComponent<AcceptInvitationHandlerProps> = (props) => {
     const match = useRouteMatch();
     const code = match.params[PARAMS.INVITATION_CODE];
 
@@ -20,3 +19,4 @@ export const AcceptInvitationHandler: FunctionComponent<AcceptInvitationHandlerP
 
     return <FullPageLoading/>;
 };
+export default AcceptInvitationHandler;

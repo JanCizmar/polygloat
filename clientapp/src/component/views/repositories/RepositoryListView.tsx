@@ -6,7 +6,7 @@ import {connect} from 'react-redux';
 import {AppState} from '../../../store';
 import {container} from 'tsyringe';
 import {RepositoryActions} from '../../../store/repository/RepositoryActions';
-import {RepositoryDTO} from '../../../service/response.types';
+import {RepositoryDTO, RepositoryPermissionType} from '../../../service/response.types';
 import {LINKS, PARAMS} from '../../../constants/links';
 import {FabAddButtonLink} from '../../common/buttons/FabAddButtonLink';
 import List from '@material-ui/core/List';
@@ -32,13 +32,9 @@ export const RepositoryListView = connect((state: AppState) =>
             actions.loadRepositories.dispatch();
         }, []);
 
-        const addRepository = () => {
-            actions.addRepository.dispatch();
-        };
-
         return (
             <DashboardPage>
-                <BaseView title="Repositories" loading={loading}>
+                <BaseView title="Repositories" lg={5} md={7} loading={loading}>
                     {() => (
                         <>
                             <List>
@@ -46,20 +42,18 @@ export const RepositoryListView = connect((state: AppState) =>
                                     <ListItemLink
                                         key={r.id}
                                         to={LINKS.REPOSITORY_TRANSLATIONS.build({[PARAMS.REPOSITORY_ID]: r.id})}>
-
                                         <ListItemText>
                                             {r.name}
                                         </ListItemText>
-
+                                        {r.permissionType === RepositoryPermissionType.MANAGE &&
                                         <ListItemSecondaryAction>
                                             <Link to={LINKS.REPOSITORY_EDIT.build({[PARAMS.REPOSITORY_ID]: r.id})}>
                                                 <SettingsIconButton/>
                                             </Link>
-                                        </ListItemSecondaryAction>
-
+                                        </ListItemSecondaryAction>}
                                     </ListItemLink>)}
                             </List>
-                            <Box display="flex" flexDirection="column" alignItems="flex-end" pr={2}>
+                            <Box display="flex" flexDirection="column" alignItems="flex-end" mt={2} pr={2}>
                                 <FabAddButtonLink to={LINKS.REPOSITORY_ADD.build()}/>
                             </Box>
                         </>

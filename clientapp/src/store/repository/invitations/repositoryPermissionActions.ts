@@ -1,27 +1,27 @@
-import {AbstractActions, createLoadable} from '../../AbstractActions';
 import {singleton} from 'tsyringe';
 import {repositoryService} from '../../../service/repositoryService';
 import {PermissionDTO} from '../../../service/response.types';
+import {AbstractLoadableActions, StateWithLoadables} from "../../AbstractLoadableActions";
 
 const listName = 'permissionsList';
 const deleteName = 'permissionDelete';
 
-export class RepositoryPermissionState {
-    [listName] = createLoadable<PermissionDTO[]>();
-    [deleteName] = createLoadable<number>();
+export class RepositoryPermissionState extends StateWithLoadables<RepositoryPermissionActions> {
 }
 
 @singleton()
-export class RepositoryPermissionActions extends AbstractActions<RepositoryPermissionState> {
+export class RepositoryPermissionActions extends AbstractLoadableActions<RepositoryPermissionState> {
 
-    loadList = this.createLoadableAction(listName, this.repositoryService.getPermissions);
-    delete = this.createDeleteAction(deleteName, listName, async (id) => {
-        await this.repositoryService.deletePermission(id);
-        return id;
-    });
+    loadableDefinitions = {
+        list: this.createLoadableDefinition(this.repositoryService.getPermissions),
+        delete: this.createDeleteDefinition("list", async (id) => {
+            await this.repositoryService.deletePermission(id);
+            return id;
+        })
+    };
 
     constructor(private repositoryService: repositoryService) {
-        super();
+        super(new RepositoryPermissionState());
     }
 
     get prefix(): string {

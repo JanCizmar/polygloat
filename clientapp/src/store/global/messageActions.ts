@@ -30,7 +30,7 @@ export class MessageActions extends AbstractActions<MessageState> {
     });
 
     constructor() {
-        super();
+        super(new MessageState());
     }
 
     get prefix(): string {

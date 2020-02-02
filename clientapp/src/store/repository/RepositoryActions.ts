@@ -1,47 +1,42 @@
 import {container, singleton} from 'tsyringe';
 
 import {repositoryService} from '../../service/repositoryService';
-import {AbstractActions} from '../AbstractActions';
 import {RepositoryDTO} from '../../service/response.types';
-import {RepositoriesState} from './RepositoriesState';
+import {LINKS} from "../../constants/links";
+import {AbstractLoadableActions, StateWithLoadables} from "../AbstractLoadableActions";
+
+export class RepositoriesState extends StateWithLoadables<RepositoryActions> {
+    repositoriesLoading: boolean = true;
+    repositories: RepositoryDTO[];
+}
 
 @singleton()
-export class RepositoryActions extends AbstractActions<RepositoriesState> {
-    addRepository = this.createAction('ADD_REPOSITORY', () => {
-    }).build.on((state) => {
-        return {...state, addingRepository: true};
-    });
-    resetEdit = this.createAction('RESET_EDIT', () => {
-    }).build.on(state => (<RepositoriesState> {...state, repositorySaved: false, repositorySaving: false}));
+export class RepositoryActions extends AbstractLoadableActions<RepositoriesState> {
+    constructor() {
+        super(new RepositoriesState());
+    }
+
     private service = container.resolve(repositoryService);
+
     public loadRepositories = this.createPromiseAction<RepositoryDTO[], any>('LOAD_ALL', this.service.getRepositories)
         .build.onFullFilled((state, action) => {
             return {...state, repositories: action.payload, repositoriesLoading: false};
         }).build.onPending((state, action) => {
             return {...state, repositoriesLoading: true};
         });
-    editRepository = this.createPromiseAction('EDIT_REPOSITORY', (id, values) => this.service.editRepository(id, values))
-        .build.onPending((state) => (<RepositoriesState> {...state, repositorySaving: true}))
-        .build.onFullFilled((state) => (<RepositoriesState> {...state, repositorySaved: true, repositorySaving: false}));
 
-    createRepository = this.createPromiseAction('CREATE_REPOSITORY', (values) => this.service.createRepository(values))
-        .build.onPending((state) => (<RepositoriesState> {...state, repositorySaving: true}))
-        .build.onFullFilled((state) => (<RepositoriesState> {...state, repositorySaved: true, repositorySaving: false}));
 
-    loadRepository = this.createPromiseAction<RepositoryDTO, any>('SELECT_REPOSITORY',
-        async (id) => {
-            const repositoryDTOS = await this.service.getRepositories();
-            return repositoryDTOS.find(r => r.id === (!Number.isInteger(id) ? parseInt(id) : id));
-        })
-        .build.onFullFilled((state, action) => {
-            return <RepositoriesState> {
-                ...state,
-                selectedRepository: action.payload,
-                selectedRepositoryLoading: false
-            };
-        }).build.onPending((state, action) => {
-            return <RepositoriesState> {...state, selectedRepositoryLoading: true};
-        });
+    get loadableDefinitions() {
+        return {
+            editRepository: this.createLoadableDefinition<null>((id, values) => this.service.editRepository(id, values), null,
+                "Successfully edited!", LINKS.REPOSITORIES),
+            createRepository: this.createLoadableDefinition((values) => this.service.createRepository(values),
+                null, "Repository created", LINKS.REPOSITORIES),
+            repository: this.createLoadableDefinition(this.service.loadRepository, null),
+            deleteRepository: this.createLoadableDefinition(this.service.deleteRepository, null, "Repository deleted", LINKS.REPOSITORIES),
+        }
+    };
+
 
     get prefix(): string {
         return 'REPOSITORIES';

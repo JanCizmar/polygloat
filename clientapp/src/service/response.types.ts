@@ -1,7 +1,9 @@
-export type FileResponse = {
-    fullPath: string,
-    source: boolean,
-    translations: { [key: string]: string }
+
+export type TranslationsObject = { [abbreviation: string]: string };
+
+export type SourceTranslationsDTO = {
+    name: string,
+    translations: TranslationsObject
 }
 
 export type LanguageDTO = {
@@ -9,8 +11,6 @@ export type LanguageDTO = {
     id: number,
     name: string
 }
-
-
 export type TranslationsDataResponse = {
     paginationMeta: {
         offset: number,
@@ -20,7 +20,7 @@ export type TranslationsDataResponse = {
         search: string,
         languages: string[],
     }
-    data: FileResponse[]
+    data: SourceTranslationsDTO[]
 }
 
 export type RepositoryDTO = {
@@ -48,9 +48,10 @@ export interface TokenDTO {
 export type ErrorResponseDTO = {
     code: string;
     params: [];
+    __handled: boolean;
 }
 
-enum RepositoryPermissionType {
+export enum RepositoryPermissionType {
     MANAGE = 'MANAGE',
     EDIT = 'EDIT',
     TRANSLATE = 'TRANSLATE',
@@ -66,7 +67,14 @@ export interface InvitationDTO {
 export interface PermissionDTO {
     id: number,
     username: string,
+    userId: number,
     userFullName: string,
     type: RepositoryPermissionType
+}
+
+export interface UserDTO {
+    id: number,
+    username: string,
+    name: string,
 }
 

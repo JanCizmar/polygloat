@@ -21,6 +21,8 @@ export class repositoryService {
 
     public createRepository = async (values: Partial<RepositoryDTO>) => (await http.postNoJson(`repositories`, values)).json();
 
+    public deleteRepository = async (id) => http.delete('repositories/' + id);
+
     public generateInvitationCode = async (repositoryId: number, type: string): Promise<string> => await http.post('repositories/invite', {
         repositoryId, type
     });
@@ -31,7 +33,7 @@ export class repositoryService {
             this.messaging.success('Invitation successfully accepted');
 
         } catch (e) {
-            if ((<ErrorResponseDTO> e).code) {
+            if ((<ErrorResponseDTO>e).code) {
                 this.messaging.error(e.code);
             }
         }
@@ -45,4 +47,6 @@ export class repositoryService {
     public getPermissions = async (repositoryId): Promise<PermissionDTO[]> => http.get('permission/list/' + repositoryId);
 
     public deletePermission = async (invitationId): Promise<void> => http.delete('permission/' + invitationId);
+
+    loadRepository = (id): Promise<RepositoryDTO> => http.get("repositories/" + id);
 }

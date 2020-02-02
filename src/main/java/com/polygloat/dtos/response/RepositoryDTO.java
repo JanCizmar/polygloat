@@ -5,9 +5,11 @@ import com.polygloat.model.Permission;
 import com.polygloat.model.Repository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class RepositoryDTO {
     Long id;
 
@@ -15,8 +17,7 @@ public class RepositoryDTO {
 
     Permission.RepositoryPermissionType permissionType;
 
-    public static RepositoryDTO fromEntity(Repository repository) {
-        Permission permission = repository.getPermissions().stream().findAny().orElseThrow(InvalidStateException::new);
+    public static RepositoryDTO fromEntityAndPermission(Repository repository, Permission permission) {
         return new RepositoryDTO(repository.getId(), repository.getName(), permission.getType());
     }
 }

@@ -16,56 +16,50 @@ import {Link, useRouteMatch} from 'react-router-dom';
 import {RepositoryPage} from '../RepositoryPage';
 import {LanguageActions} from '../../../../store/languages/LanguageActions';
 import {BaseView} from '../../BaseView';
-import Grid from '@material-ui/core/Grid';
+import {useRepository} from "../../../../hooks/useRepository";
 
 const actions = container.resolve(LanguageActions);
 
-interface Props {
-    languages: LanguageDTO[];
-    loading: boolean;
-}
+export const LanguageListView = () => {
+    const match = useRouteMatch();
+    const repositoryId = match.params[PARAMS.REPOSITORY_ID];
 
-export const LanguageListView = connect((state: AppState) =>
-    ({languages: state.languages.languages, loading: state.languages.languagesLoading}))(
-    (props: Props) => {
+    let loadable = actions.useSelector(s => s.loadables.list);
 
-        const match = useRouteMatch();
-        const repositoryId = match.params[PARAMS.REPOSITORY_ID];
+    useEffect(() => {
+        actions.loadableActions.list.dispatch(repositoryId);
+    }, []);
 
-        useEffect(() => {
-            actions.loadLanguages.dispatch(repositoryId);
-        }, []);
-
-        return (
-            <RepositoryPage id={repositoryId}>
-                <BaseView title="Languages" loading={props.loading}>
-                    {() => (
-                        <Grid item xs={12} md={6} lg={3}>
-                            <List>
-                                {props.languages.map(l => (
-                                    <ListItem key={l.id}>
-                                        <ListItemText>
-                                            {l.name} [{l.abbreviation}]
-                                        </ListItemText>
-                                        <ListItemSecondaryAction>
-                                            <Link to={LINKS.REPOSITORY_LANGUAGE_EDIT.build(
-                                                {
-                                                    [PARAMS.REPOSITORY_ID]: repositoryId,
-                                                    [PARAMS.LANGUAGE_ID]: l.id
-                                                }
-                                            )}>
-                                                <SettingsIconButton/>
-                                            </Link>
-                                        </ListItemSecondaryAction>
-                                    </ListItem>
-                                ))}
-                            </List>
-                            <Box display="flex" flexDirection="column" alignItems="flex-end" pr={2}>
-                                <FabAddButtonLink to=""/>
-                            </Box>
-                        </Grid>
-                    )}
-                </BaseView>
-            </RepositoryPage>
-        );
-    });
+    return (
+        <RepositoryPage>
+            <BaseView title="Languages" loading={loadable.loading || !loadable.touched} lg={5} md={7}>
+                {() => (
+                    <>
+                        <List>
+                            {loadable.data.map(l => (
+                                <ListItem key={l.id}>
+                                    <ListItemText>
+                                        {l.name} [{l.abbreviation}]
+                                    </ListItemText>
+                                    <ListItemSecondaryAction>
+                                        <Link to={LINKS.REPOSITORY_LANGUAGE_EDIT.build(
+                                            {
+                                                [PARAMS.REPOSITORY_ID]: repositoryId,
+                                                [PARAMS.LANGUAGE_ID]: l.id
+                                            }
+                                        )}>
+                                            <SettingsIconButton/>
+                                        </Link>
+                                    </ListItemSecondaryAction>
+                                </ListItem>
+                            ))}
+                        </List>
+                        <Box display="flex" flexDirection="column" alignItems="flex-end" pr={2} mt={5}>
+                            <FabAddButtonLink to={LINKS.REPOSITORY_LANGUAGES_CREATE.build({[PARAMS.REPOSITORY_ID]: repositoryId})}/>
+                        </Box>
+                    </>
+                )}
+            </BaseView>
+        </RepositoryPage>
+    );
+};

@@ -10,8 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class SourceServiceTest {
-    @Autowired
-    FileService fileService;
 
     @Autowired
     RepositoryRepository repositoryRepository;

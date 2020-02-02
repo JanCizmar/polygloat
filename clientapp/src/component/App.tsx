@@ -3,28 +3,31 @@ import {useEffect} from 'react';
 import {GlobalActions} from '../store/global/globalActions';
 import SnackBar from './common/SnackBar';
 import {BrowserRouter, Redirect, Route, Switch} from 'react-router-dom';
-import {RepositoriesRouter} from './views/repositories/RepositoriesRouter';
 import {container} from 'tsyringe';
 import {connect, useSelector} from 'react-redux';
 import {AppState} from '../store';
-import {FullPageLoading} from './common/FullPageLoading';
 import {LINKS} from '../constants/links';
 import {PrivateRoute} from './common/PrivateRoute';
-import {LoginRouter} from './security/LoginRouter';
 import {ErrorActions} from '../store/global/errorActions';
 import {RedirectionActions} from '../store/global/redirectionActions';
-import {PasswordResetView} from './security/ResetPasswordView';
-import {PasswordResetSetView} from './security/ResetPasswordSetView';
-import {SignUpView} from './security/SignUpView';
-import {AcceptInvitationHandler} from './security/AcceptInvitationHandler';
-import ConfirmationDialog from './common/ConfirmationDialog';
+import {RemoteConfigurationDTO} from "../service/response.types";
+import {useConfig} from "../hooks/useConfig";
+import {useUser} from "../hooks/useUser";
+import FullPageLoading from "./common/FullPageLoading";
+
+const LoginRouter = React.lazy(() => import(/* webpackChunkName: "login-router" */'./security/LoginRouter'));
+const SignUpView = React.lazy(() => import(/* webpackChunkName: "login-router" */'./security/SignUpView'));
+
+const PasswordResetSetView = React.lazy(() => import(/* webpackChunkName: "reset-password-set-view" */'./security/ResetPasswordSetView'));
+const PasswordResetView = React.lazy(() => import(/* webpackChunkName: "reset-password-view" */'./security/ResetPasswordView'));
+const ConfirmationDialog = React.lazy(() => import(/* webpackChunkName: "confirmation-dialog" */'./common/ConfirmationDialog'));
+const RepositoriesRouter = React.lazy(() => import(/* webpackChunkName: "repositories" */'./views/repositories/RepositoriesRouter'));
+const AcceptInvitationHandler = React.lazy(() => import(/* webpackChunkName: "accept-invitation-handler" */'./security/AcceptInvitationHandler'));
 
 interface Props {
-    authentication: boolean,
-    configLoading: boolean
+    remoteConfig: RemoteConfigurationDTO
 }
 
-const globalActions = container.resolve(GlobalActions);
 const errorActions = container.resolve(ErrorActions);
 const redirectionActions = container.resolve(RedirectionActions);
 
@@ -44,11 +47,23 @@ const Redirection = () => {
     return null;
 };
 
+const MandatoryDataProvider = (props) => {
+    let config = useConfig();
+    let userData = useUser();
+
+    let allowPrivate = useSelector((state: AppState) => state.global.security.allowPrivate);
+
+    if (!config || (!userData && allowPrivate)) {
+        return <FullPageLoading/>
+    } else {
+        return props.children;
+    }
+};
+
 const GlobalConfirmation = () => {
     let state = useSelector((state: AppState) => state.global.confirmationDialog);
 
     let actions = container.resolve(GlobalActions);
-
 
     const onCancel = () => {
         actions.closeConfirmation.dispatch();
@@ -60,7 +75,7 @@ const GlobalConfirmation = () => {
     };
 
 
-    return (<ConfirmationDialog open={state.open} title={state.title} message={state.content} onCancel={onCancel} onConfirm={onConfirm}/>);
+    return (<ConfirmationDialog open={!!state} {...state} onCancel={onCancel} onConfirm={onConfirm}/>);
 };
 
 export class AppImp extends React.Component<Props, null> {
@@ -69,51 +84,43 @@ export class AppImp extends React.Component<Props, null> {
         throw error;
     }
 
-    componentDidMount(): void {
-        globalActions.loadRemoteConfig.dispatch();
-    }
-
     render() {
-
-        if (this.props.configLoading) {
-            return <FullPageLoading/>;
-        }
-
         return (
             <BrowserRouter>
                 <Redirection/>
-                <Switch>
-                    <Route exact path={LINKS.RESET_PASSWORD_REQUEST.template}>
-                        <PasswordResetView/>
-                    </Route>
-                    <Route exact path={LINKS.RESET_PASSWORD_WITH_PARAMS.template}>
-                        <PasswordResetSetView/>
-                    </Route>
-                    <Route exact path={LINKS.SIGN_UP.template}>
-                        <SignUpView/>
-                    </Route>
-                    <Route path={LINKS.LOGIN.template}>
-                        <LoginRouter/>
-                    </Route>
-                    <PrivateRoute exact path="/">
-                        <Redirect to={LINKS.REPOSITORIES.template}/>
-                    </PrivateRoute>
-                    <PrivateRoute path={LINKS.REPOSITORIES.template}>
-                        <RepositoriesRouter/>
-                    </PrivateRoute>
-                    <PrivateRoute path={LINKS.ACCEPT_INVITATION.template}>
-                        <AcceptInvitationHandler/>
-                    </PrivateRoute>
-                </Switch>
-                <SnackBar/>
-                <GlobalConfirmation/>
+                <MandatoryDataProvider>
+                    <Switch>
+                        <Route exact path={LINKS.RESET_PASSWORD_REQUEST.template}>
+                            <PasswordResetView/>
+                        </Route>
+                        <Route exact path={LINKS.RESET_PASSWORD_WITH_PARAMS.template}>
+                            <PasswordResetSetView/>
+                        </Route>
+                        <Route exact path={LINKS.SIGN_UP.template}>
+                            <SignUpView/>
+                        </Route>
+                        <Route path={LINKS.LOGIN.template}>
+                            <LoginRouter/>
+                        </Route>
+                        <PrivateRoute exact path="/">
+                            <Redirect to={LINKS.REPOSITORIES.template}/>
+                        </PrivateRoute>
+                        <PrivateRoute path={LINKS.REPOSITORIES.template}>
+                            <RepositoriesRouter/>
+                        </PrivateRoute>
+                        <PrivateRoute path={LINKS.ACCEPT_INVITATION.template}>
+                            <AcceptInvitationHandler/>
+                        </PrivateRoute>
+                    </Switch>
+                    <SnackBar/>
+                    <GlobalConfirmation/>
+                </MandatoryDataProvider>
             </BrowserRouter>
         );
     }
 };
 
-export const App = connect((state: AppState) => (
+export default connect((state: AppState) => (
     {
-        authentication: state.global.remoteConfig && state.global.remoteConfig.authentication,
-        configLoading: state.global.remoteConfigLoading
+        remoteConfig: state.global.loadables.remoteConfig.data
     }))(AppImp);

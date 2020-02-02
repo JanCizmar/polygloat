@@ -19,6 +19,7 @@ public class Application {
         if (populate) {
             populator.autoPopulate();
         }
+
         if (sentry) {
             Sentry.init(sentryDSN);
         }

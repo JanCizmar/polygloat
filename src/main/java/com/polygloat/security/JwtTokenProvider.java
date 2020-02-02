@@ -1,5 +1,7 @@
 package com.polygloat.security;
 
+import com.polygloat.constants.Message;
+import com.polygloat.exceptions.AuthenticationException;
 import com.polygloat.exceptions.NotFoundException;
 import com.polygloat.model.UserAccount;
 import com.polygloat.service.UserAccountService;
@@ -65,7 +67,7 @@ public class JwtTokenProvider {
     }
 
     public Authentication getAuthentication(JwtToken token) {
-        UserAccount userDetails = userAccountService.get(token.getId()).orElseThrow(NotFoundException::new);
+        UserAccount userDetails = userAccountService.get(token.getId()).orElseThrow(() -> new AuthenticationException(Message.USER_NOT_FOUND));
 
         List<GrantedAuthority> authorities = new LinkedList<>();
 
