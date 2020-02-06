@@ -1,6 +1,6 @@
 export class TranslationData {
     constructor(
-        public source: string,
+        public sourceFullPath: string,
         public translations: { [key: string]: string }) {
     }
 }

@@ -2,7 +2,7 @@ import {TranslationData} from '../DTOs/TranslationData';
 import {Properties} from '../Properties';
 import {singleton} from 'tsyringe';
 
-const REPOSITORY_ID = 2;
+const REPOSITORY_ID = 1;
 const SERVER_URL = 'http://localhost:8080/';
 
 type Translations = { [key: string]: string | Translations };
@@ -30,7 +30,7 @@ export class PolygloatService {
     async fetchTranslations(lang: string) {
         //await new Promise(resolve => setTimeout(resolve, 5000));
         let requestResult = await fetch(`${SERVER_URL}api/public/repository/${REPOSITORY_ID}/translations/${lang}`);
-        this.translationsCache.set(lang, await requestResult.json());
+        this.translationsCache.set(lang, (await requestResult.json())[lang]);
     }
 
     async getTranslation(name: string, lang: string = this.properties.currentLanguage): Promise<string> {
@@ -57,7 +57,7 @@ export class PolygloatService {
     };
 
     async setTranslations(translationData: TranslationData) {
-        await fetch(`${SERVER_URL}api/public/repository/${REPOSITORY_ID}/translations`, {
+        let response = await fetch(`${SERVER_URL}api/public/repository/${REPOSITORY_ID}/translations`, {
             body: JSON.stringify(translationData),
             method: 'POST',
             headers: {
@@ -65,10 +65,13 @@ export class PolygloatService {
             },
         });
 
+        if (response.status != 200) {
+            throw new Error("Server responded with error status code");
+        }
 
         Object.keys(translationData.translations).forEach(lang => {
             if (this.translationsCache.get(lang)) {
-                const path = translationData.source.split('.');
+                const path = translationData.sourceFullPath.split('.');
                 let root: string | Translations = this.translationsCache.get(lang);
                 for (let i = 0; i < path.length; i++) {
                     let item = path[i];

@@ -51,6 +51,10 @@ public class LanguageService {
         return language;
     }
 
+    public Set<Language> getImplicitLanguages(Repository repository) {
+        return repository.getLanguages().stream().limit(2).collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
     @Transactional
     public Set<Language> findAll(Long repositoryId) {
         return new LinkedHashSet<>(languageRepository.findAllByRepositoryId(repositoryId));

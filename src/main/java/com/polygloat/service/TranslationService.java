@@ -16,6 +16,7 @@ import com.polygloat.model.Translation;
 import com.polygloat.repository.TranslationRepository;
 import com.polygloat.service.query_builders.TranslationsViewBuilder;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,10 +30,13 @@ import java.util.stream.Collectors;
 public class TranslationService {
 
     private final TranslationRepository translationRepository;
-    private final SourceService sourceService;
     private final EntityManager entityManager;
     private final RepositoryService repositoryService;
     private final LanguageService languageService;
+
+    //circular dependency
+    @Setter(onMethod = @__({@Autowired}))
+    private SourceService sourceService;
 
     @SuppressWarnings("unchecked")
     private void addToMap(Translation translation, Map<String, Object> map) {
@@ -44,7 +48,7 @@ public class TranslationService {
             }
             throw new InternalException(Message.DATA_CORRUPTED);
         }
-        map.put(translation.getSource().getName(), translation.getText());
+        map.put(translation.getSource().getPath().getName(), translation.getText());
     }
 
     @SuppressWarnings("unchecked")
@@ -62,11 +66,35 @@ public class TranslationService {
         return langTranslations;
     }
 
-    public Set<Translation> getSourceTranslations(Long repositoryId, PathDTO path, Set<String> languages) {
+    public Map<String, String> getSourceTranslationsResult(Long repositoryId, PathDTO path, Set<String> languages) {
         Repository repository = repositoryService.findById(repositoryId).orElseThrow(NotFoundException::new);
-        Source source = sourceService.getSource(repository, path).orElseThrow(NotFoundException::new);
-        return translationRepository.getTranslations(source, repository, languages);
+        Source source = sourceService.getSource(repository, path).orElse(null);
+
+        if (languages == null) {
+            languages = languageService.getImplicitLanguages(repository).stream().map(Language::getAbbreviation).collect(Collectors.toSet());
+        }
+
+        Set<Translation> translations = getSourceTranslations(languages, repository, source);
+
+        Map<String, String> translationsMap = translations.stream().collect(Collectors.toMap(v -> v.getLanguage().getAbbreviation(), Translation::getText));
+
+        for (String language : languages) {
+            if (translationsMap.keySet().stream().filter(l -> l.equals(language)).findAny().isEmpty()) {
+                translationsMap.put(language, "");
+            }
+        }
+
+        return translationsMap;
     }
+
+    private Set<Translation> getSourceTranslations(Set<String> languages, Repository repository, Source source) {
+        if (source != null) {
+            return translationRepository.getTranslations(source, repository, languages);
+        }
+        return new LinkedHashSet<>();
+    }
+
+
 /*
     @Transactional
     public void setTranslations(Long repositoryId, SourceTranslationsDTO data) {

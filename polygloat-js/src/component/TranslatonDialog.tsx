@@ -48,6 +48,7 @@ export default function TranslationDialog(props: DialogProps) {
     const [loading, setLoading] = useState<boolean>(true);
     const [saving, setSaving] = useState<boolean>(false);
     const [success, setSuccess] = useState<boolean>(false);
+    const [error, setError] = useState<string>(null);
     const [translationData, setTranslationData] = useState<TranslationData>(null);
     const service = container.resolve(PolygloatService);
     const handleChange = (abbr) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,6 +61,7 @@ export default function TranslationDialog(props: DialogProps) {
         if (props.open) {
             setLoading(true);
             setSuccess(false);
+            setError(null);
             service.getSourceTranslations(props.input).then(result => {
                 setTranslationData(result);
                 setLoading(false);
@@ -69,11 +71,18 @@ export default function TranslationDialog(props: DialogProps) {
 
     const onSave = async () => {
         setSaving(true);
-        await service.setTranslations(translationData);
-        container.resolve(EventService).publish(EventType.TRANSLATION_CHANGED, translationData);
-        setSaving(false);
-        setSuccess(true);
-        props.onClose();
+        try {
+            await service.setTranslations(translationData);
+            container.resolve(EventService).publish(EventType.TRANSLATION_CHANGED, translationData);
+            setSuccess(true);
+            setError(null);
+            props.onClose();
+        } catch (e) {
+            setError("error");
+            throw e;
+        } finally {
+            setSaving(false);
+        }
     };
 
     const classes = useStyles({});
@@ -101,6 +110,8 @@ export default function TranslationDialog(props: DialogProps) {
                                 style={{width: '100%'}}
                                 margin="normal"
                                 variant="filled"
+                                error={!!error}
+                                helperText={error}
                             />)
                     }
                 </DialogContent>

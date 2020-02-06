@@ -1,13 +1,8 @@
 import * as React from 'react';
-import {useEffect} from 'react';
 import Grid from '@material-ui/core/Grid';
 import {RepositoryPage} from '../RepositoryPage';
 import {Route, Switch} from 'react-router-dom';
-import Paper from "@material-ui/core/Paper";
-import {TranslationActions} from "../../../../store/repository/TranslationActions";
-import {container} from "tsyringe";
 import {useRepository} from "../../../../hooks/useRepository";
-import FullPageLoading from "../../../common/FullPageLoading";
 import {FabAddButtonLink} from "../../../common/buttons/FabAddButtonLink";
 import {LINKS, PARAMS} from "../../../../constants/links";
 import Box from "@material-ui/core/Box";

@@ -11,7 +11,8 @@ export class AppComponent implements OnInit {
   text1: string;
 
   async setTexts() {
-    this.text1 = await Polygloat.translate('sampleApp.This_is_translation_retrieved_by_service');
+    this.text1 = await Polygloat.translate('sampleApp.this_is_translation_retrieved_by_service');
+  //  console.log(this.text1);
   }
 
   async ngOnInit(): Promise<void> {

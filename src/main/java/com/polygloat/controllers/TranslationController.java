@@ -40,14 +40,14 @@ public class TranslationController implements IController {
         return translationService.getTranslations(parseLanguages(languages).orElse(null), repositoryId);
     }
 
-    @GetMapping(value = "/source/{sourceFullPath}/{languages}")
+   /* @GetMapping(value = "/source/{sourceFullPath}/{languages}")
     public Map<String, String> getSourceTranslations(@PathVariable("repositoryId") Long repositoryId,
                                                      @PathVariable("sourceFullPath") String fullPath,
                                                      @PathVariable("languages") String langs) {
         PathDTO pathDTO = PathDTO.fromFullPath(fullPath);
-        return translationService.getSourceTranslations(repositoryId, pathDTO, parseLanguages(langs).orElse(null))
+        return translationService.getSourceTranslationsResult(repositoryId, pathDTO, parseLanguages(langs).orElse(null))
                 .stream().collect(Collectors.toMap((v) -> v.getLanguage().getAbbreviation(), Translation::getText));
-    }
+    }*/
 
     @PostMapping("/set")
     private void setTranslations(@PathVariable("repositoryId") Long repositoryId, @RequestBody SetTranslationsDTO dto) {
