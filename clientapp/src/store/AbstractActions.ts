@@ -1,4 +1,4 @@
-import {AbstractAction, Action, PromiseAction} from './Action';
+import {AbstractAction, Action, ActionType, PromiseAction} from './Action';
 import {ErrorResponseDTO} from '../service/response.types';
 import {Link} from "../constants/links";
 
@@ -52,5 +52,9 @@ export abstract class AbstractActions<StateType> {
             this.actions.set(action.fulfilledType, action);
             this.actions.set(action.rejectedType, action);
         }
+    }
+
+    public customReducer(state: StateType, action: ActionType<any>): StateType {
+        return state;
     }
 }

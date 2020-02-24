@@ -4,6 +4,8 @@ import {translationService} from "../../service/translationService";
 import {AppState} from "../index";
 import {useSelector} from "react-redux";
 import {TranslationsDataResponse} from "../../service/response.types";
+import {ActionType} from "../Action";
+import {LanguageActions} from "../languages/LanguageActions";
 
 export class TranslationsState extends StateWithLoadables<TranslationActions> {
     selectedLanguages: string[] = [];
@@ -11,6 +13,7 @@ export class TranslationsState extends StateWithLoadables<TranslationActions> {
 
 
 const service = container.resolve(translationService);
+const languageActions = container.resolve(LanguageActions);
 
 @singleton()
 export class TranslationActions extends AbstractLoadableActions<TranslationsState> {
@@ -37,6 +40,23 @@ export class TranslationActions extends AbstractLoadableActions<TranslationsStat
 
     useSelector<T>(selector: (state: TranslationsState) => T): T {
         return useSelector((state: AppState) => selector(state.translations))
+    }
+
+    customReducer(state: TranslationsState, action: ActionType<any>): TranslationsState {
+        switch (action.type) {
+            case languageActions.loadableActions.list.fulfilledType:
+                //reseting translations state on language change
+                return {
+                    ...state,
+                    selectedLanguages: [],
+                    loadables: {
+                        ...state.loadables,
+                        translations:
+                        this.initialState.loadables.translations
+                    }
+                };
+        }
+        return state;
     }
 
     get prefix(): string {

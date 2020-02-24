@@ -18,7 +18,6 @@ export class Polygloat {
     private observer = new MutationObserver(
         async (mutationsList: MutationRecord[]) => {
             for (let mutation of mutationsList) {
-                //console.log(mutation);
                 if (mutation.type === 'childList') {
                     let nodes: XPathResult =
                         document.evaluate(`.//*[contains(text(), \'${this.properties.config.inputPrefix}\')]`, mutation.target);

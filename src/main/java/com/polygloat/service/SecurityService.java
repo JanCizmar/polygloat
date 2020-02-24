@@ -1,5 +1,6 @@
 package com.polygloat.service;
 
+import com.polygloat.constants.ApiScope;
 import com.polygloat.exceptions.PermissionException;
 import com.polygloat.model.Permission;
 import com.polygloat.model.Repository;
@@ -13,18 +14,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class SecurityService {
     private final AuthenticationFacade authenticationFacade;
-    private final PermissionRepository permissionRepository;
+    private final PermissionService permissionService;
+    private final ApiKeyService apiKeyService;
 
     @Transactional
     public void grantFullAccessToRepo(UserAccount userAccount, Repository repository) {
         Permission permission = Permission.builder().type(Permission.RepositoryPermissionType.MANAGE).repository(repository).user(userAccount).build();
-        permissionRepository.save(permission);
-        repository.getPermissions().add(permission);
+        permissionService.create(permission);
     }
 
     @Transactional
@@ -32,8 +34,8 @@ public class SecurityService {
         grantFullAccessToRepo(getActiveUser(), repository);
     }
 
-    public Optional<Permission> getRepositoryPermission(Long repositoryId) {
-        return this.permissionRepository.findOneByRepositoryIdAndUserId(repositoryId, getActiveUser().getId());
+    private Optional<Permission> getRepositoryPermission(Long repositoryId) {
+        return permissionService.getRepositoryPermission(repositoryId, getActiveUser());
     }
 
     public Permission getAnyRepositoryPermission(Long repositoryId) {
@@ -54,6 +56,12 @@ public class SecurityService {
         return usersPermission;
     }
 
+
+    public void checkApiKeyScopes(Set<ApiScope> scopes, Repository repository) {
+        if (!apiKeyService.getAvailableScopes(getActiveUser(), repository).containsAll(scopes)) {
+            throw new PermissionException();
+        }
+    }
 
     private UserAccount getActiveUser() {
         return this.authenticationFacade.getUserAccount();

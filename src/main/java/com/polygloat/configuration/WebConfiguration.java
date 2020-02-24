@@ -7,6 +7,8 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.security.SecureRandom;
+
 @Configuration
 public class WebConfiguration implements WebMvcConfigurer {
 
@@ -29,5 +31,10 @@ public class WebConfiguration implements WebMvcConfigurer {
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
+    }
+
+    @Bean
+    public SecureRandom secureRandom() {
+        return new SecureRandom();
     }
 }

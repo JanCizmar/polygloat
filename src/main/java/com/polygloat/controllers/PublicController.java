@@ -1,14 +1,11 @@
 package com.polygloat.controllers;
 
+import com.polygloat.constants.Message;
 import com.polygloat.dtos.PathDTO;
 import com.polygloat.dtos.request.SetTranslationsDTO;
-import com.polygloat.dtos.response.SourceResponseDTO;
-import com.polygloat.dtos.response.ViewDataResponse;
-import com.polygloat.dtos.response.translations_view.ResponseParams;
 import com.polygloat.exceptions.NotFoundException;
-import com.polygloat.model.Permission;
+import com.polygloat.model.Repository;
 import com.polygloat.model.Source;
-import com.polygloat.model.Translation;
 import com.polygloat.service.RepositoryService;
 import com.polygloat.service.SecurityService;
 import com.polygloat.service.SourceService;
@@ -29,6 +26,7 @@ public class PublicController implements IController {
 
     private final TranslationService translationService;
     private final SourceService sourceService;
+    private final RepositoryService repositoryService;
     private final SecurityService securityService;
 
 
@@ -55,7 +53,8 @@ public class PublicController implements IController {
 
     @PostMapping("")
     private void setTranslations(@PathVariable("repositoryId") Long repositoryId, @RequestBody @Valid SetTranslationsDTO dto) {
-        Source source = sourceService.getSource(repositoryId, PathDTO.fromFullPath(dto.getSourceFullPath())).orElseThrow(NotFoundException::new);
+        Repository repository = repositoryService.findById(repositoryId).orElseThrow(() -> new NotFoundException(Message.REPOSITORY_NOT_FOUND));
+        Source source = sourceService.getOrCreateSource(repository, PathDTO.fromFullPath(dto.getSourceFullPath()));
         translationService.setForSource(source, dto.getTranslations());
     }
 

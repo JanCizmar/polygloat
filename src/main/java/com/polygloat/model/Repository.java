@@ -21,7 +21,6 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Indexed
 @Data
 public class Repository extends AuditModel {
     @Id

@@ -30,6 +30,7 @@ public class SourceService {
     @Setter(onMethod = @__({@Autowired}))
     private TranslationService translationService;
 
+    @Transactional
     public Source getOrCreateSource(Repository repository, PathDTO path) {
 
         Source source = getSource(repository, path)

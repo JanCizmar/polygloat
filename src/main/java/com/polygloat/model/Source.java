@@ -18,7 +18,6 @@ import java.util.Set;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Indexed
 @Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = {"repository_id", "name"}),
 })

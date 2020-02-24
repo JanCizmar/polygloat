@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {container} from 'tsyringe';
 import {LINKS, PARAMS} from '../../../../constants/links';
 import {useRouteMatch} from 'react-router-dom';
@@ -31,9 +31,11 @@ export const LanguageEditView = () => {
     let editLoadable = actions.useSelector(s => s.loadables.edit);
     let deleteLoadable = actions.useSelector(s => s.loadables.delete);
 
-    if (!languageLoadable.loaded && !languageLoadable.loading) {
-        actions.loadableActions.language.dispatch(repositoryId, languageId);
-    }
+    useEffect(() => {
+        if (!languageLoadable.loaded && !languageLoadable.loading) {
+            actions.loadableActions.language.dispatch(repositoryId, languageId);
+        }
+    }, []);
 
     const onSubmit = (values) => {
         const dto: LanguageDTO = {
@@ -47,6 +49,7 @@ export const LanguageEditView = () => {
         setCancelled(false);
         actions.loadableReset.edit.dispatch();
         actions.loadableReset.delete.dispatch();
+        actions.loadableReset.language.dispatch();
         useRedirect(LINKS.REPOSITORY_LANGUAGES, {[PARAMS.REPOSITORY_ID]: repositoryId});
     }
 

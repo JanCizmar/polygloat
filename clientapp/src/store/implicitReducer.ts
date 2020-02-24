@@ -4,8 +4,7 @@ import {AbstractActions} from './AbstractActions';
 
 @singleton()
 export class implicitReducer {
-    create = <StateType>(actions: AbstractActions<StateType>,
-                         customReducers?: (state: StateType, action: ActionType<any>) => StateType) =>
+    create = <StateType>(actions: AbstractActions<StateType>) =>
         (state = actions.initialState, action: ActionType<any>): StateType => {
             let abstractActionDef = actions.getAction(action.type);
 
@@ -25,7 +24,7 @@ export class implicitReducer {
                 }
             }
 
-            return customReducers !== undefined ? customReducers(state, action) : state;
+            return actions.customReducer(state, action);
         };
 }
 

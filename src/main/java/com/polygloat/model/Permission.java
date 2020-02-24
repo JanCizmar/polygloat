@@ -1,8 +1,11 @@
 package com.polygloat.model;
 
+import com.polygloat.constants.ApiScope;
+import io.swagger.annotations.Api;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true, of = {"id"})
 @Entity
@@ -29,12 +32,15 @@ public class Permission extends AuditModel {
 
     @AllArgsConstructor
     public enum RepositoryPermissionType {
-        VIEW(1),
-        TRANSLATE(2),
-        EDIT(3),
-        MANAGE(4);
+        VIEW(1, new ApiScope[]{ApiScope.TRANSLATIONS_VIEW}),
+        TRANSLATE(2, new ApiScope[]{ApiScope.TRANSLATIONS_VIEW, ApiScope.TRANSLATIONS_EDIT}),
+        EDIT(3, new ApiScope[]{ApiScope.TRANSLATIONS_VIEW, ApiScope.TRANSLATIONS_EDIT, ApiScope.SOURCES_EDIT}),
+        MANAGE(4, new ApiScope[]{ApiScope.TRANSLATIONS_VIEW, ApiScope.TRANSLATIONS_EDIT, ApiScope.SOURCES_EDIT});
 
         @Getter
         private final int power;
+
+        @Getter
+        private final ApiScope[] availableScopes;
     }
 }

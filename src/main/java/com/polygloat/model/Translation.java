@@ -15,7 +15,6 @@ import javax.persistence.*;
         @UniqueConstraint(columnNames = {"source_id", "language_id"}),
 })
 @Data
-@Indexed
 public class Translation extends AuditModel {
     @Id
     @EqualsAndHashCode.Include

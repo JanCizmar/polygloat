@@ -1,0 +1,52 @@
+package com.polygloat.model;
+
+import com.polygloat.constants.ApiScope;
+import lombok.*;
+import org.hibernate.annotations.Where;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Entity
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"key"}),
+})
+@EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString(of = {"key"})
+@Builder
+@Data
+public class ApiKey extends AuditModel {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    private UserAccount userAccount;
+
+    @ManyToOne
+    private Repository repository;
+
+    @NotNull
+    private String key;
+
+    @NotBlank
+    @NotNull
+    private String scopes;
+
+    public Set<ApiScope> getScopes() {
+        return Arrays.stream(this.scopes.split(";")).map(ApiScope::fromValue).collect(Collectors.toSet());
+    }
+
+    public void setScopes(Set<ApiScope> scopes) {
+        scopes.stream().map(ApiScope::getValue).collect(Collectors.joining(";"));
+    }
+}
