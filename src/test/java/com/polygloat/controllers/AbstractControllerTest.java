@@ -26,7 +26,8 @@ public abstract class AbstractControllerTest extends AbstractTransactionalTest i
     protected MockMvc mvc;
 
     @Autowired
-    DbPopulatorReal dbPopulator;
+    public DbPopulatorReal dbPopulator;
+
     @Autowired
     RepositoryService repositoryService;
 
@@ -49,8 +50,7 @@ public abstract class AbstractControllerTest extends AbstractTransactionalTest i
         ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.readValue(json, clazz);
-        }
-        catch (JsonProcessingException e) {
+        } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
@@ -78,9 +78,9 @@ public abstract class AbstractControllerTest extends AbstractTransactionalTest i
         String jsonRequest = mapper.writeValueAsString(request);
 
         return mvc.perform(post("/api/public/generatetoken")
-                                   .content(jsonRequest)
-                                   .accept(MediaType.ALL)
-                                   .contentType(MediaType.APPLICATION_JSON))
+                .content(jsonRequest)
+                .accept(MediaType.ALL)
+                .contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
     }
 

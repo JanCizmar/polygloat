@@ -7,19 +7,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeTest;
 
 import static com.polygloat.controllers.LoggedRequestFactory.loggedPost;
 
 public abstract class SignedInControllerTest extends AbstractControllerTest {
     UserAccount userAccount;
 
-    @BeforeEach
+    @BeforeMethod
     public void beforeEach() throws Exception {
         if (userAccount == null) {
             DefaultAuthenticationResult defaultAuthenticationResult = defaultLogin();
             LoggedRequestFactory.init(defaultAuthenticationResult.getToken());
             this.userAccount = defaultAuthenticationResult.getEntity();
         }
+        commitTransaction();
     }
 
     public ResultActions performPost(String url, Object content) throws Exception {

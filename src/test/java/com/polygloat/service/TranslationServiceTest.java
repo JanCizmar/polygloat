@@ -1,13 +1,13 @@
 package com.polygloat.service;
 
 import com.polygloat.development.DbPopulatorReal;
-import com.polygloat.dtos.PathDTO;
 import com.polygloat.model.Repository;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
 import org.springframework.transaction.annotation.Transactional;
+import org.testng.annotations.Test;
 
 import javax.persistence.EntityManager;
 import java.util.Arrays;
@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @Transactional
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-class TranslationServiceTest {
+public class TranslationServiceTest extends AbstractTransactionalTestNGSpringContextTests {
 
     @Autowired
     TranslationService translationService;

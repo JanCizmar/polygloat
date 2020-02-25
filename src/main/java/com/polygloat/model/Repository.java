@@ -22,6 +22,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@ToString(of={"id", "name"})
 public class Repository extends AuditModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

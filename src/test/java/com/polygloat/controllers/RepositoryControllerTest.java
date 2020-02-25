@@ -8,7 +8,6 @@ import com.polygloat.dtos.request.LanguageDTO;
 import com.polygloat.dtos.response.RepositoryDTO;
 import com.polygloat.model.Language;
 import com.polygloat.model.Repository;
-import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -16,6 +15,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
+import org.testng.annotations.Test;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -27,13 +27,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @Transactional
-class RepositoryControllerTest extends SignedInControllerTest {
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+public class RepositoryControllerTest extends SignedInControllerTest {
     private final LanguageDTO languageDTO = new LanguageDTO("English", "en");
 
     @Test
-    @Rollback
     void createRepository() throws Exception {
         dbPopulator.createBase("test");
 
@@ -105,10 +104,10 @@ class RepositoryControllerTest extends SignedInControllerTest {
     @Test
     @Rollback
     void editRepository() throws Exception {
-        Repository test = dbPopulator.createBase("test");
-        Repository test2 = dbPopulator.createBase("test2");
+        Repository test = dbPopulator.createBase(generateUniqueString());
+        Repository test2 = dbPopulator.createBase(generateUniqueString());
 
-        testEditValidationUniqueness(test2.getId());
+        testEditValidationUniqueness(test, test2.getName());
         testEditCorrectRequest(test);
     }
 
@@ -132,8 +131,8 @@ class RepositoryControllerTest extends SignedInControllerTest {
         assertThat(found).isPresent();
     }
 
-    private void testEditValidationUniqueness(Long repositoryId) throws Exception {
-        EditRepositoryDTO request = new EditRepositoryDTO(repositoryId, "test");
+    private void testEditValidationUniqueness(Repository repository, String nonUniqueName) throws Exception {
+        EditRepositoryDTO request = new EditRepositoryDTO(repository.getId(), nonUniqueName);
 
         //test validation
         MvcResult mvcResult = mvc.perform(
@@ -150,7 +149,7 @@ class RepositoryControllerTest extends SignedInControllerTest {
     @Test
     @Rollback
     void deleteRepository() throws Exception {
-        Repository test = dbPopulator.createBase("test");
+        Repository test = dbPopulator.createBase(generateUniqueString());
 
         MvcResult mvcResult = mvc.perform(
                 loggedDelete("/api/repositories/" + test.getId())
@@ -169,9 +168,9 @@ class RepositoryControllerTest extends SignedInControllerTest {
     @Test
     @Rollback
     void findAll() throws Exception {
-        dbPopulator.createBase("test");
-        dbPopulator.createBase("test1");
-        dbPopulator.createBase("test2");
+        dbPopulator.createBase(generateUniqueString());
+        dbPopulator.createBase(generateUniqueString());
+        dbPopulator.createBase(generateUniqueString());
 
         MvcResult mvcResult = mvc.perform(
                 loggedGet("/api/repositories/")

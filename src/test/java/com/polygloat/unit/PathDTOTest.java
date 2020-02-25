@@ -2,7 +2,7 @@ package com.polygloat.unit;
 
 import com.polygloat.dtos.PathDTO;
 import com.polygloat.exceptions.InvalidPathException;
-import org.junit.jupiter.api.Test;
+import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.LinkedList;

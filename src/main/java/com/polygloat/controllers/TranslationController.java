@@ -40,7 +40,7 @@ public class TranslationController implements IController {
         return translationService.getTranslations(parseLanguages(languages).orElse(null), repositoryId);
     }
 
-   /* @GetMapping(value = "/source/{sourceFullPath}/{languages}")
+    /*@GetMapping(value = "/source/{sourceFullPath}/{languages}")
     public Map<String, String> getSourceTranslations(@PathVariable("repositoryId") Long repositoryId,
                                                      @PathVariable("sourceFullPath") String fullPath,
                                                      @PathVariable("languages") String langs) {

@@ -35,7 +35,11 @@ public class ApiKeyService {
     private final SecureRandom random;
 
     public String createApiKey(UserAccount userAccount, Set<ApiScope> scopes, Repository repository) {
-        ApiKey apiKey = ApiKey.builder().key(new BigInteger(130, random).toString(32)).userAccount(userAccount).build();
+        ApiKey apiKey = ApiKey.builder()
+                .key(new BigInteger(130, random).toString(32))
+                .scopes(scopes)
+                .repository(repository)
+                .userAccount(userAccount).build();
         apiKeyRepository.save(apiKey);
         return apiKey.getKey();
     }

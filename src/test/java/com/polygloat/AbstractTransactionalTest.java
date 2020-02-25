@@ -1,12 +1,14 @@
 package com.polygloat;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
 import org.springframework.test.context.transaction.TestTransaction;
 
 import javax.persistence.EntityManager;
 
 
-public abstract class AbstractTransactionalTest {
+public abstract class AbstractTransactionalTest extends AbstractTransactionalTestNGSpringContextTests {
     @Autowired
     protected EntityManager entityManager;
 

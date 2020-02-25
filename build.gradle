@@ -108,6 +108,7 @@ dependencies {
     //compile 'io.springfox:springfox-data-rest:2.9.2'
     compile 'io.springfox:springfox-bean-validators:2.9.2'
     compile 'org.hibernate:hibernate-search-orm:5.11.4.Final'
+    testCompile group: 'org.testng', name: 'testng', version: '6.14.3'
 }
 
 task unpack(type: Copy) {
@@ -129,7 +130,8 @@ dockerCompose {
 }
 
 test {
-    useJUnitPlatform()
+    //useJUnitPlatform()
+    useTestNG()
 }
 
 node {

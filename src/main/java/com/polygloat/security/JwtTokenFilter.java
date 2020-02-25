@@ -36,7 +36,6 @@ public class JwtTokenFilter extends GenericFilterBean {
                 SecurityContextHolder.getContext().setAuthentication(auth);
             } catch (Exception e) {
                 logger.error(e);
-                filterChain.doFilter(req, res);
             }
         }
         filterChain.doFilter(req, res);

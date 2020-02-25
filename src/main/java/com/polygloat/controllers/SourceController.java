@@ -23,7 +23,6 @@ import javax.validation.Valid;
 public class SourceController implements IController {
 
     private final SourceService sourceService;
-    private final RepositoryService repositoryService;
     private final SecurityService securityService;
 
     /*@PostMapping(value = "")

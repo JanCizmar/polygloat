@@ -6,6 +6,7 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Arrays;
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
 
 @Entity
 @Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"key"}),
+        @UniqueConstraint(columnNames = {"key"}, name = "api_key_unique"),
 })
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
@@ -29,12 +30,15 @@ public class ApiKey extends AuditModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
     @ManyToOne
     private UserAccount userAccount;
 
+    @NotNull
     @ManyToOne
     private Repository repository;
 
+    @NotEmpty
     @NotNull
     private String key;
 
@@ -47,6 +51,20 @@ public class ApiKey extends AuditModel {
     }
 
     public void setScopes(Set<ApiScope> scopes) {
-        scopes.stream().map(ApiScope::getValue).collect(Collectors.joining(";"));
+        this.scopes = stringifyScopes(scopes);
+    }
+
+    @SuppressWarnings("unused")
+    public static class ApiKeyBuilder {
+        private String scopes;
+
+        public ApiKeyBuilder scopes(Set<ApiScope> scopes) {
+            this.scopes = stringifyScopes(scopes);
+            return this;
+        }
+    }
+
+    private static String stringifyScopes(Set<ApiScope> scopes) {
+        return scopes.stream().map(ApiScope::getValue).collect(Collectors.joining(";"));
     }
 }
