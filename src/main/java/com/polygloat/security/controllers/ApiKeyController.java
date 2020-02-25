@@ -2,6 +2,7 @@ package com.polygloat.security.controllers;
 
 import com.polygloat.constants.Message;
 import com.polygloat.dtos.request.CreateApiKeyDTO;
+import com.polygloat.dtos.request.EditApiKeyDTO;
 import com.polygloat.dtos.response.ApiKeyDTO.ApiKeyDTO;
 import com.polygloat.exceptions.NotFoundException;
 import com.polygloat.exceptions.PermissionException;
@@ -49,12 +50,21 @@ public class ApiKeyController extends PrivateController {
         apiKeyService.createApiKey(authenticationFacade.getUserAccount(), createApiKeyDTO.getScopes(), repository);
     }
 
+    @PostMapping(path = "/edit")
+    public void edit(@RequestBody() EditApiKeyDTO dto) {
+        ApiKey apiKey = apiKeyService.getApiKey(dto.getId()).orElseThrow(() -> new NotFoundException(Message.API_KEY_NOT_FOUND));
+        securityService.checkApiKeyScopes(dto.getScopes(), apiKey.getRepository());
+        apiKey.setScopes(dto.getScopes());
+        apiKeyService.editApiKey(apiKey);
+    }
+
     @DeleteMapping(path = "/{key}")
     public void delete(@PathVariable("key") String key) {
         ApiKey apiKey = apiKeyService.getApiKey(key).orElseThrow(() -> new NotFoundException(Message.API_KEY_NOT_FOUND));
         try {
             securityService.checkRepositoryPermission(apiKey.getRepository().getId(), Permission.RepositoryPermissionType.MANAGE);
-        } catch (PermissionException e) {
+        }
+        catch (PermissionException e) {
             //user can delete their own api keys
             if (!apiKey.getUserAccount().getId().equals(authenticationFacade.getUserAccount().getId())) {
                 throw e;

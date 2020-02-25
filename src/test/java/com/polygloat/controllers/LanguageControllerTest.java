@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @Transactional
-class LanguageControllerTest extends LoggedControllerTest implements ITest {
+class LanguageControllerTest extends SignedInControllerTest implements ITest {
 
     private final LanguageDTO languageDTO = new LanguageDTO("en", "en");
     private final LanguageDTO languageDTOBlank = new LanguageDTO(null, "");

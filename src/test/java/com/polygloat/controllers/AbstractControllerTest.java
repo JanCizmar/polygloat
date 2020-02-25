@@ -41,14 +41,16 @@ public abstract class AbstractControllerTest extends AbstractTransactionalTest i
 
     @Autowired
     UserAccountService userAccountService;
+
     @Autowired
-    private ObjectMapper mapper;
+    public ObjectMapper mapper;
 
     <T> T decodeJson(String json, Class<T> clazz) {
         ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.readValue(json, clazz);
-        } catch (JsonProcessingException e) {
+        }
+        catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
@@ -76,9 +78,9 @@ public abstract class AbstractControllerTest extends AbstractTransactionalTest i
         String jsonRequest = mapper.writeValueAsString(request);
 
         return mvc.perform(post("/api/public/generatetoken")
-                .content(jsonRequest)
-                .accept(MediaType.ALL)
-                .contentType(MediaType.APPLICATION_JSON))
+                                   .content(jsonRequest)
+                                   .accept(MediaType.ALL)
+                                   .contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
     }
 

@@ -1,5 +1,6 @@
 package com.polygloat.configuration;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
@@ -22,7 +23,6 @@ public class WebConfiguration implements WebMvcConfigurer {
                 .setViewName("forward:/");
     }
 
-
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**").allowedMethods("GET", "POST", "PUT", "DELETE");
@@ -36,5 +36,10 @@ public class WebConfiguration implements WebMvcConfigurer {
     @Bean
     public SecureRandom secureRandom() {
         return new SecureRandom();
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
     }
 }

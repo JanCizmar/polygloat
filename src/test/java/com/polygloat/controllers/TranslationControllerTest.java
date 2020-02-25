@@ -2,7 +2,6 @@ package com.polygloat.controllers;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.polygloat.dtos.query_results.SourceDTO;
 import com.polygloat.dtos.response.SourceResponseDTO;
 import com.polygloat.dtos.response.ViewDataResponse;
 import com.polygloat.dtos.response.translations_view.ResponseParams;
@@ -27,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-class TranslationControllerTest extends LoggedControllerTest {
+class TranslationControllerTest extends SignedInControllerTest {
     @Test
     @Rollback
     void getViewDataSearch() throws Exception {
@@ -65,8 +64,6 @@ class TranslationControllerTest extends LoggedControllerTest {
 
         //with same language multiple times
         ViewDataResponse<LinkedHashSet<SourceResponseDTO>, ResponseParams> response4 = performValidViewRequest(repository, "?languages=,en,en,,");
-
-
     }
 
     private ViewDataResponse<LinkedHashSet<SourceResponseDTO>, ResponseParams> performValidViewRequest(Repository repository, String queryString) throws Exception {

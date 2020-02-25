@@ -2,6 +2,7 @@ package com.polygloat.service;
 
 import com.polygloat.constants.ApiScope;
 import com.polygloat.dtos.request.CreateRepositoryDTO;
+import com.polygloat.dtos.request.EditApiKeyDTO;
 import com.polygloat.dtos.request.EditRepositoryDTO;
 import com.polygloat.dtos.request.LanguageDTO;
 import com.polygloat.dtos.response.RepositoryDTO;
@@ -51,6 +52,10 @@ public class ApiKeyService {
         return apiKeyRepository.findByKey(apiKey);
     }
 
+    public Optional<ApiKey> getApiKey(Long id) {
+        return apiKeyRepository.findById(id);
+    }
+
     public void deleteApiKey(ApiKey apiKey) {
         apiKeyRepository.delete(apiKey);
     }
@@ -59,5 +64,9 @@ public class ApiKeyService {
         return Arrays.stream(
                 permissionService.getRepositoryPermission(repository.getId(), userAccount).orElseThrow(NotFoundException::new).getType().getAvailableScopes()
         ).collect(Collectors.toSet());
+    }
+
+    public void editApiKey(ApiKey apiKey) {
+        apiKeyRepository.save(apiKey);
     }
 }
