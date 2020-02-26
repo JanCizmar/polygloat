@@ -17,7 +17,6 @@ import com.polygloat.repository.TranslationRepository;
 import com.polygloat.service.query_builders.TranslationsViewBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.apache.commons.lang3.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -123,20 +122,18 @@ public class TranslationService {
     }
 
     public ViewDataResponse<LinkedHashSet<SourceResponseDTO>, ResponseParams> getViewData(
-            Set<String> languages, Long repositoryId, int limit, int offset, String search
+            Set<String> languageAbbreviations, Long repositoryId, int limit, int offset, String search
     ) {
         Repository repository = repositoryService.findById(repositoryId).orElseThrow(NotFoundException::new);
 
-        if (languages == null) {
-            languages = repository.getLanguages().stream().map(Language::getAbbreviation).collect(Collectors.toSet());
-        }
+        Set<Language> languages = languageService.getLanguagesForTranslationsView(languageAbbreviations, repository);
 
         TranslationsViewBuilder.Result data = TranslationsViewBuilder.getData(entityManager, repository, languages, search, limit, offset);
         return new ViewDataResponse<>(data.getData()
                 .stream()
                 .map(queryResult -> SourceResponseDTO.fromQueryResult(new SourceDTO((Object[]) queryResult)))
-                .collect(Collectors
-                        .toCollection(LinkedHashSet::new)), 0, data.getCount(), new ResponseParams(search, languages));
+                .collect(Collectors.toCollection(LinkedHashSet::new)), offset, data.getCount(),
+                new ResponseParams(search, languages.stream().map(Language::getAbbreviation).collect(Collectors.toSet())));
     }
 
     public void setTranslation(Source source, String abbreviation, String text) {

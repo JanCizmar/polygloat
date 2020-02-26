@@ -1,5 +1,6 @@
 package com.polygloat.service;
 
+import com.polygloat.constants.Message;
 import com.polygloat.dtos.request.LanguageDTO;
 import com.polygloat.exceptions.NotFoundException;
 import com.polygloat.model.Language;
@@ -72,11 +73,22 @@ public class LanguageService {
         return languageRepository.findByAbbreviationAndRepositoryId(abbreviation, repositoryId);
     }
 
-    public Optional<Language> findByName(String name, Repository repository) {
-        return languageRepository.findByNameAndRepository(name, repository);
+    public Set<Language> findByAbbreviations(Set<String> abbreviations, Long repositoryId) {
+        Set<Language> langs = languageRepository.findAllByAbbreviationInAndRepositoryId(abbreviations, repositoryId);
+        if (!langs.stream().map(Language::getAbbreviation).collect(Collectors.toSet()).containsAll(abbreviations)) {
+            throw new NotFoundException(Message.LANGGUAGE_NOT_FOUND);
+        }
+        return langs;
     }
 
-    public Set<String> getDefaultLanguagesForView(Repository repository) {
-        return repository.getLanguages().stream().limit(2).map(Language::getAbbreviation).collect(Collectors.toSet());
+    public Set<Language> getLanguagesForTranslationsView(Set<String> languages, Repository repository) {
+        if (languages == null) {
+            return getImplicitLanguages(repository);
+        }
+        return findByAbbreviations(languages, repository.getId());
+    }
+
+    public Optional<Language> findByName(String name, Repository repository) {
+        return languageRepository.findByNameAndRepository(name, repository);
     }
 }

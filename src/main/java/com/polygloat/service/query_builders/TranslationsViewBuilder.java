@@ -14,17 +14,17 @@ import java.util.Set;
 
 public class TranslationsViewBuilder {
     private final Repository repository;
-    private final Set<String> abbrs;
+    private final Set<Language> languages;
     private final String searchString;
     Set<Selection<?>> selection = new LinkedHashSet<>();
     Set<Expression<String>> fullTextFields = new HashSet<>();
     Set<Predicate> restrictions = new HashSet<>();
     private CriteriaBuilder cb;
 
-    public TranslationsViewBuilder(CriteriaBuilder cb, Repository repository, Set<String> abbrs, String searchString) {
+    public TranslationsViewBuilder(CriteriaBuilder cb, Repository repository, Set<Language> languages, String searchString) {
         this.cb = cb;
         this.repository = repository;
-        this.abbrs = abbrs;
+        this.languages = languages;
         this.searchString = searchString;
     }
 
@@ -37,9 +37,9 @@ public class TranslationsViewBuilder {
 
         Join<Source, Repository> repository = source.join(Source_.repository);
 
-        for (String abbr : abbrs) {
+        for (Language language : languages) {
             SetJoin<Repository, Language> languages = repository.join(Repository_.languages);
-            languages.on(cb.equal(languages.get(Language_.abbreviation), abbr));
+            languages.on(cb.equal(languages.get(Language_.abbreviation), language.getAbbreviation()));
 
             SetJoin<Source, Translation> translations = source.join(Source_.translations, JoinType.LEFT);
             translations.on(cb.equal(translations.get(Translation_.language), languages));
@@ -92,10 +92,10 @@ public class TranslationsViewBuilder {
         return query;
     }
 
-    public static Result getData(EntityManager em, Repository repository, Set<String> abbrs, String searchString, int limit, int offset) {
-        TranslationsViewBuilder translationsViewBuilder = new TranslationsViewBuilder(em.getCriteriaBuilder(), repository, abbrs, searchString);
+    public static Result getData(EntityManager em, Repository repository, Set<Language> languages, String searchString, int limit, int offset) {
+        TranslationsViewBuilder translationsViewBuilder = new TranslationsViewBuilder(em.getCriteriaBuilder(), repository, languages, searchString);
         Long count = em.createQuery(translationsViewBuilder.getCountQuery()).getSingleResult();
-        translationsViewBuilder = new TranslationsViewBuilder(em.getCriteriaBuilder(), repository, abbrs, searchString);
+        translationsViewBuilder = new TranslationsViewBuilder(em.getCriteriaBuilder(), repository, languages, searchString);
         TypedQuery<Object> query = em.createQuery(translationsViewBuilder.getDataQuery()).setFirstResult(offset).setMaxResults(limit);
         List<Object> resultList = query.getResultList();
         return new Result(count, resultList);
