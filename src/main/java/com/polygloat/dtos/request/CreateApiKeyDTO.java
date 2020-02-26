@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.polygloat.constants.ApiScope;
 import lombok.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Set;
@@ -21,12 +22,13 @@ public class CreateApiKeyDTO {
     private Long repositoryId;
 
     @JsonIgnore
+    @NotEmpty
     @Getter
     @Setter
     private Set<ApiScope> scopes;
 
     @JsonSetter("scopes")
-    public void jsonSetScopes(@NotEmpty Set<String> scopes) {
+    public void jsonSetScopes(Set<String> scopes) {
         this.scopes = scopes.stream().map(ApiScope::fromValue).collect(Collectors.toSet());
     }
 

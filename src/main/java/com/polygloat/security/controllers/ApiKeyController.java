@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -44,14 +45,14 @@ public class ApiKeyController extends PrivateController {
     }
 
     @PostMapping(path = "")
-    public void create(@RequestBody() CreateApiKeyDTO createApiKeyDTO) {
+    public void create(@RequestBody() @Valid CreateApiKeyDTO createApiKeyDTO) {
         Repository repository = repositoryService.findById(createApiKeyDTO.getRepositoryId()).orElseThrow(() -> new NotFoundException(Message.REPOSITORY_NOT_FOUND));
         securityService.checkApiKeyScopes(createApiKeyDTO.getScopes(), repository);
         apiKeyService.createApiKey(authenticationFacade.getUserAccount(), createApiKeyDTO.getScopes(), repository);
     }
 
     @PostMapping(path = "/edit")
-    public void edit(@RequestBody() EditApiKeyDTO dto) {
+    public void edit(@RequestBody() @Valid EditApiKeyDTO dto) {
         ApiKey apiKey = apiKeyService.getApiKey(dto.getId()).orElseThrow(() -> new NotFoundException(Message.API_KEY_NOT_FOUND));
         securityService.checkApiKeyScopes(dto.getScopes(), apiKey.getRepository());
         apiKey.setScopes(dto.getScopes());
@@ -63,8 +64,7 @@ public class ApiKeyController extends PrivateController {
         ApiKey apiKey = apiKeyService.getApiKey(key).orElseThrow(() -> new NotFoundException(Message.API_KEY_NOT_FOUND));
         try {
             securityService.checkRepositoryPermission(apiKey.getRepository().getId(), Permission.RepositoryPermissionType.MANAGE);
-        }
-        catch (PermissionException e) {
+        } catch (PermissionException e) {
             //user can delete their own api keys
             if (!apiKey.getUserAccount().getId().equals(authenticationFacade.getUserAccount().getId())) {
                 throw e;
