@@ -3,6 +3,7 @@ package com.polygloat.development;
 import com.polygloat.model.*;
 import com.polygloat.repository.RepositoryRepository;
 import com.polygloat.repository.UserAccountRepository;
+import com.polygloat.service.PermissionService;
 import com.polygloat.service.SecurityService;
 import com.polygloat.service.UserAccountService;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +18,11 @@ import javax.persistence.EntityManager;
 public class DbPopulatorReal {
     private final EntityManager entityManager;
     private final UserAccountRepository userAccountRepository;
-    private final RepositoryRepository repositoryRepository;
+    private final PermissionService permissionService;
     private final UserAccountService userAccountService;
     private final SecurityService securityService;
+    public static final String DEFAULT_USERNAME = "ben";
+
 
     private Language de;
     private Language en;
@@ -32,17 +35,19 @@ public class DbPopulatorReal {
         }
     }
 
-    @Transactional
-    public Repository createBase(String repositoryName) {
-
-        String defaultUsername = "ben";
-
-        UserAccount userAccount = userAccountService.getByUserName(defaultUsername).orElseGet(() -> {
+    public UserAccount createUser(String username) {
+        return userAccountService.getByUserName(username).orElseGet(() -> {
             UserAccount newUserAccount = new UserAccount();
-            newUserAccount.setUsername(defaultUsername);
+            newUserAccount.setUsername(username);
             userAccountService.createUser(newUserAccount);
             return newUserAccount;
         });
+    }
+
+    @Transactional
+    public Repository createBase(String repositoryName, String username) {
+
+        UserAccount userAccount = createUser(username);
 
         Repository repository = new Repository();
         repository.setName(repositoryName);
@@ -51,16 +56,28 @@ public class DbPopulatorReal {
         en = createLanguage("en", repository);
         de = createLanguage("de", repository);
 
-        securityService.grantFullAccessToRepo(userAccount, repository);
+        permissionService.grantFullAccessToRepo(userAccount, repository);
 
         entityManager.persist(repository);
 
         return repository;
     }
 
+
+    @Transactional
+    public Repository createBase(String repositoryName) {
+        return createBase(repositoryName, DEFAULT_USERNAME);
+    }
+
+
     @Transactional
     public Repository populate(String repositoryName) {
-        Repository repository = createBase(repositoryName);
+        return populate(repositoryName, DEFAULT_USERNAME);
+    }
+
+    @Transactional
+    public Repository populate(String repositoryName, String userName) {
+        Repository repository = createBase(repositoryName, userName);
 
         createTranslation(repository, "Hello world!", "Hallo Welt!", en, de);
         createTranslation(repository, "English text one.", "Deutsch text einz.", en, de);

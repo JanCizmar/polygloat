@@ -28,8 +28,9 @@ public class UserAccountService {
         return userAccountRepository.findById(id);
     }
 
-    public void createUser(UserAccount userAccount) {
+    public UserAccount createUser(UserAccount userAccount) {
         this.userAccountRepository.save(userAccount);
+        return userAccount;
     }
 
     public UserAccount createUser(SignUp request) {

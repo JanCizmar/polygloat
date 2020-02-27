@@ -8,6 +8,7 @@ import com.polygloat.security.AuthenticationFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.util.Optional;
@@ -39,5 +40,11 @@ public class PermissionService {
 
     public void delete(Permission permission) {
         permissionRepository.delete(permission);
+    }
+
+    @Transactional
+    public void grantFullAccessToRepo(UserAccount userAccount, Repository repository) {
+        Permission permission = Permission.builder().type(Permission.RepositoryPermissionType.MANAGE).repository(repository).user(userAccount).build();
+        create(permission);
     }
 }

@@ -44,6 +44,16 @@ sn: Alex
 uid: ben
 userPassword: benspassword
 
+dn: uid=testUser,ou=people,dc=springframework,dc=org
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+cn: Test User
+sn: Alex
+uid: testUser
+userPassword: password
+
 dn: uid=bob,ou=people,dc=springframework,dc=org
 objectclass: top
 objectclass: person
