@@ -9,10 +9,10 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
-public class ErrorMessageAssert extends AbstractAssert<ErrorMessageAssert, MvcResult> {
+public class ErrorResponseAssert extends AbstractAssert<ErrorResponseAssert, MvcResult> {
 
-    public ErrorMessageAssert(MvcResult mvcResult) {
-        super(mvcResult, ErrorMessageAssert.class);
+    public ErrorResponseAssert(MvcResult mvcResult) {
+        super(mvcResult, ErrorResponseAssert.class);
     }
 
     public StandardValidationMessageAssert isStandardValidation() {
@@ -28,7 +28,8 @@ public class ErrorMessageAssert extends AbstractAssert<ErrorMessageAssert, MvcRe
         try {
             return objectMapper.readValue(actual.getResponse().getContentAsString(), new TypeReference<>() {
             });
-        } catch (JsonProcessingException | UnsupportedEncodingException e) {
+        }
+        catch (JsonProcessingException | UnsupportedEncodingException e) {
             throw new RuntimeException("Can not parse error response.");
         }
     }

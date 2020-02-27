@@ -5,6 +5,7 @@ import com.polygloat.dtos.request.CreateRepositoryDTO;
 import com.polygloat.dtos.request.EditApiKeyDTO;
 import com.polygloat.dtos.request.EditRepositoryDTO;
 import com.polygloat.dtos.request.LanguageDTO;
+import com.polygloat.dtos.response.ApiKeyDTO.ApiKeyDTO;
 import com.polygloat.dtos.response.RepositoryDTO;
 import com.polygloat.exceptions.NotFoundException;
 import com.polygloat.model.ApiKey;
@@ -34,14 +35,14 @@ public class ApiKeyService {
     private final PermissionService permissionService;
     private final SecureRandom random;
 
-    public String createApiKey(UserAccount userAccount, Set<ApiScope> scopes, Repository repository) {
+    public ApiKeyDTO createApiKey(UserAccount userAccount, Set<ApiScope> scopes, Repository repository) {
         ApiKey apiKey = ApiKey.builder()
                 .key(new BigInteger(130, random).toString(32))
                 .scopes(scopes)
                 .repository(repository)
                 .userAccount(userAccount).build();
         apiKeyRepository.save(apiKey);
-        return apiKey.getKey();
+        return ApiKeyDTO.fromEntity(apiKey);
     }
 
     public Set<ApiKey> getAllByUser(UserAccount userAccount) {

@@ -25,7 +25,12 @@ public abstract class SignedInControllerTest extends AbstractControllerTest {
         commitTransaction();
     }
 
-    public ResultActions performPost(String url, Object content) throws Exception {
-        return mvc.perform(loggedPost(url).contentType(MediaType.APPLICATION_JSON).content(asJsonString(content)));
+    public ResultActions performPost(String url, Object content) {
+        try {
+            return mvc.perform(loggedPost(url).contentType(MediaType.APPLICATION_JSON).content(asJsonString(content)));
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
