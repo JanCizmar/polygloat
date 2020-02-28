@@ -16,7 +16,7 @@ public abstract class SignedInControllerTest extends AbstractControllerTest {
         //populate to create the user if not created
         dbPopulator.autoPopulate();
         if (userAccount == null) {
-            logAsUser("ben", "benspassword");
+            logAsUser("ben", "ben");
         }
         //commitTransaction();
     }

@@ -73,7 +73,7 @@ public class TranslationControllerTest extends SignedInControllerTest {
         ObjectMapper mapper = new ObjectMapper();
 
         return mapper.readValue(mvcResult.getResponse().getContentAsString(),
-                new TypeReference<ViewDataResponse<LinkedHashSet<SourceResponseDTO>, ResponseParams>>() {
+                new TypeReference<>() {
                 });
     }
 

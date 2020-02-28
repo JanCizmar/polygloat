@@ -49,7 +49,7 @@ public class TranslationsViewBuilder {
             fullTextFields.add(translations.get(Translation_.text));
         }
 
-        restrictions.add(cb.equal(source.get(Source_.repository), repository));
+        restrictions.add(cb.equal(source.get(Source_.repository), this.repository));
 
         Set<Predicate> fullTextRestrictions = new HashSet<>();
 
