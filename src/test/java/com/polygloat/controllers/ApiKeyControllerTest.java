@@ -36,7 +36,7 @@ public class ApiKeyControllerTest extends SignedInControllerTest implements ITes
     @Test(testName = "setup")
     void setup() {
         repository = dbPopulator.createBase(generateUniqueString());
-        commitTransaction();
+        //commitTransaction();
     }
 
     @Test(dependsOnMethods = "setup", testName = "create_success")
@@ -48,7 +48,7 @@ public class ApiKeyControllerTest extends SignedInControllerTest implements ITes
         Optional<ApiKey> apiKey = service.getApiKey(apiKeyDTO.getKey());
         assertThat(apiKey).isPresent();
         checkKey(apiKey.get().getKey());
-        commitTransaction(); //otherwise the transaction is rolled back after test - other tests are depending on this
+       // commitTransaction(); //otherwise the transaction is rolled back after test - other tests are depending on this
     }
 
     @Test(dependsOnMethods = "setup")

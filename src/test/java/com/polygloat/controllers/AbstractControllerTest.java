@@ -16,6 +16,7 @@ import com.polygloat.service.TranslationService;
 import com.polygloat.service.UserAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -25,8 +26,9 @@ import java.util.List;
 import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public abstract class AbstractControllerTest extends AbstractTransactionalTest implements ITest {
+public abstract class AbstractControllerTest extends AbstractTestNGSpringContextTests implements ITest {
     @Autowired
     protected MockMvc mvc;
 

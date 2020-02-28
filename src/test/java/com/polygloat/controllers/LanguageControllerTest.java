@@ -94,7 +94,7 @@ public class LanguageControllerTest extends SignedInControllerTest implements IT
 
         performDelete(test.getId(), en.getId()).andExpect(status().isOk());
 
-        commitTransaction();
+        //commitTransaction();
 
         assertThat(languageService.findById(en.getId())).isEmpty();
     }

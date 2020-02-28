@@ -25,6 +25,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         this.configuration = configuration;
     }
 
+    @Value("${spring.ldap.embedded.port:#{null}}")
+    private Integer embeddedLdapPort;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -59,7 +61,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .managerPassword(configuration.getLdapPrincipalPassword())
                     .and()
                     .userDnPatterns(configuration.getLdapUserDnPattern());
-        return;
+            return;
         }
     }
 
