@@ -13,10 +13,12 @@ public abstract class SignedInControllerTest extends AbstractControllerTest {
 
     @BeforeMethod
     public void beforeEach() throws Exception {
+        //populate to create the user if not created
+        dbPopulator.autoPopulate();
         if (userAccount == null) {
             logAsUser("ben", "benspassword");
         }
-        commitTransaction();
+        //commitTransaction();
     }
 
     public void logAsUser(String userName, String password) throws Exception {

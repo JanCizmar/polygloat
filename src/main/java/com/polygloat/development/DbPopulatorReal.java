@@ -1,5 +1,6 @@
 package com.polygloat.development;
 
+import com.polygloat.dtos.request.SignUp;
 import com.polygloat.model.*;
 import com.polygloat.repository.RepositoryRepository;
 import com.polygloat.repository.UserAccountRepository;
@@ -37,10 +38,11 @@ public class DbPopulatorReal {
 
     public UserAccount createUser(String username) {
         return userAccountService.getByUserName(username).orElseGet(() -> {
-            UserAccount newUserAccount = new UserAccount();
-            newUserAccount.setUsername(username);
-            userAccountService.createUser(newUserAccount);
-            return newUserAccount;
+            SignUp signUp = new SignUp();
+            signUp.setEmail(username);
+            signUp.setName(username);
+            signUp.setPassword(username);
+            return userAccountService.createUser(signUp);
         });
     }
 

@@ -3,7 +3,6 @@ package com.polygloat.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.polygloat.AbstractTransactionalTest;
 import com.polygloat.development.DbPopulatorReal;
 import com.polygloat.exceptions.NotFoundException;
 import com.polygloat.model.UserAccount;
@@ -13,6 +12,7 @@ import com.polygloat.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -22,7 +22,7 @@ import java.util.HashMap;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @SpringBootTest
-public abstract class AbstractControllerTest extends AbstractTransactionalTest implements ITest {
+public abstract class AbstractControllerTest extends AbstractTestNGSpringContextTests implements ITest {
     @Autowired
     protected MockMvc mvc;
 
