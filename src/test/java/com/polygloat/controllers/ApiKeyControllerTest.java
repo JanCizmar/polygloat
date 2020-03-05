@@ -11,8 +11,10 @@ import com.polygloat.model.Repository;
 import com.polygloat.model.UserAccount;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.test.web.servlet.MvcResult;
 import org.testng.annotations.Test;
 
@@ -26,37 +28,35 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class ApiKeyControllerTest extends SignedInControllerTest implements ITest {
 
-    private Repository repository;
-    private ApiKeyDTO apiKeyDTO;
-
-    @Test(testName = "setup")
-    void setup() {
-        repository = dbPopulator.createBase(generateUniqueString());
-        //commitTransaction();
-    }
-
-    @Test(dependsOnMethods = "setup", testName = "create_success")
+    @Test()
     void create_success() throws Exception {
-        CreateApiKeyDTO requestDto = CreateApiKeyDTO.builder().repositoryId(repository.getId()).scopes(Set.of(ApiScope.TRANSLATIONS_VIEW, ApiScope.SOURCES_EDIT)).build();
-        MvcResult mvcResult = performPost("/api/apiKeys", requestDto).andExpect(status().isOk()).andReturn();
-        apiKeyDTO = mapResponse(mvcResult, ApiKeyDTO.class);
+        ApiKeyDTO apiKeyDTO = doCreate();
         Optional<ApiKey> apiKey = apiKeyService.getApiKey(apiKeyDTO.getKey());
         assertThat(apiKey).isPresent();
         checkKey(apiKey.get().getKey());
-       // commitTransaction(); //otherwise the transaction is rolled back after test - other tests are depending on this
+        // commitTransaction(); //otherwise the transaction is rolled back after test - other tests are depending on this
     }
 
-    @Test(dependsOnMethods = "setup")
+    private ApiKeyDTO doCreate() throws Exception {
+        Repository repository = dbPopulator.createBase(generateUniqueString());
+        CreateApiKeyDTO requestDto = CreateApiKeyDTO.builder().repositoryId(repository.getId()).scopes(Set.of(ApiScope.TRANSLATIONS_VIEW, ApiScope.SOURCES_EDIT)).build();
+        MvcResult mvcResult = performPost("/api/apiKeys", requestDto).andExpect(status().isOk()).andReturn();
+        return mapResponse(mvcResult, ApiKeyDTO.class);
+    }
+
+    @Test()
     void create_failure_no_scopes() throws Exception {
+        Repository repository = dbPopulator.createBase(generateUniqueString());
         CreateApiKeyDTO requestDto = CreateApiKeyDTO.builder().repositoryId(repository.getId()).scopes(Set.of()).build();
         MvcResult mvcResult = performPost("/api/apiKeys", requestDto).andExpect(status().isBadRequest()).andReturn();
         assertThat(mvcResult).error().isStandardValidation().onField("scopes").isEqualTo("must not be empty");
         assertThat(mvcResult).error().isStandardValidation().errorCount().isEqualTo(1);
     }
 
-    @Test(dependsOnMethods = "setup")
+    @Test()
     void create_failure_no_repository() throws Exception {
         CreateApiKeyDTO requestDto = CreateApiKeyDTO.builder().scopes(Set.of(ApiScope.TRANSLATIONS_VIEW)).build();
         MvcResult mvcResult = performPost("/api/apiKeys", requestDto).andExpect(status().isBadRequest()).andReturn();
@@ -64,8 +64,9 @@ public class ApiKeyControllerTest extends SignedInControllerTest implements ITes
         assertThat(mvcResult).error().isStandardValidation().errorCount().isEqualTo(1);
     }
 
-    @Test(dependsOnMethods = {"setup", "create_success"})
+    @Test()
     void edit_success() throws Exception {
+        ApiKeyDTO apiKeyDTO = doCreate();
         Set<ApiScope> newScopes = Set.of(ApiScope.TRANSLATIONS_EDIT);
         EditApiKeyDTO editDto = EditApiKeyDTO.builder().id(apiKeyDTO.getId()).scopes(newScopes).build();
         performPost("/api/apiKeys/edit", editDto).andExpect(status().isOk()).andReturn();
@@ -74,16 +75,18 @@ public class ApiKeyControllerTest extends SignedInControllerTest implements ITes
         assertThat(apiKey.get().getScopes()).isEqualTo(newScopes);
     }
 
-    @Test(dependsOnMethods = {"setup", "create_success"})
+    @Test()
     void edit_failure_no_scopes() throws Exception {
         Set<ApiScope> newScopes = Set.of();
+        ApiKeyDTO apiKeyDTO = doCreate();
         EditApiKeyDTO editDto = EditApiKeyDTO.builder().id(apiKeyDTO.getId()).scopes(newScopes).build();
         MvcResult mvcResult = performPost("/api/apiKeys/edit", editDto).andExpect(status().isBadRequest()).andReturn();
         assertThat(mvcResult).error().isStandardValidation().onField("scopes").isEqualTo("must not be empty");
     }
 
-    @Test(dependsOnMethods = {"setup", "create_success"})
+    @Test()
     void getAllByUser() throws Exception {
+        Repository repository = dbPopulator.createBase(generateUniqueString());
         ApiKeyDTO apiKey1 = apiKeyService.createApiKey(repository.getCreatedBy(), Set.of(ApiScope.SOURCES_EDIT), repository);
         Repository repository2 = dbPopulator.createBase(generateUniqueString(), DbPopulatorReal.DEFAULT_USERNAME);
         ApiKeyDTO apiKey2 = apiKeyService.createApiKey(repository2.getCreatedBy(), Set.of(ApiScope.SOURCES_EDIT, ApiScope.TRANSLATIONS_VIEW), repository);
@@ -93,6 +96,7 @@ public class ApiKeyControllerTest extends SignedInControllerTest implements ITes
         MvcResult mvcResult = performGet("/api/apiKeys").andExpect(status().isOk()).andReturn();
 
         Set<ApiKeyDTO> set = mapResponse(mvcResult, TypeFactory.defaultInstance().constructCollectionType(Set.class, ApiKeyDTO.class));
+        ApiKeyDTO apiKeyDTO = doCreate();
         assertThat(set).extracting("key").containsExactlyInAnyOrder(apiKeyDTO.getKey(), apiKey1.getKey(), apiKey2.getKey());
 
         logAsUser("testUser", "password");
@@ -101,8 +105,10 @@ public class ApiKeyControllerTest extends SignedInControllerTest implements ITes
         assertThat(set).extracting("key").containsExactlyInAnyOrder(user2Key.getKey());
     }
 
-    @Test(dependsOnMethods = {"setup", "create_success"})
+    @Test()
     void getAllByRepository() throws Exception {
+        Repository repository = dbPopulator.createBase(generateUniqueString());
+        ApiKeyDTO apiKeyDTO = doCreate();
         ApiKeyDTO apiKey1 = apiKeyService.createApiKey(repository.getCreatedBy(), Set.of(ApiScope.SOURCES_EDIT), repository);
         Repository repository2 = dbPopulator.createBase(generateUniqueString(), DbPopulatorReal.DEFAULT_USERNAME);
         ApiKeyDTO apiKey2 = apiKeyService.createApiKey(repository2.getCreatedBy(), Set.of(ApiScope.SOURCES_EDIT, ApiScope.TRANSLATIONS_VIEW), repository);

@@ -18,7 +18,7 @@ public abstract class SignedInControllerTest extends AbstractControllerTest {
         if (userAccount == null) {
             logAsUser("ben", "ben");
         }
-        //commitTransaction();
+        commitTransaction();
     }
 
     public void logAsUser(String userName, String password) throws Exception {
