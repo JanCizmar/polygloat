@@ -1,5 +1,6 @@
 package com.polygloat.controllers;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.polygloat.dtos.request.AbstractRepositoryDTO;
 import com.polygloat.dtos.request.CreateRepositoryDTO;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.testng.annotations.Test;
 
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -102,7 +104,6 @@ public class RepositoryControllerTest extends SignedInControllerTest {
 
 
     @Test
-    @Rollback
     void editRepository() throws Exception {
         Repository test = dbPopulator.createBase(generateUniqueString());
         Repository test2 = dbPopulator.createBase(generateUniqueString());
@@ -157,7 +158,7 @@ public class RepositoryControllerTest extends SignedInControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        //commitTransaction();
+        commitTransaction();
 
         Optional<Repository> repository = repositoryService.findById(test.getId());
 
@@ -166,11 +167,11 @@ public class RepositoryControllerTest extends SignedInControllerTest {
 
 
     @Test
-    @Rollback
     void findAll() throws Exception {
-        dbPopulator.createBase(generateUniqueString());
-        dbPopulator.createBase(generateUniqueString());
-        dbPopulator.createBase(generateUniqueString());
+        LinkedHashSet<String> repos = new LinkedHashSet<>();
+        for (int i = 0; i < 3; i++) {
+            repos.add(dbPopulator.createBase(generateUniqueString()).getName());
+        }
 
         MvcResult mvcResult = mvc.perform(
                 loggedGet("/api/repositories/")
@@ -178,9 +179,7 @@ public class RepositoryControllerTest extends SignedInControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        ObjectMapper mapper = new ObjectMapper();
-
-        Set set = mapper.readValue(mvcResult.getResponse().getContentAsString(), Set.class);
-        assertThat(set).hasSize(3);
+        @SuppressWarnings("unchecked") Set<RepositoryDTO> set = mapResponse(mvcResult, Set.class, RepositoryDTO.class);
+        assertThat(set).extracting("name").containsAll(repos);
     }
 }

@@ -87,9 +87,11 @@ public class LanguageControllerTest extends SignedInControllerTest implements IT
 
         performDelete(test.getId(), en.getId()).andExpect(status().isOk());
 
-        //commitTransaction();
+        commitTransaction();
 
         assertThat(languageService.findById(en.getId())).isEmpty();
+        repositoryService.deleteRepository(test.getId());
+        commitTransaction();
     }
 
     private void createLanguageCorrectRequest(Long repoId) throws Exception {

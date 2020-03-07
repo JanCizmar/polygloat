@@ -3,6 +3,7 @@ package com.polygloat.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.polygloat.AbstractTransactionalTest;
 import com.polygloat.development.DbPopulatorReal;
 import com.polygloat.exceptions.NotFoundException;
@@ -19,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Collection;
 import java.util.HashMap;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -100,6 +102,19 @@ public abstract class AbstractControllerTest extends AbstractTransactionalTest i
     protected <T> T mapResponse(MvcResult result, Class<T> clazz) {
         try {
             return mapper.readValue(result.getResponse().getContentAsString(), clazz);
+        } catch (JsonProcessingException | UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    @SuppressWarnings("unchecked")
+    protected <C extends Collection<E>, E> C mapResponse(MvcResult result, Class<C> collectionType, Class<E> elementType) {
+        try {
+            return (C) mapper.readValue(
+                    result.getResponse().getContentAsString(),
+                    TypeFactory.defaultInstance().constructCollectionType(collectionType, elementType)
+            );
         } catch (JsonProcessingException | UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }

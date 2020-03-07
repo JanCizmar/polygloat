@@ -11,10 +11,6 @@ import com.polygloat.model.Repository;
 import com.polygloat.model.UserAccount;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Commit;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.test.web.servlet.MvcResult;
 import org.testng.annotations.Test;
 
@@ -28,7 +24,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class ApiKeyControllerTest extends SignedInControllerTest implements ITest {
 
     @Test()
@@ -37,11 +32,13 @@ public class ApiKeyControllerTest extends SignedInControllerTest implements ITes
         Optional<ApiKey> apiKey = apiKeyService.getApiKey(apiKeyDTO.getKey());
         assertThat(apiKey).isPresent();
         checkKey(apiKey.get().getKey());
-        // commitTransaction(); //otherwise the transaction is rolled back after test - other tests are depending on this
     }
 
     private ApiKeyDTO doCreate() throws Exception {
-        Repository repository = dbPopulator.createBase(generateUniqueString());
+        return doCreate(dbPopulator.createBase(generateUniqueString()));
+    }
+
+    private ApiKeyDTO doCreate(Repository repository) throws Exception {
         CreateApiKeyDTO requestDto = CreateApiKeyDTO.builder().repositoryId(repository.getId()).scopes(Set.of(ApiScope.TRANSLATIONS_VIEW, ApiScope.SOURCES_EDIT)).build();
         MvcResult mvcResult = performPost("/api/apiKeys", requestDto).andExpect(status().isOk()).andReturn();
         return mapResponse(mvcResult, ApiKeyDTO.class);
@@ -93,13 +90,13 @@ public class ApiKeyControllerTest extends SignedInControllerTest implements ITes
         UserAccount testUser = dbPopulator.createUser("testUser");
         ApiKeyDTO user2Key = apiKeyService.createApiKey(testUser, Set.of(ApiScope.SOURCES_EDIT, ApiScope.TRANSLATIONS_VIEW), repository);
 
-        MvcResult mvcResult = performGet("/api/apiKeys").andExpect(status().isOk()).andReturn();
-
-        Set<ApiKeyDTO> set = mapResponse(mvcResult, TypeFactory.defaultInstance().constructCollectionType(Set.class, ApiKeyDTO.class));
         ApiKeyDTO apiKeyDTO = doCreate();
+
+        MvcResult mvcResult = performGet("/api/apiKeys").andExpect(status().isOk()).andReturn();
+        Set<ApiKeyDTO> set = mapResponse(mvcResult, TypeFactory.defaultInstance().constructCollectionType(Set.class, ApiKeyDTO.class));
         assertThat(set).extracting("key").containsExactlyInAnyOrder(apiKeyDTO.getKey(), apiKey1.getKey(), apiKey2.getKey());
 
-        logAsUser("testUser", "password");
+        logAsUser("testUser", "testUser");
         mvcResult = performGet("/api/apiKeys").andExpect(status().isOk()).andReturn();
         set = mapResponse(mvcResult, TypeFactory.defaultInstance().constructCollectionType(Set.class, ApiKeyDTO.class));
         assertThat(set).extracting("key").containsExactlyInAnyOrder(user2Key.getKey());
@@ -108,7 +105,7 @@ public class ApiKeyControllerTest extends SignedInControllerTest implements ITes
     @Test()
     void getAllByRepository() throws Exception {
         Repository repository = dbPopulator.createBase(generateUniqueString());
-        ApiKeyDTO apiKeyDTO = doCreate();
+        ApiKeyDTO apiKeyDTO = doCreate(repository);
         ApiKeyDTO apiKey1 = apiKeyService.createApiKey(repository.getCreatedBy(), Set.of(ApiScope.SOURCES_EDIT), repository);
         Repository repository2 = dbPopulator.createBase(generateUniqueString(), DbPopulatorReal.DEFAULT_USERNAME);
         ApiKeyDTO apiKey2 = apiKeyService.createApiKey(repository2.getCreatedBy(), Set.of(ApiScope.SOURCES_EDIT, ApiScope.TRANSLATIONS_VIEW), repository);
@@ -117,10 +114,10 @@ public class ApiKeyControllerTest extends SignedInControllerTest implements ITes
 
         MvcResult mvcResult = performGet("/api/apiKeys/repository/" + repository.getId()).andExpect(status().isOk()).andReturn();
 
-        Set<ApiKeyDTO> set = mapResponse(mvcResult, TypeFactory.defaultInstance().constructCollectionType(Set.class, ApiKeyDTO.class));
+        @SuppressWarnings("unchecked") Set<ApiKeyDTO> set = mapResponse(mvcResult, Set.class, ApiKeyDTO.class);
         assertThat(set).extracting("key").containsExactlyInAnyOrder(apiKeyDTO.getKey(), apiKey1.getKey(), apiKey2.getKey());
 
-      /*  //logAsUser("testUser", "password");
+        logAsUser("testUser", "testUser");
         performGet("/api/apiKeys/repository/" + repository2.getId()).andExpect(status().isForbidden()).andReturn();
 
         permissionService.grantFullAccessToRepo(testUser, repository2);
@@ -128,7 +125,7 @@ public class ApiKeyControllerTest extends SignedInControllerTest implements ITes
         mvcResult = performGet("/api/apiKeys/repository/" + repository2.getId()).andExpect(status().isOk()).andReturn();
         set = mapResponse(mvcResult, TypeFactory.defaultInstance().constructCollectionType(Set.class, ApiKeyDTO.class));
         assertThat(set).extracting("key").containsExactlyInAnyOrder(user2Key.getKey());
-        logout();*/
+        logout();
     }
 
     private void checkKey(String key) {
