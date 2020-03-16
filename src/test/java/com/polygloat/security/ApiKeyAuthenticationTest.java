@@ -28,7 +28,6 @@ public class ApiKeyAuthenticationTest extends AbstractControllerTest {
     public void accessWithApiKey_success() throws Exception {
         Repository base = this.dbPopulator.createBase(generateUniqueString());
         ApiKeyDTO apiKey = this.apiKeyService.createApiKey(base.getCreatedBy(), Set.of(ApiScope.values()), base);
-        commitTransaction();
         mvc.perform(get("/uaa/en?ak=" + apiKey.getKey())).andExpect(status().isOk()).andReturn();
     }
 
@@ -36,7 +35,6 @@ public class ApiKeyAuthenticationTest extends AbstractControllerTest {
     public void accessWithApiKey_failure_api_path() throws Exception {
         Repository base = this.dbPopulator.createBase(generateUniqueString());
         ApiKeyDTO apiKey = this.apiKeyService.createApiKey(base.getCreatedBy(), Set.of(ApiScope.values()), base);
-        commitTransaction();
         mvc.perform(get("/api/repositories")).andExpect(status().isForbidden()).andReturn();
     }
 }
