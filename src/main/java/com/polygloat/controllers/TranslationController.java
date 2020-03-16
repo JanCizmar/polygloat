@@ -1,16 +1,13 @@
 package com.polygloat.controllers;
 
 import com.polygloat.dtos.PathDTO;
-import com.polygloat.dtos.query_results.SourceDTO;
 import com.polygloat.dtos.request.SetTranslationsDTO;
 import com.polygloat.dtos.response.SourceResponseDTO;
 import com.polygloat.dtos.response.ViewDataResponse;
 import com.polygloat.dtos.response.translations_view.ResponseParams;
 import com.polygloat.exceptions.NotFoundException;
 import com.polygloat.model.Permission;
-import com.polygloat.model.Repository;
 import com.polygloat.model.Source;
-import com.polygloat.model.Translation;
 import com.polygloat.service.RepositoryService;
 import com.polygloat.service.SecurityService;
 import com.polygloat.service.SourceService;
@@ -37,6 +34,7 @@ public class TranslationController implements IController {
     @GetMapping(value = "/{languages}")
     public Map<String, Object> getTranslations(@PathVariable("repositoryId") Long repositoryId,
                                                @PathVariable("languages") String languages) {
+        securityService.checkRepositoryPermission(repositoryId, Permission.RepositoryPermissionType.VIEW);
         return translationService.getTranslations(parseLanguages(languages).orElse(null), repositoryId);
     }
 
@@ -63,8 +61,7 @@ public class TranslationController implements IController {
                                                                                           @RequestParam(name = "offset", defaultValue = "0") int offset,
                                                                                           @RequestParam(name = "search", required = false) String search
     ) {
-
-
+        securityService.checkRepositoryPermission(repositoryId, Permission.RepositoryPermissionType.VIEW);
         return translationService.getViewData(parseLanguages(languages).orElse(null), repositoryId, limit, offset, search);
     }
 

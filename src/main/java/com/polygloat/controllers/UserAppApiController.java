@@ -4,8 +4,10 @@ import com.polygloat.constants.Message;
 import com.polygloat.dtos.PathDTO;
 import com.polygloat.dtos.request.SetTranslationsDTO;
 import com.polygloat.exceptions.NotFoundException;
+import com.polygloat.model.ApiKey;
 import com.polygloat.model.Repository;
 import com.polygloat.model.Source;
+import com.polygloat.security.AuthenticationFacade;
 import com.polygloat.service.RepositoryService;
 import com.polygloat.service.SecurityService;
 import com.polygloat.service.SourceService;
@@ -20,20 +22,20 @@ import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(origins = "*")
-@RequestMapping("/api/public/repository/{repositoryId}/translations")
+@RequestMapping("/uaa")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class PublicController implements IController {
+public class UserAppApiController implements IController {
 
     private final TranslationService translationService;
     private final SourceService sourceService;
     private final RepositoryService repositoryService;
     private final SecurityService securityService;
-
+    private final AuthenticationFacade authenticationFacade;
 
     @GetMapping(value = "/{languages}")
-    public Map<String, Object> getTranslations(@PathVariable("repositoryId") Long repositoryId,
-                                               @PathVariable("languages") String languages) {
-        return translationService.getTranslations(parseLanguages(languages).orElse(null), repositoryId);
+    public Map<String, Object> getTranslations(@PathVariable("languages") String languages) {
+        ApiKey apiKey = authenticationFacade.getApiKey();
+        return translationService.getTranslations(parseLanguages(languages).orElse(null), apiKey.getRepository().getId());
     }
 
     @GetMapping(value = "/source/{sourceFullPath}/{languages}")
@@ -52,7 +54,7 @@ public class PublicController implements IController {
     }
 
     @PostMapping("")
-    private void setTranslations(@PathVariable("repositoryId") Long repositoryId, @RequestBody @Valid SetTranslationsDTO dto) {
+    public void setTranslations(@PathVariable("repositoryId") Long repositoryId, @RequestBody @Valid SetTranslationsDTO dto) {
         Repository repository = repositoryService.findById(repositoryId).orElseThrow(() -> new NotFoundException(Message.REPOSITORY_NOT_FOUND));
         Source source = sourceService.getOrCreateSource(repository, PathDTO.fromFullPath(dto.getSourceFullPath()));
         translationService.setForSource(source, dto.getTranslations());

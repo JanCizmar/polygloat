@@ -27,6 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @SpringBootTest
 public abstract class AbstractControllerTest extends AbstractTransactionalTest implements ITest {
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") //false positive
     @Autowired
     protected MockMvc mvc;
 
@@ -34,25 +35,25 @@ public abstract class AbstractControllerTest extends AbstractTransactionalTest i
     public DbPopulatorReal dbPopulator;
 
     @Autowired
-    RepositoryService repositoryService;
+    protected RepositoryService repositoryService;
 
     @Autowired
-    TranslationService translationService;
+    protected TranslationService translationService;
 
     @Autowired
-    LanguageService languageService;
+    protected LanguageService languageService;
 
     @Autowired
-    SourceRepository sourceRepository;
+    protected SourceRepository sourceRepository;
 
     @Autowired
-    UserAccountService userAccountService;
+    protected UserAccountService userAccountService;
 
     @Autowired
-    ApiKeyService apiKeyService;
+    protected ApiKeyService apiKeyService;
 
     @Autowired
-    PermissionService permissionService;
+    protected PermissionService permissionService;
 
     @Autowired
     public ObjectMapper mapper;
