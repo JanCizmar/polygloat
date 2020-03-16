@@ -55,6 +55,7 @@ export enum PARAMS {
     SERVICE_TYPE = 'serviceType',
     REPOSITORY_ID = 'repositoryId',
     LANGUAGE_ID = 'languageId',
+    API_KEY_ID = 'languageId',
 
 }
 
@@ -78,11 +79,26 @@ export class LINKS {
 
     static ACCEPT_INVITATION = Link.ofRoot('accept_invitation/' + p(PARAMS.INVITATION_CODE));
 
+
     /**
-     * Visible with view permissions
+     * Authenticated user stuff
+     */
+
+    static USER_API_KEYS = Link.ofRoot('apiKeys');
+
+    static USER_API_KEYS_GENERATE = Link.ofParent(LINKS.USER_API_KEYS, 'generate');
+
+    static USER_API_KEYS_EDIT = Link.ofParent(LINKS.USER_API_KEYS, 'edit/' + p(PARAMS.API_KEY_ID));
+
+    /**
+     * Repository stuff
      */
 
     static REPOSITORIES = Link.ofRoot('repositories');
+
+    /**
+     * Visible with view permissions
+     */
 
     static AFTER_LOGIN = LINKS.REPOSITORIES;
 
@@ -113,6 +129,7 @@ export class LINKS {
     static REPOSITORY_INVITATION = Link.ofParent(LINKS.REPOSITORY_MANAGE, 'invite');
 
     static REPOSITORY_PERMISSIONS = Link.ofParent(LINKS.REPOSITORY_MANAGE, 'permissions');
+
 
     static REPOSITORY_LANGUAGES_CREATE = Link.ofParent(LINKS.REPOSITORY_LANGUAGES, 'add');
 }

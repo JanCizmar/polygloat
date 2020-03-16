@@ -11,6 +11,7 @@ import SupervisedUserCircleIcon from "@material-ui/icons/SupervisedUserCircle";
 import * as React from "react";
 import {useRepository} from "../../../hooks/useRepository";
 import {RepositoryPermissionType} from "../../../service/response.types";
+import VpnKeyIcon from '@material-ui/icons/VpnKey';
 
 export const RepositoryMenu = ({id}) => {
 

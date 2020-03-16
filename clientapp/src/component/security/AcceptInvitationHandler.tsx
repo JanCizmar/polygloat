@@ -3,7 +3,7 @@ import {useRouteMatch} from 'react-router-dom';
 import {PARAMS} from '../../constants/links';
 import {container} from 'tsyringe';
 import {RepositoryInvitationActions} from '../../store/repository/invitations/repositoryInvitationActions';
-import FullPageLoading from "../common/FullPageLoading";
+import FullPageLoadingView from "../common/FullPageLoadingView";
 
 interface AcceptInvitationHandlerProps {
 
@@ -17,6 +17,6 @@ const AcceptInvitationHandler: FunctionComponent<AcceptInvitationHandlerProps> =
 
     useEffect(() => actions.acceptInvitation.dispatch(code), []);
 
-    return <FullPageLoading/>;
+    return <FullPageLoadingView/>;
 };
 export default AcceptInvitationHandler;

@@ -1,4 +1,3 @@
-
 export type TranslationsObject = { [abbreviation: string]: string };
 
 export type SourceTranslationsDTO = {
@@ -76,5 +75,14 @@ export interface UserDTO {
     id: number,
     username: string,
     name: string,
+}
+
+export interface ApiKeyDTO {
+    "id": number,
+    "key": string,
+    "userName": string,
+    "scopes": string[],
+    "repositoryId": number,
+    "repositoryName": string,
 }
 

@@ -45,7 +45,7 @@ export const RepositorySettingsView: FunctionComponent = () => {
     }
 
     return (
-        <RepositoryPage id={repository.id}>
+        <RepositoryPage>
             <BaseFormView lg={6} md={8} title={"Repository settings"} initialValues={initialValues} onSubmit={onSubmit}
                           onCancel={() => setCancelled(true)}
                           saveActionLoadable={loadable}

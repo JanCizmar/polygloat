@@ -38,7 +38,7 @@ export const RepositoryInviteView: FunctionComponent<RepositoryInviteVIewProps> 
     }, [state.invitationCode]);
 
     return (
-        <RepositoryPage id={repositoryId}>
+        <RepositoryPage>
             <BaseView title="Invite user" xs={12} md={8} lg={6}>
                 {() => (
                     <>

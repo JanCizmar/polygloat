@@ -1,27 +1,16 @@
 package com.polygloat.service;
 
 import com.polygloat.constants.ApiScope;
-import com.polygloat.dtos.request.CreateRepositoryDTO;
-import com.polygloat.dtos.request.EditApiKeyDTO;
-import com.polygloat.dtos.request.EditRepositoryDTO;
-import com.polygloat.dtos.request.LanguageDTO;
 import com.polygloat.dtos.response.ApiKeyDTO.ApiKeyDTO;
-import com.polygloat.dtos.response.RepositoryDTO;
 import com.polygloat.exceptions.NotFoundException;
 import com.polygloat.model.ApiKey;
 import com.polygloat.model.Repository;
 import com.polygloat.model.UserAccount;
 import com.polygloat.repository.ApiKeyRepository;
-import com.polygloat.repository.PermissionRepository;
-import com.polygloat.repository.RepositoryRepository;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.Scope;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.*;
@@ -46,7 +35,7 @@ public class ApiKeyService {
     }
 
     public Set<ApiKey> getAllByUser(UserAccount userAccount) {
-        return apiKeyRepository.getAllByUserAccount(userAccount);
+        return apiKeyRepository.getAllByUserAccountOrderById(userAccount);
     }
 
     public Set<ApiKey> getAllByRepository(Long repositoryId) {

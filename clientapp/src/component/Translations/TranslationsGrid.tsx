@@ -3,7 +3,7 @@ import {ContextType, FunctionComponent, ReactNode, useEffect, useState} from 're
 import {container} from "tsyringe";
 import {TranslationActions} from "../../store/repository/TranslationActions";
 import {useRepository} from "../../hooks/useRepository";
-import FullPageLoading from "../common/FullPageLoading";
+import FullPageLoadingView from "../common/FullPageLoadingView";
 import {Box, TextField} from "@material-ui/core";
 import {SourceTranslations} from "./SourceTranslations";
 import {Header} from "./Header";
@@ -56,7 +56,7 @@ export const TranslationsGrid: FunctionComponent<TranslationsGridProps> = (props
 
 
     if (!listLoadable.touched || (listLoadable.loading && !listLoadable.data)) {
-        return <FullPageLoading/>
+        return <FullPageLoadingView/>
     }
 
     const headerCells = ["Source text", ...listLoadable.data.params.languages].map(h => <b>{h}</b>);

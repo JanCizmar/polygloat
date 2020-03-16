@@ -1,6 +1,5 @@
 import {default as React, FunctionComponent} from 'react';
-import {createStyles, makeStyles} from '@material-ui/core/styles';
-import {Input, InputProps, TextField as MUITextField, TextFieldProps, Theme} from '@material-ui/core';
+import {Input, InputProps} from '@material-ui/core';
 import {useField} from 'formik';
 
 interface EasyInputProps {

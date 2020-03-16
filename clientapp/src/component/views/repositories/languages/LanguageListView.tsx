@@ -2,10 +2,7 @@ import * as React from 'react';
 import {useEffect} from 'react';
 import {ListItem} from '@material-ui/core';
 import Box from '@material-ui/core/Box';
-import {connect} from 'react-redux';
-import {AppState} from '../../../../store';
 import {container} from 'tsyringe';
-import {LanguageDTO} from '../../../../service/response.types';
 import {LINKS, PARAMS} from '../../../../constants/links';
 import {FabAddButtonLink} from '../../../common/buttons/FabAddButtonLink';
 import List from '@material-ui/core/List';
@@ -16,7 +13,6 @@ import {Link, useRouteMatch} from 'react-router-dom';
 import {RepositoryPage} from '../RepositoryPage';
 import {LanguageActions} from '../../../../store/languages/LanguageActions';
 import {BaseView} from '../../BaseView';
-import {useRepository} from "../../../../hooks/useRepository";
 
 const actions = container.resolve(LanguageActions);
 

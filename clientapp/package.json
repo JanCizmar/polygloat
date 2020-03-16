@@ -10,7 +10,8 @@
     "build": "webpack --env.mode=production",
     "watch": "webpack --watch",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "check": "tsc"
   },
   "author": "Jan Cizmar",
   "license": "ISC",

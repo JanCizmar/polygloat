@@ -25,9 +25,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         this.configuration = configuration;
     }
 
-    @Value("${spring.ldap.embedded.port:#{null}}")
-    private Integer embeddedLdapPort;
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         if (configuration.isAuthentication()) {
@@ -36,7 +33,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     //if jwt token is provided in header, this filter will manualy authorize user, so the request is not gonna reach the ldap auth
                     .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                     .authorizeRequests()
-                    .antMatchers("/api/public/**").permitAll()
+                    .antMatchers("/api/public/**", "/webjars/**", "/swagger-ui.html", "/swagger-resources/**", "/v2/api-docs").permitAll()
                     .anyRequest().authenticated()
                     .and().sessionManagement()
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and();

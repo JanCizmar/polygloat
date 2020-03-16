@@ -12,6 +12,7 @@ interface FormProps<T = { [key: string]: any }> {
     validationSchema?: ObjectSchema;
     submitButtons?: ReactNode
     customActions?: ReactNode
+    submitButtonInner?: ReactNode
 }
 
 export const StandardForm: FunctionComponent<FormProps> = ({initialValues, validationSchema, ...props}) => {
@@ -19,14 +20,16 @@ export const StandardForm: FunctionComponent<FormProps> = ({initialValues, valid
         <Formik initialValues={initialValues} onSubmit={props.onSubmit} validationSchema={validationSchema}>
             {(formikProps: FormikProps<any>) => (
                 <Form>
-                    {typeof props.children === "function" && (!props.loading && props.children()) || props.children}
+                    {typeof props.children === "function" && (!props.loading && props.children(formikProps)) || props.children}
                     {props.loading && <CircularProgress/>}
                     {!props.loading && (props.submitButtons || (
                         <Box mt={2} display="flex" justifyContent="flex-end">
                             <React.Fragment>
                                 {props.customActions && <Box flexGrow={1}>{props.customActions}</Box>}
                                 <Box>
-                                    <Button color="primary" disabled={props.loading || Object.values(formikProps.errors).length > 0} type="submit">Save</Button>
+                                    <Button color="primary" disabled={props.loading || Object.values(formikProps.errors).length > 0} type="submit">
+                                        {props.submitButtonInner || "Save"}
+                                    </Button>
                                     <Button disabled={props.loading}
                                             onClick={props.onCancel}>Cancel</Button>
                                 </Box>

@@ -7,6 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import {UserMenu} from '../security/UserMenu';
+import {Link} from "react-router-dom";
 
 const drawerWidth = 240;
 
@@ -37,6 +38,10 @@ const useStyles = makeStyles(theme => ({
     },
     title: {
         flexGrow: 1
+    },
+    polygloatLink: {
+        color: "inherit",
+        textDecoration: "inherit"
     }
 }));
 
@@ -67,7 +72,7 @@ export function TopBar({onSideMenuOpen, open, isSideMenu, ...props}: TopBarProps
                 {/*
                         // @ts-ignore */}
                 <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-                    Polygloat {props.subtitle && '- ' + props.subtitle}
+                    <Link className={classes.polygloatLink} to={"/"}>Polygloat</Link> {props.subtitle && '- ' + props.subtitle}
                 </Typography>
                 <UserMenu/>
             </Toolbar>

@@ -8,6 +8,8 @@ import {useConfig} from "../../hooks/useConfig";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import {useUser} from "../../hooks/useUser";
+import {Link} from "react-router-dom";
+import {LINKS} from "../../constants/links";
 
 interface UserMenuProps {
 
@@ -59,10 +61,10 @@ export const UserMenu: FunctionComponent<UserMenuProps> = (props) => {
                           horizontal: 'right',
                       }}>
                     <MenuItem onClick={() => globalActions.logout.dispatch()}>Logout</MenuItem>
+                    <MenuItem component={Link} to={LINKS.USER_API_KEYS.build()}>Api keys</MenuItem>
                 </Menu>
             </div>
             }
         </>
     );
-    return null;
 };

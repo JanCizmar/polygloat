@@ -14,7 +14,7 @@ import java.util.Set;
 public interface ApiKeyRepository extends JpaRepository<ApiKey, Long> {
     Optional<ApiKey> findByKey(@NotNull String key);
 
-    LinkedHashSet<ApiKey> getAllByUserAccount(UserAccount userAccount);
+    LinkedHashSet<ApiKey> getAllByUserAccountOrderById(UserAccount userAccount);
 
     Set<ApiKey> getAllByRepositoryId(Long repositoryId);
 }

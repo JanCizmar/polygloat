@@ -5,7 +5,7 @@ import {RepositoryActions} from "../store/repository/RepositoryActions";
 import {useSelector} from "react-redux";
 import {AppState} from "../store";
 import {GlobalError} from "../error/GlobalError";
-import FullPageLoading from "../component/common/FullPageLoading";
+import FullPageLoadingView from "../component/common/FullPageLoadingView";
 
 const repositoryActions = container.resolve(RepositoryActions);
 
@@ -21,11 +21,11 @@ export const RepositoryProvider: FunctionComponent<{ id: number }> = (props) => 
 
     if (init || idChanged) {
         repositoryActions.loadableActions.repository.dispatch(props.id);
-        return <FullPageLoading/>
+        return <FullPageLoadingView/>
     }
 
     if (repositoryDTOLoadable.loading) {
-        return <FullPageLoading/>
+        return <FullPageLoadingView/>
     }
 
     if (repositoryDTOLoadable.data) {

@@ -33,7 +33,7 @@ public class TranslationService {
     private final RepositoryService repositoryService;
     private final LanguageService languageService;
 
-    //circular dependency
+    //avoid circular dependency
     @Setter(onMethod = @__({@Autowired}))
     private SourceService sourceService;
 

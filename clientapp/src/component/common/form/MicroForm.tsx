@@ -12,7 +12,7 @@ export const MicroForm: FunctionComponent<MicroFormProps> = ({initialValues, val
     return (
         <Formik initialValues={initialValues} onSubmit={props.onSubmit} validationSchema={validationSchema}>
             {(formikProps: FormikProps<any>) => (
-                <Form>
+                <Form {...formikProps}>
                     {props.children}
                 </Form>
             )}

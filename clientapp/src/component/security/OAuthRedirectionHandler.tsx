@@ -5,7 +5,7 @@ import {GlobalActions, GlobalState} from '../../store/global/globalActions';
 import {LINKS, PARAMS} from '../../constants/links';
 import {useSelector} from 'react-redux';
 import {AppState} from '../../store';
-import FullPageLoading from '../common/FullPageLoading';
+import FullPageLoadingView from '../common/FullPageLoadingView';
 
 interface OAuthRedirectionHandlerProps {
 }
@@ -38,7 +38,7 @@ export const OAuthRedirectionHandler: FunctionComponent<OAuthRedirectionHandlerP
 
     return (
         <>
-            <FullPageLoading/>
+            <FullPageLoadingView/>
         </>
     );
 };

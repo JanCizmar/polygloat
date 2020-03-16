@@ -25,7 +25,7 @@ export abstract class AbstractLoadableActions<StateType extends StateWithLoadabl
         return {...this._initialState, loadables};
     }
 
-    constructor(initialState) {
+    protected constructor(initialState) {
         super(initialState);
     }
 
@@ -111,7 +111,6 @@ export abstract class AbstractLoadableActions<StateType extends StateWithLoadabl
     }
 
 
-
     private generateLoadableActions() {
         const loadableActions = {};
         for (let loadableName in this.loadableDefinitions) {
@@ -130,7 +129,8 @@ export abstract class AbstractLoadableActions<StateType extends StateWithLoadabl
             if (index > -1) {
                 data.splice(index, 1);
             }
-            state[listLoadableName].data = data;
+            //set new data to list loadable
+            state = {...state, loadables: {...state.loadables, [listLoadableName]: {...state.loadables[listLoadableName], data}}};
             return typeof then === "function" ? then(state, action) : state;
         });
 }

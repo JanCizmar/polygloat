@@ -14,13 +14,12 @@ import {dispatchService} from './service/dispatchService';
 import * as Sentry from '@sentry/browser';
 
 import ErrorBoundary from "./component/ErrorBoundary";
-import FullPageLoading from "./component/common/FullPageLoading";
+import FullPageLoading from "./component/common/FullPageLoadingView";
+import App from "./component/App";
 
 const store = configureStore();
 
-//const FullPageLoading = React.lazy(() => import(/* webpackChunkName: "loading" */"./component/common/FullPageLoading"));
 
-const App = React.lazy(() => import(/* webpackChunkName: "app" */'./component/App'));
 // #if process.env.target==="appbundle"
 Sentry.init({dsn: 'https://371b68a5e0da4f86a5142af52ad38599@sentry.io/1853046'});
 // #endif
@@ -29,14 +28,12 @@ container.resolve(dispatchService).store = store;
 
 
 ReactDOM.render(
-    <React.Suspense fallback={"Loading..."}>
-        <React.Suspense fallback={<FullPageLoading/>}>
-            <Provider store={store}>
-                <ErrorBoundary>
-                    <App/>
-                </ErrorBoundary>
-            </Provider>
-        </React.Suspense>
+    <React.Suspense fallback={<FullPageLoading/>}>
+        <Provider store={store}>
+            <ErrorBoundary>
+                <App/>
+            </ErrorBoundary>
+        </Provider>
     </React.Suspense>,
     document.getElementById('root')
 );

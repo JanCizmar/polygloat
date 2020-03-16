@@ -13,7 +13,9 @@ import {RedirectionActions} from '../store/global/redirectionActions';
 import {RemoteConfigurationDTO} from "../service/response.types";
 import {useConfig} from "../hooks/useConfig";
 import {useUser} from "../hooks/useUser";
-import FullPageLoading from "./common/FullPageLoading";
+import FullPageLoadingView from "./common/FullPageLoadingView";
+import {ApiKeysView} from "./security/apiKeys/ApiKeysView";
+import {RepositoryProvider} from "../hooks/RepositoryProvider";
 
 const LoginRouter = React.lazy(() => import(/* webpackChunkName: "login-router" */'./security/LoginRouter'));
 const SignUpView = React.lazy(() => import(/* webpackChunkName: "login-router" */'./security/SignUpView'));
@@ -54,7 +56,7 @@ const MandatoryDataProvider = (props) => {
     let allowPrivate = useSelector((state: AppState) => state.global.security.allowPrivate);
 
     if (!config || (!userData && allowPrivate)) {
-        return <FullPageLoading/>
+        return <FullPageLoadingView/>
     } else {
         return props.children;
     }
@@ -110,6 +112,9 @@ export class AppImp extends React.Component<Props, null> {
                         </PrivateRoute>
                         <PrivateRoute path={LINKS.ACCEPT_INVITATION.template}>
                             <AcceptInvitationHandler/>
+                        </PrivateRoute>
+                        <PrivateRoute path={`${LINKS.USER_API_KEYS.template}`}>
+                            <ApiKeysView/>
                         </PrivateRoute>
                     </Switch>
                     <SnackBar/>

@@ -8,6 +8,7 @@ import {RepositoryPermissionsView} from './permissions/RepositoryPermissionsVIew
 import {RepositorySettingsView} from "./repository/RepositorySettingsView";
 import {RepositoryProvider} from "../../../hooks/RepositoryProvider";
 import {LanguageCreateView} from "./languages/LanguageCreateView";
+import {ApiKeysView} from "../../security/apiKeys/ApiKeysView";
 
 export const RepositoryRouter = () => {
     let match = useRouteMatch();
