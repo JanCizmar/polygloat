@@ -6,7 +6,7 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import {CircularProgress, Theme} from '@material-ui/core';
+import {CircularProgress, FormHelperText, Theme} from '@material-ui/core';
 import {createStyles, makeStyles} from '@material-ui/core/styles';
 import {TranslationData} from '../DTOs/TranslationData';
 import {PolygloatService} from '../services/polygloatService';
@@ -91,6 +91,7 @@ export default function TranslationDialog(props: DialogProps) {
         [classes.buttonSuccess]: success,
     });
 
+    const disabled = () => !service.isKeyAllowed("translations.edit");
 
     return (
         <div>
@@ -100,6 +101,7 @@ export default function TranslationDialog(props: DialogProps) {
                     {loading ? <div style={{textAlign: 'center'}}><CircularProgress/></div> :
                         Object.keys(translationData.translations).map(key =>
                             <TextField
+                                disabled={disabled()}
                                 key={key}
                                 id="filled-multiline-flexible"
                                 label={key}
@@ -114,6 +116,12 @@ export default function TranslationDialog(props: DialogProps) {
                                 helperText={error}
                             />)
                     }
+                    {
+                        disabled() &&
+                        <FormHelperText error>
+                            Modification is restricted due to missing translations.edit scope in current api key settings.
+                        </FormHelperText>
+                    }
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={props.onClose} color="primary">
@@ -124,7 +132,7 @@ export default function TranslationDialog(props: DialogProps) {
                             variant="contained"
                             color="primary"
                             className={buttonClassname}
-                            disabled={saving}
+                            disabled={saving || disabled()}
                             onClick={onSave}
                         >
                             {success ? 'Saved' : 'Save'}

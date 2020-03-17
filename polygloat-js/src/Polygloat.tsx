@@ -35,8 +35,8 @@ export class Polygloat {
             }
         });
 
-    constructor(lang: string, config: PolygloatConfig) {
-        this.properties.currentLanguage = lang;
+    constructor(config: PolygloatConfig) {
+        this.properties.currentLanguage = config.defaultLanguage;
         this.properties.config = config;
     }
 
@@ -53,9 +53,17 @@ export class Polygloat {
         return this._service;
     }
 
-    public static run(lang: string, config: PolygloatConfig = {}): Promise<void> {
-        return this.getInstance(lang, config).manage();
-    };
+    public static async init(config: PolygloatConfig = new PolygloatConfig()) {
+        if (this.instance == null) {
+            this.instance = new Polygloat({...(new PolygloatConfig()), ...config});
+            this.instance.properties.scopes = await this.instance.service.getScopes();
+        }
+    }
+
+    public static async run(config: PolygloatConfig): Promise<void> {
+        await this.init(config);
+        return await this.getInstance().manage();
+    }
 
     static translate = async (inputText: string, noWrap: boolean = false): Promise<string> => {
         if (Polygloat.getInstance().properties.mode == Mode.DEVELOP && !noWrap) {
@@ -64,9 +72,9 @@ export class Polygloat {
         return await Polygloat.getInstance().service.getTranslation(inputText);
     };
 
-    public static getInstance(lang?: string, config: PolygloatConfig = new PolygloatConfig()): Polygloat {
-        if (this.instance == null) {
-            this.instance = new Polygloat(lang, {...(new PolygloatConfig()), ...config});
+    public static getInstance(): Polygloat {
+        if (this.instance === undefined) {
+            throw new Error("Polygloat is not initiated, run init function first.");
         }
         return this.instance;
     }

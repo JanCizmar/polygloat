@@ -2,6 +2,7 @@ package com.polygloat.service;
 
 import com.polygloat.constants.ApiScope;
 import com.polygloat.exceptions.PermissionException;
+import com.polygloat.model.ApiKey;
 import com.polygloat.model.Permission;
 import com.polygloat.model.Repository;
 import com.polygloat.model.UserAccount;
@@ -51,6 +52,13 @@ public class SecurityService {
 
     public void checkApiKeyScopes(Set<ApiScope> scopes, Repository repository) {
         if (!apiKeyService.getAvailableScopes(getActiveUser(), repository).containsAll(scopes)) {
+            throw new PermissionException();
+        }
+    }
+
+    public void checkApiKeyScopes(Set<ApiScope> scopes, ApiKey apiKey) {
+        checkApiKeyScopes(scopes, apiKey.getRepository()); // checks if user's has permissions to use api key with api key's permissions
+        if (!apiKey.getScopes().containsAll(scopes)) {
             throw new PermissionException();
         }
     }

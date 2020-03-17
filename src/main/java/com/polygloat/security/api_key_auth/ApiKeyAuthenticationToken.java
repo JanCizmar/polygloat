@@ -6,7 +6,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 
 import java.util.Collections;
 
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, of = {"apiKey"})
 public class ApiKeyAuthenticationToken extends UsernamePasswordAuthenticationToken {
 
     private ApiKey apiKey;

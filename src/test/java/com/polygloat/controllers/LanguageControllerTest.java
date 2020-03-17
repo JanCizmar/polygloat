@@ -2,6 +2,7 @@ package com.polygloat.controllers;
 
 import com.polygloat.dtos.request.LanguageDTO;
 import com.polygloat.exceptions.NotFoundException;
+import com.polygloat.helpers.JsonHelper;
 import com.polygloat.model.Language;
 import com.polygloat.model.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -128,14 +129,14 @@ public class LanguageControllerTest extends SignedInControllerTest implements IT
         return mvc.perform(
                 loggedPost("/api/repository/" + repositoryId + "/languages")
                         .contentType(MediaType.APPLICATION_JSON).content(
-                        asJsonString(content)));
+                        JsonHelper.asJsonString(content)));
     }
 
     private ResultActions performEdit(Long repositoryId, LanguageDTO content) throws Exception {
         return mvc.perform(
                 loggedPost("/api/repository/" + repositoryId + "/languages/edit")
                         .contentType(MediaType.APPLICATION_JSON).content(
-                        asJsonString(content)));
+                        JsonHelper.asJsonString(content)));
     }
 
     private ResultActions performDelete(Long repositoryId, Long languageId) throws Exception {

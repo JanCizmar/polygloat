@@ -6,4 +6,6 @@ export class PolygloatConfig {
     defaultLanguage?: string = 'en';
     inputPrefix?: string = '%-%polygloat:';
     inputPostfix?: string = '%-%';
+    apiUrl: string;
+    apiKey: string;
 }

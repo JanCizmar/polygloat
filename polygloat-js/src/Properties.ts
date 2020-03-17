@@ -7,7 +7,10 @@ export class Properties {
     currentLanguage: string = 'en';
     defaultLanguage: string = 'en';
     mode: Mode = Mode.DEVELOP;
+    scopes: Scope[] = [];
 }
+
+export type Scope = "translations.edit" | "translations.view" | "sources.edit";
 
 export enum Mode {
     DEVELOP = 'develop',

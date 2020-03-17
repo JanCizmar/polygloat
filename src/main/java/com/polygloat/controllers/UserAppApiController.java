@@ -1,5 +1,6 @@
 package com.polygloat.controllers;
 
+import com.polygloat.constants.ApiScope;
 import com.polygloat.constants.Message;
 import com.polygloat.dtos.PathDTO;
 import com.polygloat.dtos.request.SetTranslationsDTO;
@@ -35,29 +36,39 @@ public class UserAppApiController implements IController {
     @GetMapping(value = "/{languages}")
     public Map<String, Object> getTranslations(@PathVariable("languages") String languages) {
         ApiKey apiKey = authenticationFacade.getApiKey();
+        securityService.checkApiKeyScopes(Set.of(ApiScope.TRANSLATIONS_VIEW), apiKey);
         return translationService.getTranslations(parseLanguages(languages).orElse(null), apiKey.getRepository().getId());
     }
 
     @GetMapping(value = "/source/{sourceFullPath}/{languages}")
-    public Map<String, String> getSourceTranslations(@PathVariable("repositoryId") Long repositoryId,
-                                                     @PathVariable("sourceFullPath") String fullPath,
+    public Map<String, String> getSourceTranslations(@PathVariable("sourceFullPath") String fullPath,
                                                      @PathVariable("languages") String langs) {
         PathDTO pathDTO = PathDTO.fromFullPath(fullPath);
-        return translationService.getSourceTranslationsResult(repositoryId, pathDTO, parseLanguages(langs).orElse(null));
+        ApiKey apiKey = authenticationFacade.getApiKey();
+        securityService.checkApiKeyScopes(Set.of(ApiScope.TRANSLATIONS_VIEW), apiKey);
+        return translationService.getSourceTranslationsResult(apiKey.getRepository().getId(), pathDTO, parseLanguages(langs).orElse(null));
     }
 
     @GetMapping(value = "/source/{sourceFullPath}")
-    public Map<String, String> getSourceTranslations(@PathVariable("repositoryId") Long repositoryId,
-                                                     @PathVariable("sourceFullPath") String fullPath) {
+    public Map<String, String> getSourceTranslations(@PathVariable("sourceFullPath") String fullPath) {
         PathDTO pathDTO = PathDTO.fromFullPath(fullPath);
-        return translationService.getSourceTranslationsResult(repositoryId, pathDTO, null);
+        ApiKey apiKey = authenticationFacade.getApiKey();
+        return translationService.getSourceTranslationsResult(apiKey.getRepository().getId(), pathDTO, null);
     }
 
     @PostMapping("")
-    public void setTranslations(@PathVariable("repositoryId") Long repositoryId, @RequestBody @Valid SetTranslationsDTO dto) {
-        Repository repository = repositoryService.findById(repositoryId).orElseThrow(() -> new NotFoundException(Message.REPOSITORY_NOT_FOUND));
+    public void setTranslations(@RequestBody @Valid SetTranslationsDTO dto) {
+        ApiKey apiKey = authenticationFacade.getApiKey();
+        securityService.checkApiKeyScopes(Set.of(ApiScope.TRANSLATIONS_EDIT), apiKey);
+        Repository repository = repositoryService.findById(apiKey.getRepository().getId()).orElseThrow(() -> new NotFoundException(Message.REPOSITORY_NOT_FOUND));
         Source source = sourceService.getOrCreateSource(repository, PathDTO.fromFullPath(dto.getSourceFullPath()));
         translationService.setForSource(source, dto.getTranslations());
+    }
+
+    @GetMapping("/scopes")
+    public Set<String> getScopes() {
+        ApiKey apiKey = authenticationFacade.getApiKey();
+        return apiKey.getScopes().stream().map(ApiScope::getValue).collect(Collectors.toSet());
     }
 
     private Optional<Set<String>> parseLanguages(String languages) {

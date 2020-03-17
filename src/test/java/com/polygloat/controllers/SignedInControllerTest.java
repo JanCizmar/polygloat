@@ -1,5 +1,6 @@
 package com.polygloat.controllers;
 
+import com.polygloat.helpers.JsonHelper;
 import com.polygloat.model.UserAccount;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
@@ -33,7 +34,7 @@ public abstract class SignedInControllerTest extends AbstractControllerTest {
 
     public ResultActions performPost(String url, Object content) {
         try {
-            return mvc.perform(loggedPost(url).contentType(MediaType.APPLICATION_JSON).content(asJsonString(content)));
+            return mvc.perform(loggedPost(url).contentType(MediaType.APPLICATION_JSON).content(JsonHelper.asJsonString(content)));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -1,9 +1,6 @@
 import {TranslationData} from '../DTOs/TranslationData';
-import {Properties} from '../Properties';
+import {Properties, Scope} from '../Properties';
 import {singleton} from 'tsyringe';
-
-const REPOSITORY_ID = 1;
-const SERVER_URL = 'http://localhost:8080/';
 
 type Translations = { [key: string]: string | Translations };
 
@@ -17,6 +14,7 @@ export class PolygloatService {
     };
 
     async getTranslations(lang: string) {
+        this.checkScopes("translations.view");
         if (this.translationsCache.get(lang) == undefined) {
             if (!(this.fetchPromise instanceof Promise)) {
                 this.fetchPromise = this.fetchTranslations(lang);
@@ -29,7 +27,7 @@ export class PolygloatService {
 
     async fetchTranslations(lang: string) {
         //await new Promise(resolve => setTimeout(resolve, 5000));
-        let requestResult = await fetch(`${SERVER_URL}api/public/repository/${REPOSITORY_ID}/translations/${lang}`);
+        let requestResult = await fetch(this.getUrl(`${lang}`));
         this.translationsCache.set(lang, (await requestResult.json())[lang]);
     }
 
@@ -37,6 +35,8 @@ export class PolygloatService {
         await this.getTranslations(lang);
         return this.instant(name, lang);
     }
+
+    readonly getScopes = async () => (await fetch(this.getUrl(`scopes`))).json();
 
     instant(name: string, lang: string): string {
         const path = name.split('.');
@@ -51,13 +51,16 @@ export class PolygloatService {
     }
 
     getSourceTranslations = async (sourceText: string): Promise<TranslationData> => {
-        let data = await (await fetch(`${SERVER_URL}api/public/repository/${REPOSITORY_ID}/translations/source/${sourceText}`))
+        this.checkScopes("translations.view");
+        let data = await (await fetch(this.getUrl(`source/${sourceText}`)))
             .json();
         return new TranslationData(sourceText, data);
     };
 
     async setTranslations(translationData: TranslationData) {
-        let response = await fetch(`${SERVER_URL}api/public/repository/${REPOSITORY_ID}/translations`, {
+        this.checkScopes("translations.edit");
+
+        let response = await fetch(this.getUrl(``), {
             body: JSON.stringify(translationData),
             method: 'POST',
             headers: {
@@ -103,4 +106,17 @@ export class PolygloatService {
 
         return {inputs, newValue: text, oldValue};
     }
+
+    isKeyAllowed(...scopes: Scope[]) {
+        return !scopes.filter(s => this.properties.scopes.indexOf(s) < 0).length;
+    }
+
+    checkScopes(...scopes: Scope[]) {
+        if (!this.isKeyAllowed(...scopes)) {
+            throw new Error("Api key not permitted to do this, please add 'translations.view' scope.");
+        }
+    }
+
+    readonly getUrl = (path: string) => `${this.properties.config.apiUrl}/uaa/${path}?ak=${this.properties.config.apiKey}`;
 }
+

@@ -1,12 +1,12 @@
 package com.polygloat.controllers;
 
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.polygloat.dtos.request.AbstractRepositoryDTO;
 import com.polygloat.dtos.request.CreateRepositoryDTO;
 import com.polygloat.dtos.request.EditRepositoryDTO;
 import com.polygloat.dtos.request.LanguageDTO;
 import com.polygloat.dtos.response.RepositoryDTO;
+import com.polygloat.helpers.JsonHelper;
 import com.polygloat.model.Language;
 import com.polygloat.model.Repository;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -51,7 +51,7 @@ public class RepositoryControllerTest extends SignedInControllerTest {
         MvcResult mvcResult = mvc.perform(
                 loggedPost("/api/repositories")
                         .contentType(MediaType.APPLICATION_JSON).content(
-                        asJsonString(request)))
+                        JsonHelper.asJsonString(request)))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -79,7 +79,7 @@ public class RepositoryControllerTest extends SignedInControllerTest {
         MvcResult mvcResult = mvc.perform(
                 loggedPost("/api/repositories")
                         .contentType(MediaType.APPLICATION_JSON).content(
-                        asJsonString(request)))
+                        JsonHelper.asJsonString(request)))
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
@@ -94,7 +94,7 @@ public class RepositoryControllerTest extends SignedInControllerTest {
         MvcResult mvcResult = mvc.perform(
                 loggedPost("/api/repositories")
                         .contentType(MediaType.APPLICATION_JSON).content(
-                        asJsonString(request)))
+                        JsonHelper.asJsonString(request)))
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
@@ -118,7 +118,7 @@ public class RepositoryControllerTest extends SignedInControllerTest {
         MvcResult mvcResult = mvc.perform(
                 loggedPost("/api/repositories/edit")
                         .contentType(MediaType.APPLICATION_JSON).content(
-                        asJsonString(request)))
+                        JsonHelper.asJsonString(request)))
                 .andExpect(status().isOk()).andReturn();
 
         ObjectMapper mapper = new ObjectMapper();
@@ -139,7 +139,7 @@ public class RepositoryControllerTest extends SignedInControllerTest {
         MvcResult mvcResult = mvc.perform(
                 loggedPost("/api/repositories/edit")
                         .contentType(MediaType.APPLICATION_JSON).content(
-                        asJsonString(request)))
+                        JsonHelper.asJsonString(request)))
                 .andExpect(status().isBadRequest())
                 .andReturn();
 

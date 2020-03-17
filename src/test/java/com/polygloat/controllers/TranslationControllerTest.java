@@ -6,6 +6,7 @@ import com.polygloat.dtos.response.SourceResponseDTO;
 import com.polygloat.dtos.response.ViewDataResponse;
 import com.polygloat.dtos.response.translations_view.ResponseParams;
 import com.polygloat.exceptions.NotFoundException;
+import com.polygloat.helpers.JsonHelper;
 import com.polygloat.model.Repository;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,7 +19,6 @@ import org.testng.annotations.Test;
 
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
 
 import static com.polygloat.controllers.LoggedRequestFactory.loggedGet;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -115,9 +115,9 @@ public class TranslationControllerTest extends SignedInControllerTest {
         assertThat(response.getParams().getLanguages()).contains("en", "de");
     }
 
-    private void assertSearch(ViewDataResponse<LinkedHashSet<SourceResponseDTO>, ResponseParams> response, String searchString) {
+    private static void assertSearch(ViewDataResponse<LinkedHashSet<SourceResponseDTO>, ResponseParams> response, String searchString) {
         for (SourceResponseDTO item : response.getData()) {
-            assertThat(asJsonString(item)).contains(searchString);
+            assertThat(JsonHelper.asJsonString(item)).contains(searchString);
         }
     }
 

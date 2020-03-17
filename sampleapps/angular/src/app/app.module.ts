@@ -10,7 +10,10 @@ import {NgxPolygloatModule} from './ngx-polygloat/ngx-polygloat.module';
   ],
   imports: [
     BrowserModule,
-    NgxPolygloatModule
+    NgxPolygloatModule.forRoot({
+      apiUrl: "http://localhost:8080",
+      apiKey: "g35eunaq1g4iq7asumihiidh33",
+    })
   ],
   providers: [],
   bootstrap: [AppComponent]

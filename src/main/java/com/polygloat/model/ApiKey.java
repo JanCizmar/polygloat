@@ -2,16 +2,12 @@ package com.polygloat.model;
 
 import com.polygloat.constants.ApiScope;
 import lombok.*;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -19,7 +15,7 @@ import java.util.stream.Collectors;
 @Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = {"key"}, name = "api_key_unique"),
 })
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, of = {"id", "key", "scopes"})
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(of = {"key"})
