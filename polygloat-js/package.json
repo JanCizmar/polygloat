@@ -1,6 +1,6 @@
 {
   "name": "polygloat",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "dist/polygloat.umd.js",
   "types": "lib/index.d.ts",
@@ -10,7 +10,7 @@
     "dist": "dist"
   },
   "scripts": {
-    "build": "webpack --mode=production",
+    "build": "webpack --mode=production && tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "develop": "webpack --mode=development --watch"
   },

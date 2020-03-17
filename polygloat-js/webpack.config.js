@@ -25,6 +25,6 @@ module.exports = {
     },
     mode: 'production',
     plugins: [
-        new WebpackBundleAnalyzer()
+        //new WebpackBundleAnalyzer()
     ]
 };

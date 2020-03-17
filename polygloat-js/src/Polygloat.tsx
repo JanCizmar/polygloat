@@ -36,17 +36,17 @@ export class Polygloat {
         });
 
     constructor(config: PolygloatConfig) {
-        this.properties.currentLanguage = config.defaultLanguage;
-        this.properties.config = config;
+        this.properties.config = {...(new PolygloatConfig()), ...config};
+        this.properties.currentLanguage = this.properties.defaultLanguage;
     }
 
     public get lang() {
         return this.properties.currentLanguage;
     }
 
-    public static set lang(value) {
-        this.getInstance().properties.currentLanguage = value;
-        this.getInstance().eventService.publish(EventType.TRANSLATION_CHANGED, {lang: value});
+    public set lang(value) {
+        this.properties.currentLanguage = value;
+        this.eventService.publish(EventType.TRANSLATION_CHANGED, {lang: value});
     }
 
     public get service() {
@@ -55,21 +55,26 @@ export class Polygloat {
 
     public static async init(config: PolygloatConfig = new PolygloatConfig()) {
         if (this.instance == null) {
-            this.instance = new Polygloat({...(new PolygloatConfig()), ...config});
-            this.instance.properties.scopes = await this.instance.service.getScopes();
+            this.instance = new Polygloat(config);
         }
     }
 
     public static async run(config: PolygloatConfig): Promise<void> {
         await this.init(config);
+        this.instance.properties.scopes = await this.instance.service.getScopes();
         return await this.getInstance().manage();
     }
 
-    static translate = async (inputText: string, noWrap: boolean = false): Promise<string> => {
-        if (Polygloat.getInstance().properties.mode == Mode.DEVELOP && !noWrap) {
-            return Polygloat.getInstance().wrap(inputText);
+    public async run(): Promise<void> {
+        this.properties.scopes = await this.service.getScopes();
+        return await this.manage();
+    }
+
+    translate = async (inputText: string, noWrap: boolean = false): Promise<string> => {
+        if (this.properties.mode == Mode.DEVELOP && !noWrap) {
+            return this.wrap(inputText);
         }
-        return await Polygloat.getInstance().service.getTranslation(inputText);
+        return await this.service.getTranslation(inputText);
     };
 
     public static getInstance(): Polygloat {
