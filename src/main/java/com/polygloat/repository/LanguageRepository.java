@@ -19,4 +19,6 @@ public interface LanguageRepository extends JpaRepository<Language, Long> {
     Set<Language> findAllByRepositoryId(Long repositoryId);
 
     Set<Language> findAllByAbbreviationInAndRepositoryId(Collection<String> abbreviation, Long repositoryId);
+
+    void deleteAllByRepositoryId(Long repositoryId);
 }

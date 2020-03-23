@@ -1,4 +1,4 @@
-import {default as React, FunctionComponent} from 'react';
+import {default as React, FunctionComponent, useEffect} from 'react';
 import {DashboardPage} from '../layout/DashboardPage';
 import {BaseView} from '../views/BaseView';
 import {Button} from '@material-ui/core';
@@ -12,8 +12,8 @@ import Box from '@material-ui/core/Box';
 import {container} from 'tsyringe';
 import {GlobalActions} from '../../store/global/globalActions';
 import {Alert} from '../common/Alert';
-import * as Yup from 'yup';
 import {useConfig} from "../../hooks/useConfig";
+import {Validation} from "../../constants/GlobalValidationSchema";
 
 
 interface LoginProps {
@@ -31,30 +31,28 @@ const PasswordResetView: FunctionComponent<LoginProps> = (props) => {
     const security = useSelector((state: AppState) => state.global.security);
     const remoteConfig = useConfig();
 
-    const loading = useSelector((state: AppState) => state.global.passwordResetLoading);
-    const error = useSelector((state: AppState) => state.global.passwordResetError);
-    const sent = useSelector((state: AppState) => state.global.passwordResetSent);
+    const loadable = useSelector((state: AppState) => state.global.loadables.resetPasswordRequest);
 
     if (!remoteConfig.authentication || security.allowPrivate || !remoteConfig.passwordResettable) {
         return (<Redirect to={LINKS.AFTER_LOGIN.build()}/>);
     }
 
+    useEffect(() => () => globalActions.loadableReset.resetPasswordRequest.dispatch(), []);
+
     return (
         <DashboardPage>
-            <BaseView title="Reset password" lg={6} md={8} xs={12} loading={loading}>
-                {error || sent &&
+            <BaseView title="Reset password" lg={6} md={8} xs={12} loading={loadable.loading}>
+                {loadable.error || loadable.loaded &&
                 <Box mt={1}>
-                    {sent && <Alert severity="success">Request successfully sent</Alert>
+                    {loadable.loaded && <Alert severity="success">Request successfully sent! Check your mail box.</Alert>
                     ||
-                    error &&
-                    <Alert severity="error">{error}</Alert>}
+                    loadable.error &&
+                    <Alert severity="error">{loadable.error}</Alert>}
                 </Box>}
 
-                {!sent &&
+                {!loadable.loaded &&
                 <StandardForm initialValues={{email: ''} as ValueType}
-                              validationSchema={Yup.object().shape({
-                                  email: Yup.string().email().required()
-                              })}
+                              validationSchema={Validation.RESET_PASSWORD_REQUEST}
                               submitButtons={
                                   <>
                                       <Box display="flex">
@@ -66,7 +64,7 @@ const PasswordResetView: FunctionComponent<LoginProps> = (props) => {
                                       </Box>
                                   </>}
                               onSubmit={(v: ValueType) => {
-                                  globalActions.resetPasswordRequest.dispatch(v.email);
+                                  globalActions.loadableActions.resetPasswordRequest.dispatch(v.email);
                               }}>
                     <TextField name="email" label="E-mail"/>
                 </StandardForm>}

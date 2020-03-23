@@ -26,17 +26,15 @@ export class TranslationActions extends AbstractLoadableActions<TranslationsStat
         (<TranslationsState>{...state, selectedLanguages: action.payload}));
 
 
-    get loadableDefinitions() {
-        return {
-            translations: this.createLoadableDefinition(service.getTranslations, (state, action) => {
-                return {...state, selectedLanguages: action.payload.params.languages}
-            }),
-            createSource: this.createLoadableDefinition(service.createSource),
-            editSource: this.createLoadableDefinition(service.editSource),
-            setTranslations: this.createLoadableDefinition(service.setTranslations)
-        };
-    }
-
+    readonly loadableDefinitions = {
+        translations: this.createLoadableDefinition(service.getTranslations, (state, action) => {
+            return {...state, selectedLanguages: action.payload.params.languages}
+        }),
+        createSource: this.createLoadableDefinition(service.createSource),
+        editSource: this.createLoadableDefinition(service.editSource),
+        setTranslations: this.createLoadableDefinition(service.setTranslations),
+        delete: this.createLoadableDefinition(service.deleteSource)
+    };
 
     useSelector<T>(selector: (state: TranslationsState) => T): T {
         return useSelector((state: AppState) => selector(state.translations))

@@ -4,6 +4,7 @@ import com.polygloat.model.Language;
 import com.polygloat.model.Source;
 import com.polygloat.model.Translation;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -21,4 +22,16 @@ public interface TranslationRepository extends JpaRepository<Translation, Long> 
     Set<Translation> getTranslations(Source source, com.polygloat.model.Repository repository, Collection<String> languages);
 
     Optional<Translation> findOneBySourceAndLanguage(Source source, Language language);
+
+    @Modifying
+    @Query("delete from Translation t where t.source.id in (select s.id from Source s where s.repository.id = :repositoryId)")
+    void deleteAllByRepositoryId(Long repositoryId);
+
+    void deleteAllByLanguageId(Long languageId);
+
+    @Modifying
+    @Query("delete from Translation t where t.source.id in :ids")
+    void deleteAllBySourceIds(Collection<Long> ids);
+
+    void deleteAllBySourceId(Long id);
 }

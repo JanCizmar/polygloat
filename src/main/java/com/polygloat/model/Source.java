@@ -2,10 +2,8 @@ package com.polygloat.model;
 
 import com.polygloat.dtos.PathDTO;
 import lombok.*;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
-import org.hibernate.search.annotations.*;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.IndexedEmbedded;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -36,7 +34,7 @@ public class Source extends AuditModel {
 
     @Builder.Default
     @IndexedEmbedded(includePaths = {"text"})
-    @OneToMany(mappedBy = "source", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "source")
     private Set<Translation> translations = new HashSet<>();
 
     public Optional<Translation> getTranslation(String abbr) {

@@ -25,6 +25,10 @@ export class translationService {
     editSource = (repositoryId: number, dto: { oldFullPathString: string, newFullPathString: string }) =>
         this.http.post(`repository/${repositoryId}/sources/edit`, dto);
 
-    setTranslations = (repositoryId: number, dto: { sourceFullPath: string, translations: TranslationsObject}) =>
+    setTranslations = (repositoryId: number, dto: { sourceFullPath: string, translations: TranslationsObject }) =>
         this.http.post(`repository/${repositoryId}/translations/set`, dto);
+
+    deleteSource = (repositoryId: number, ids: number[]) =>
+        this.http.delete(`repository/${repositoryId}/sources`, ids);
+
 }

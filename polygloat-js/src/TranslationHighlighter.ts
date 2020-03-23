@@ -30,10 +30,14 @@ export class TranslationHighlighter {
 
     listen(node: Element) {
         node.addEventListener('mouseenter', () => this.onMouseOver(node));
-    };
+    }
 
     onMouseOver = (node): void => {
-        const clickListener = () => this.translationEdit(node);
+        const clickListener = (e: MouseEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.translationEdit(node);
+        };
 
         const leaveListener = () => {
             node.style.backgroundColor = null;

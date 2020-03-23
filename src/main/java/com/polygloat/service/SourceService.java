@@ -4,8 +4,8 @@ import com.polygloat.constants.Message;
 import com.polygloat.dtos.PathDTO;
 import com.polygloat.dtos.request.EditSourceDTO;
 import com.polygloat.dtos.request.SetTranslationsDTO;
-import com.polygloat.dtos.response.SourceDTO;
 import com.polygloat.dtos.request.validators.exceptions.ValidationException;
+import com.polygloat.dtos.response.SourceDTO;
 import com.polygloat.exceptions.NotFoundException;
 import com.polygloat.model.Repository;
 import com.polygloat.model.Source;
@@ -17,7 +17,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -29,6 +32,7 @@ public class SourceService {
     //circular dependency
     @Setter(onMethod = @__({@Autowired}))
     private TranslationService translationService;
+
 
     @Transactional
     public Source getOrCreateSource(Repository repository, PathDTO path) {
@@ -57,6 +61,11 @@ public class SourceService {
         return sourceRepository.findById(id);
     }
 
+    public List<Source> getSources(Set<Long> ids) {
+        return sourceRepository.findAllById(ids);
+    }
+
+
     public void createSource(Repository repository, SourceDTO dto) {
         if (this.getSource(repository, dto.getPathDto()).isPresent()) {
             throw new ValidationException(Message.SOURCE_EXISTS);
@@ -82,7 +91,17 @@ public class SourceService {
 
     public void deleteSource(Long id) {
         Source source = getSource(id).orElseThrow(NotFoundException::new);
+        translationService.deleteAllBySource(id);
         sourceRepository.delete(source);
+    }
+
+    public void deleteSources(Collection<Long> ids) {
+        translationService.deleteAllBySources(ids);
+        sourceRepository.deleteAllByIdIn(ids);
+    }
+
+    public void deleteAllByRepository(Long repositoryId) {
+        this.sourceRepository.deleteAllByRepositoryId(repositoryId);
     }
 
     @Transactional

@@ -6,6 +6,8 @@ import com.polygloat.exceptions.NotFoundException;
 import com.polygloat.model.Language;
 import com.polygloat.model.Repository;
 import com.polygloat.repository.LanguageRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,17 +19,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class LanguageService {
-    private LanguageRepository languageRepository;
+    private final LanguageRepository languageRepository;
+    private final EntityManager entityManager;
 
-    private EntityManager entityManager;
-
-    @Autowired
-    public LanguageService(LanguageRepository languageRepository,
-                           EntityManager entityManager) {
-        this.languageRepository = languageRepository;
-        this.entityManager = entityManager;
-    }
+    @Setter(onMethod = @__(@Autowired))
+    private TranslationService translationService;
 
     @Transactional
     public Language createLanguage(LanguageDTO dto, Repository repository) {
@@ -41,7 +39,8 @@ public class LanguageService {
     @Transactional
     public void deleteLanguage(Long id) {
         Language language = languageRepository.findById(id).orElseThrow(NotFoundException::new);
-        language.setDeleted(true);
+        translationService.deleteAllByLanguage(language.getId());
+        languageRepository.delete(language);
     }
 
     @Transactional
@@ -76,9 +75,21 @@ public class LanguageService {
     public Set<Language> findByAbbreviations(Set<String> abbreviations, Long repositoryId) {
         Set<Language> langs = languageRepository.findAllByAbbreviationInAndRepositoryId(abbreviations, repositoryId);
         if (!langs.stream().map(Language::getAbbreviation).collect(Collectors.toSet()).containsAll(abbreviations)) {
-            throw new NotFoundException(Message.LANGGUAGE_NOT_FOUND);
+            throw new NotFoundException(Message.LANGUAGE_NOT_FOUND);
         }
         return langs;
+    }
+
+    @Transactional
+    public Language getOrCreate(Repository repository, String languageAbbreviation) {
+        return this.findByAbbreviation(languageAbbreviation, repository)
+                .orElseGet(
+                        () -> this.createLanguage(
+                                LanguageDTO.builder()
+                                        .abbreviation(languageAbbreviation)
+                                        .name(languageAbbreviation).build(),
+                                repository)
+                );
     }
 
     public Set<Language> getLanguagesForTranslationsView(Set<String> languages, Repository repository) {
@@ -90,5 +101,9 @@ public class LanguageService {
 
     public Optional<Language> findByName(String name, Repository repository) {
         return languageRepository.findByNameAndRepository(name, repository);
+    }
+
+    public void deleteAllByRepository(Long repositoryId) {
+        languageRepository.deleteAllByRepositoryId(repositoryId);
     }
 }

@@ -21,7 +21,7 @@ const detectLoop = (url) => {
     }
     timer = setTimeout(() => {
         requests = {};
-    }, 5000)
+    }, 2000)
 };
 
 
@@ -72,6 +72,7 @@ export class ApiHttpService {
                 }
                 //use input error, result should contain json
                 if (r.status >= 400 && r.status <= 500) {
+                    this.messageService.error("Bad request!");
                     ApiHttpService.getResObject(r).then(b => reject(b));
                 } else {
                     resolve(r);
@@ -90,8 +91,14 @@ export class ApiHttpService {
         return ApiHttpService.getResObject(await (this.postNoJson(url, body)));
     }
 
-    async delete<T>(url): Promise<T> {
-        return ApiHttpService.getResObject(await this.fetch(url, {method: 'DELETE'}));
+    async delete<T>(url, body?: object): Promise<T> {
+        return ApiHttpService.getResObject(await this.fetch(url, {
+            method: 'DELETE',
+            body: body && JSON.stringify(body),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        }));
     }
 
     postNoJson(input: RequestInfo, body: {}): Promise<Response> {

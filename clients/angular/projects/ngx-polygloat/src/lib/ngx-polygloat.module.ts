@@ -1,4 +1,4 @@
-import {APP_INITIALIZER, NgModule, Optional, SkipSelf} from '@angular/core';
+import {APP_INITIALIZER, NgModule} from '@angular/core';
 import {TranslatePipe} from './translate.pipe';
 import {TranslationsProvider} from './translations-provider';
 import {PolygloatConfig} from "polygloat";
@@ -16,9 +16,7 @@ import {TranslateService} from "./translate.service";
   exports: [
     TranslatePipe,
   ],
-  providers: [
-    //TranslateService
-  ]
+  providers: []
 })
 export class NgxPolygloatModule {
 
@@ -35,7 +33,8 @@ export class NgxPolygloatModule {
           },
           deps: [TranslationsProvider, TranslateService],
           multi: true
-        }
+        },
+        {provide: PolygloatConfig, useValue: options}
       ],
     }
   }

@@ -9,26 +9,18 @@ import Box from "@material-ui/core/Box";
 import {TranslationCreationDialog} from "../../../Translations/TranslationCreationDialog";
 import {RepositoryLanguageProvider} from "../../../../hooks/RepositoryLanguagesProvider";
 import {TranslationsGrid} from "../../../Translations/TranslationsGrid";
-
-//const TranslationsTable = React.lazy(() => import(/* webpackChunkName: "translationsTable" */'../../../Translations/TranslationsTable'));
+import {Container} from "@material-ui/core";
+import {TranslationGridContextProvider} from "../../../Translations/TtranslationsGridContextProvider";
 
 export default function TranslationView() {
-    let repositoryDTO = useRepository();
-
     return (
         <RepositoryPage fullWidth={true}>
             <RepositoryLanguageProvider>
-                <Grid lg={12}>
-                    <TranslationsGrid/>
-                    <Box display="flex" justifyContent="flex-end" mt={3}>
-                        <FabAddButtonLink to={LINKS.REPOSITORY_TRANSLATIONS_ADD.build({[PARAMS.REPOSITORY_ID]: repositoryDTO.id})}/>
-                    </Box>
-                    <Switch>
-                        <Route path={LINKS.REPOSITORY_TRANSLATIONS_ADD.template}>
-                            <TranslationCreationDialog/>
-                        </Route>
-                    </Switch>
-                </Grid>
+                <Container maxWidth={false}>
+                    <TranslationGridContextProvider>
+                        <TranslationsGrid/>
+                    </TranslationGridContextProvider>
+                </Container>
             </RepositoryLanguageProvider>
         </RepositoryPage>
     );

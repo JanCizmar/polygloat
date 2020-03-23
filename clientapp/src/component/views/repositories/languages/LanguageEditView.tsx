@@ -12,6 +12,7 @@ import {Button} from "@material-ui/core";
 import {useConfirmation} from "../../../../hooks/useConfirmation";
 import {LanguageDTO} from "../../../../service/response.types";
 import {useRedirect} from "../../../../hooks/useRedirect";
+import {Validation} from "../../../../constants/GlobalValidationSchema";
 
 const actions = container.resolve(LanguageActions);
 
@@ -63,11 +64,7 @@ export const LanguageEditView = () => {
                 onCancel={() => setCancelled(true)}
                 saveActionLoadable={editLoadable}
                 resourceLoadable={languageLoadable}
-                validationSchema={Yup.object().shape(
-                    {
-                        name: Yup.string().required().max(100),
-                        abbreviation: Yup.string().required().max(20)
-                    })}
+                validationSchema={Validation.LANGUAGE}
                 customActions={
                     <Button variant="outlined" color="secondary"
                             onClick={() => confirmation({

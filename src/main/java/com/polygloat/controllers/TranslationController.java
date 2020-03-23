@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,17 +39,8 @@ public class TranslationController implements IController {
         return translationService.getTranslations(parseLanguages(languages).orElse(null), repositoryId);
     }
 
-    /*@GetMapping(value = "/source/{sourceFullPath}/{languages}")
-    public Map<String, String> getSourceTranslations(@PathVariable("repositoryId") Long repositoryId,
-                                                     @PathVariable("sourceFullPath") String fullPath,
-                                                     @PathVariable("languages") String langs) {
-        PathDTO pathDTO = PathDTO.fromFullPath(fullPath);
-        return translationService.getSourceTranslationsResult(repositoryId, pathDTO, parseLanguages(langs).orElse(null))
-                .stream().collect(Collectors.toMap((v) -> v.getLanguage().getAbbreviation(), Translation::getText));
-    }*/
-
     @PostMapping("/set")
-    private void setTranslations(@PathVariable("repositoryId") Long repositoryId, @RequestBody SetTranslationsDTO dto) {
+    public void setTranslations(@PathVariable("repositoryId") Long repositoryId, @RequestBody @Valid SetTranslationsDTO dto) {
         securityService.checkRepositoryPermission(repositoryId, Permission.RepositoryPermissionType.TRANSLATE);
         Source source = sourceService.getSource(repositoryId, PathDTO.fromFullPath(dto.getSourceFullPath())).orElseThrow(NotFoundException::new);
         translationService.setForSource(source, dto.getTranslations());

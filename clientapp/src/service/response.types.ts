@@ -2,6 +2,7 @@ export type TranslationsObject = { [abbreviation: string]: string };
 
 export type SourceTranslationsDTO = {
     name: string,
+    id: number,
     translations: TranslationsObject
 }
 

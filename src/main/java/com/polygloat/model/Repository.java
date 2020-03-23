@@ -1,13 +1,9 @@
 package com.polygloat.model;
 
 import lombok.*;
-import org.hibernate.annotations.Where;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.LinkedHashSet;
 import java.util.Optional;
@@ -17,12 +13,11 @@ import java.util.Set;
 @Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = {"name", "created_by_id"}),
 })
-@Where(clause = "deleted = 'false'")
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@ToString(of={"id", "name"})
+@ToString(of = {"id", "name"})
 public class Repository extends AuditModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,13 +32,18 @@ public class Repository extends AuditModel {
     @OneToMany(mappedBy = "repository")
     private Set<Permission> permissions = new LinkedHashSet<>();
 
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "repository")
+    private Set<Source> sources = new LinkedHashSet<>();
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "repository")
+    private Set<ApiKey> apiKeys = new LinkedHashSet<>();
+
     @NotBlank
     @Size(min = 3, max = 500)
     private String name;
 
     private String description;
-
-    private boolean deleted = false;
 
     public Repository(UserAccount createdBy, @NotBlank @Size(min = 3, max = 500) String name, String description) {
         this.createdBy = createdBy;

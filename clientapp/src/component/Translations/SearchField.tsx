@@ -1,12 +1,12 @@
 import * as React from 'react';
 import {FunctionComponent, useContext, useEffect, useState} from 'react';
 import {Box, TextField} from "@material-ui/core";
-import {TranslationListContext} from "./TranslationsGrid";
+import {TranslationListContext} from "./TtranslationsGridContextProvider";
 
 export const SearchField: FunctionComponent = (props) => {
     const listContext = useContext(TranslationListContext);
 
-    const [search, setSearch] = useState(listContext.listLoadable.data ? listContext.listLoadable.data.params.search : "");
+    const [search, setSearch] = useState(listContext.listLoadable.data ? listContext.listLoadable.data.params.search || "" : "");
     const [oldSearch, setOldSearch] = useState("");
 
     useEffect(() => {
@@ -21,7 +21,7 @@ export const SearchField: FunctionComponent = (props) => {
 
 
     return (
-        <Box p={3}>
+        <Box>
             <TextField id="standard-search"
                        label="Search field"
                        type="search"

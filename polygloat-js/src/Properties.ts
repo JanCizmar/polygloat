@@ -5,7 +5,7 @@ import {singleton} from 'tsyringe';
 export class Properties {
     config: PolygloatConfig = new PolygloatConfig();
     currentLanguage: string = 'en';
-    defaultLanguage: string = 'en';
+    defaultLanguage: string = this.config.defaultLanguage;
     mode: Mode = Mode.DEVELOP;
     scopes: Scope[] = [];
 }

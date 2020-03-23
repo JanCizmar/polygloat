@@ -18,6 +18,7 @@ import FullPageLoading from "./component/common/FullPageLoadingView";
 import App from "./component/App";
 
 const store = configureStore();
+import {SnackbarProvider} from 'notistack';
 
 
 // #if process.env.target==="appbundle"
@@ -31,7 +32,9 @@ ReactDOM.render(
     <React.Suspense fallback={<FullPageLoading/>}>
         <Provider store={store}>
             <ErrorBoundary>
-                <App/>
+                <SnackbarProvider>
+                {<App/>}
+                </SnackbarProvider>
             </ErrorBoundary>
         </Provider>
     </React.Suspense>,

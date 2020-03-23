@@ -9,12 +9,10 @@ import com.polygloat.exceptions.NotFoundException;
 import com.polygloat.model.Permission;
 import com.polygloat.model.Repository;
 import com.polygloat.model.UserAccount;
-import com.polygloat.repository.UserAccountRepository;
 import com.polygloat.security.AuthenticationFacade;
 import com.polygloat.service.InvitationService;
 import com.polygloat.service.RepositoryService;
 import com.polygloat.service.SecurityService;
-import com.polygloat.service.UserAccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -29,12 +27,9 @@ import java.util.Set;
 public class RepositoryController implements IController {
 
     private final RepositoryService repositoryService;
-    private final UserAccountRepository userAccountRepository;
     private final AuthenticationFacade authenticationFacade;
     private final SecurityService securityService;
-    private final UserAccountService userAccountService;
     private final InvitationService invitationService;
-
 
     @PostMapping(value = "")
     public RepositoryDTO createRepository(@RequestBody @Valid CreateRepositoryDTO dto) {

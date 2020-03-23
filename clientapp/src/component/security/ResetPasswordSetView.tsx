@@ -11,9 +11,9 @@ import Box from '@material-ui/core/Box';
 import {container} from 'tsyringe';
 import {GlobalActions} from '../../store/global/globalActions';
 import {Alert} from '../common/Alert';
-import * as Yup from 'yup';
-import {SetPasswordFields, setPasswordValidationSchema} from './SetPasswordFields';
+import {SetPasswordFields} from './SetPasswordFields';
 import {useConfig} from "../../hooks/useConfig";
+import {Validation} from "../../constants/GlobalValidationSchema";
 
 const globalActions = container.resolve(GlobalActions);
 
@@ -21,8 +21,6 @@ type ValueType = {
     password: string;
     passwordRepeat: string
 }
-
-const validationSchema = Yup.object().shape(setPasswordValidationSchema);
 
 const PasswordResetSetView: FunctionComponent = () => {
 
@@ -56,7 +54,7 @@ const PasswordResetSetView: FunctionComponent = () => {
                 }
                 {passwordResetSetValidated && (
                     <StandardForm initialValues={{password: '', passwordRepeat: ''} as ValueType}
-                                  validationSchema={validationSchema}
+                                  validationSchema={Validation.USER_PASSWORD_WITH_REPEAT}
                                   submitButtons={
                                       <>
                                           <Box display="flex">

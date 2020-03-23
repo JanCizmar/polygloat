@@ -1,20 +1,22 @@
 package com.polygloat.controllers;
 
-import com.polygloat.dtos.request.DeleteSourceDTO;
+import com.polygloat.constants.Message;
 import com.polygloat.dtos.request.EditSourceDTO;
 import com.polygloat.dtos.request.SetTranslationsDTO;
 import com.polygloat.dtos.response.SourceDTO;
 import com.polygloat.exceptions.NotFoundException;
 import com.polygloat.model.Permission;
 import com.polygloat.model.Source;
-import com.polygloat.service.RepositoryService;
 import com.polygloat.service.SecurityService;
 import com.polygloat.service.SourceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.ValidationException;
+import java.util.Set;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -25,17 +27,8 @@ public class SourceController implements IController {
     private final SourceService sourceService;
     private final SecurityService securityService;
 
-    /*@PostMapping(value = "")
-    public void create(@PathVariable("repositoryId") Long repositoryId,
-                       @RequestBody @Valid SourceDTO dto) {
-        Repository repository = repositoryService.findById(repositoryId).orElseThrow(NotFoundException::new);
-
-        sourceService.createSource(repository, dto);
-    }*/
-
-
     @PostMapping("/create")
-    private void create(@PathVariable("repositoryId") Long repositoryId, @RequestBody SetTranslationsDTO dto) {
+    public void create(@PathVariable("repositoryId") Long repositoryId, @RequestBody @Valid SetTranslationsDTO dto) {
         Permission permission = securityService.checkRepositoryPermission(repositoryId, Permission.RepositoryPermissionType.TRANSLATE);
         sourceService.createSource(permission.getRepository(), dto);
     }
@@ -61,9 +54,14 @@ public class SourceController implements IController {
     }
 
     @DeleteMapping(value = "")
-    public void delete(@PathVariable("repositoryId") Long repositoryId, @RequestBody DeleteSourceDTO dto) {
-        Source source = sourceService.getSource(repositoryId, dto.getFullPathDTO()).orElseThrow(NotFoundException::new);
-        securityService.checkRepositoryPermission(source.getRepository().getId(), Permission.RepositoryPermissionType.EDIT);
-        sourceService.deleteSource(source.getId());
+    @Transactional
+    public void delete(@PathVariable("repositoryId") Long repositoryId, @RequestBody Set<Long> ids) {
+        securityService.checkRepositoryPermission(repositoryId, Permission.RepositoryPermissionType.EDIT);
+        for (Source source : sourceService.getSources(ids)) {
+            if (!repositoryId.equals(source.getRepository().getId())) {
+                throw new ValidationException(Message.SOURCE_NOT_FROM_REPOSITORY.getCode());
+            }
+            sourceService.deleteSources(ids);
+        }
     }
 }

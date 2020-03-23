@@ -5,13 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.polygloat.dtos.response.SourceResponseDTO;
 import com.polygloat.dtos.response.ViewDataResponse;
 import com.polygloat.dtos.response.translations_view.ResponseParams;
-import com.polygloat.exceptions.NotFoundException;
 import com.polygloat.helpers.JsonHelper;
 import com.polygloat.model.Repository;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
@@ -26,24 +24,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class TranslationControllerTest extends SignedInControllerTest {
     @Test
-    @Rollback
     void getViewDataSearch() throws Exception {
-        dbPopulator.populate("app2");
-
-        Repository repository = repositoryService.findByName("app2", userAccount).orElseThrow(NotFoundException::new);
+        Repository app = dbPopulator.populate(generateUniqueString());
 
         String searchString = "This";
 
-        ViewDataResponse<LinkedHashSet<SourceResponseDTO>, ResponseParams> response = performValidViewRequest(repository, "?search=" + searchString);
+        ViewDataResponse<LinkedHashSet<SourceResponseDTO>, ResponseParams> response = performValidViewRequest(app, "?search=" + searchString);
 
         assertSearch(response, searchString);
     }
 
     @Test
-    @Rollback
     void getViewDataQueryLanguages() throws Exception {
         Repository repository = dbPopulator.populate(generateUniqueString());
 
@@ -122,11 +115,8 @@ public class TranslationControllerTest extends SignedInControllerTest {
     }
 
     @Test
-    @Rollback
     void getTranslations() throws Exception {
-        dbPopulator.populate("app");
-
-        Repository repository = repositoryService.findByName("app", userAccount).orElseThrow(NotFoundException::new);
+        Repository repository = dbPopulator.populate(generateUniqueString());
 
         MvcResult mvcResult = mvc.perform(
                 loggedGet("/api/repository/" + repository.getId().toString() + "/translations/en,de")

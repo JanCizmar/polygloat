@@ -11,7 +11,7 @@ import SupervisedUserCircleIcon from "@material-ui/icons/SupervisedUserCircle";
 import * as React from "react";
 import {useRepository} from "../../../hooks/useRepository";
 import {RepositoryPermissionType} from "../../../service/response.types";
-import VpnKeyIcon from '@material-ui/icons/VpnKey';
+import ImportExportIcon from '@material-ui/icons/ImportExport';
 
 export const RepositoryMenu = ({id}) => {
 
@@ -41,6 +41,8 @@ export const RepositoryMenu = ({id}) => {
                                       icon={<PersonAddIcon/>} text="Invite user"/>
                         <SideMenuItem linkTo={LINKS.REPOSITORY_PERMISSIONS.build({[PARAMS.REPOSITORY_ID]: id})}
                                       icon={<SupervisedUserCircleIcon/>} text="Permissions"/>
+                        <SideMenuItem linkTo={LINKS.REPOSITORY_IMPORT_EXPORT.build({[PARAMS.REPOSITORY_ID]: id})}
+                                      icon={<ImportExportIcon/>} text="Import"/>
                     </>
                 )}
             </List>

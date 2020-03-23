@@ -1,11 +1,14 @@
 package com.polygloat.dtos.request;
 
 import com.polygloat.model.Language;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
 
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class LanguageDTO {
     @Getter
     private Long id;
@@ -13,15 +16,14 @@ public class LanguageDTO {
     @Getter
     @Setter
     @NotBlank
+    @Length(max = 100)
     private String name;
 
     @Getter
     @Setter
     @NotBlank
+    @Length(max = 20)
     private String abbreviation;
-
-    public LanguageDTO() {
-    }
 
     public LanguageDTO(@NotBlank String name, @NotBlank String abbreviation) {
         this.name = name;

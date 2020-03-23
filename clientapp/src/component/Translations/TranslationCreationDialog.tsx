@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {useContext, useEffect} from 'react';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -11,8 +12,9 @@ import {LanguagesMenu} from "../common/form/LanguagesMenu";
 import {TranslationActions} from "../../store/repository/TranslationActions";
 import {TextField} from "../common/form/fields/TextField";
 import {ResourceErrorComponent} from "../common/form/ResourceErrorComponent";
-import {BaseView} from "../views/BaseView";
 import {messageService} from "../../service/messageService";
+import {Validation} from "../../constants/GlobalValidationSchema";
+import {TranslationListContext} from "./TtranslationsGridContextProvider";
 
 export type TranslationCreationValue = {
     source: string;
@@ -27,20 +29,24 @@ export function TranslationCreationDialog() {
 
     const repositoryDTO = useRepository();
 
-
     let selectedLanguages = translationActions.useSelector(s => s.selectedLanguages);
 
     let saveLoadable = translationActions.useSelector(s => s.loadables.createSource);
 
+    let listContext = useContext(TranslationListContext);
+
     function onClose() {
+        translationActions.loadableReset.createSource.dispatch();
         redirectionActions.redirect.dispatch(LINKS.REPOSITORY_TRANSLATIONS.build({[PARAMS.REPOSITORY_ID]: repositoryDTO.id}));
     }
 
-    if (saveLoadable.loaded && !saveLoadable.error) {
-        messaging.success("Translation created");
-        translationActions.loadableReset.createSource.dispatch();
-        onClose();
-    }
+    useEffect(() => {
+        if (saveLoadable.loaded && !saveLoadable.error) {
+            messaging.success("Translation created");
+            listContext.loadData();
+            onClose();
+        }
+    }, [saveLoadable.error, saveLoadable.loaded]);
 
     function onSubmit(v) {
         translationActions.loadableActions.createSource.dispatch(repositoryDTO.id, v);
@@ -54,18 +60,21 @@ export function TranslationCreationDialog() {
             onClose={() => onClose()}
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
+            fullWidth
         >
             <DialogTitle id="alert-dialog-title">Add translation</DialogTitle>
             <DialogContent>
-
                 {saveLoadable && saveLoadable.error && <ResourceErrorComponent error={saveLoadable.error}/>}
 
                 <LanguagesMenu/>
-                <StandardForm onSubmit={onSubmit} initialValues={{source: "", translations: initialTranslations}} onCancel={() => onClose()}>
-                    <TextField name="source" label="Source text" fullWidth/>
+                <StandardForm onSubmit={onSubmit}
+                              initialValues={{source: "", translations: initialTranslations}}
+                              validationSchema={Validation.SOURCE_TRANSLATION_CREATION(selectedLanguages)}
+                              onCancel={() => onClose()}>
+                    <TextField multiline name="source" label="Source text" fullWidth/>
 
                     {selectedLanguages.map(s => (
-                        <TextField name={"translations." + s} label={s}/>
+                        <TextField multiline key={s} name={"translations." + s} label={s}/>
                     ))}
 
                 </StandardForm>

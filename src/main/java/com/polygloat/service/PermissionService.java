@@ -42,6 +42,10 @@ public class PermissionService {
         permissionRepository.delete(permission);
     }
 
+    public void deleteAllByRepository(Long repositoryId) {
+        permissionRepository.deleteAllByRepositoryId(repositoryId);
+    }
+
     @Transactional
     public void grantFullAccessToRepo(UserAccount userAccount, Repository repository) {
         Permission permission = Permission.builder().type(Permission.RepositoryPermissionType.MANAGE).repository(repository).user(userAccount).build();

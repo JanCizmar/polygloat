@@ -13,7 +13,7 @@ export class TranslatePipe implements PipeTransform {
   constructor(private translateService: TranslateService) {
   }
 
-  transform(value: any, ...args: any[]): any {
+  transform(value: any, params = {}): any {
     if (!value || value.length === 0) {
       return value;
     }
@@ -22,9 +22,9 @@ export class TranslatePipe implements PipeTransform {
       return this.value;
     }
 
-    this.lastKey = value;
+    this.lastKey = value;;
 
-    this.translateService.get(value).toPromise().then(r => {
+    this.translateService.get(value, params).toPromise().then(r => {
       this.value = r;
     });
 

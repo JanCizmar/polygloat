@@ -22,10 +22,16 @@ export interface TextInputElementData {
     placeholderInputs: string[];
 }
 
+export type Translations = { [key: string]: string | Translations };
+export type TranslationParams = { [key: string]: string }
+export type PolygloatData = { input: string, params: TranslationParams }
+
 export interface SimpleSpanElementData {
     input: string;
+    params?: TranslationParams;
 }
 
 export interface PolygloatSimpleSpanElement extends HTMLSpanElement {
     __polygloat: SimpleSpanElementData;
 }
+

@@ -10,6 +10,7 @@ import {BaseFormView} from '../../BaseFormView';
 import {LanguageActions} from '../../../../store/languages/LanguageActions';
 import {LanguageDTO} from "../../../../service/response.types";
 import {useRedirect} from "../../../../hooks/useRedirect";
+import {Validation} from "../../../../constants/GlobalValidationSchema";
 
 const actions = container.resolve(LanguageActions);
 
@@ -44,11 +45,7 @@ export const LanguageCreateView = () => {
                 onSubmit={onSubmit}
                 onCancel={() => setCancelled(true)}
                 saveActionLoadable={createLoadable}
-                validationSchema={Yup.object().shape(
-                    {
-                        name: Yup.string().required().max(100),
-                        abbreviation: Yup.string().required().max(20)
-                    })}
+                validationSchema={Validation.LANGUAGE}
             >
                 <>
                     <TextField label="Name" name="name" required={true}/>

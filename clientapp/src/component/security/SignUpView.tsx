@@ -10,12 +10,12 @@ import {StandardForm} from '../common/form/StandardForm';
 import Box from '@material-ui/core/Box';
 import {container} from 'tsyringe';
 import {Alert} from '../common/Alert';
-import * as Yup from 'yup';
-import {SetPasswordFields, setPasswordValidationSchema} from './SetPasswordFields';
+import {SetPasswordFields} from './SetPasswordFields';
 import {SignUpActions} from '../../store/global/signUpActions';
 import {TextField} from '../common/form/fields/TextField';
 import {signUpService} from '../../service/signUpService';
 import {useConfig} from "../../hooks/useConfig";
+import {Validation} from "../../constants/GlobalValidationSchema";
 
 const actions = container.resolve(SignUpActions);
 const service = container.resolve(signUpService);
@@ -26,23 +26,6 @@ export type SignUpType = {
     password: string;
     passwordRepeat: string
 }
-
-let timer = null;
-
-const validationSchema = Yup.object().shape({
-    ...setPasswordValidationSchema,
-    name: Yup.string().required(),
-    email: Yup.string().email().required()
-        .test('checkEmailUnique', 'User with this e-mail already exists.', v => {
-            clearTimeout(timer);
-            return new Promise((resolve) => {
-                timer = setTimeout(
-                    () => v && Yup.string().email().validateSync(v) && resolve(service.validateEmail(v)),
-                    500,
-                );
-            });
-        })
-});
 
 const SignUpView: FunctionComponent = () => {
     const security = useSelector((state: AppState) => state.global.security);
@@ -63,7 +46,7 @@ const SignUpView: FunctionComponent = () => {
                 </Box>
                 }
                 <StandardForm initialValues={{password: '', passwordRepeat: '', name: '', email: ''} as SignUpType}
-                              validationSchema={validationSchema}
+                              validationSchema={Validation.SIGN_UP}
                               submitButtons={
                                   <>
                                       <Box display="flex">

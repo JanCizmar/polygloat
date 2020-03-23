@@ -3,7 +3,6 @@ package com.polygloat.service;
 import com.polygloat.constants.Message;
 import com.polygloat.dtos.PathDTO;
 import com.polygloat.dtos.query_results.SourceDTO;
-import com.polygloat.dtos.request.validators.exceptions.ValidationException;
 import com.polygloat.dtos.response.SourceResponseDTO;
 import com.polygloat.dtos.response.ViewDataResponse;
 import com.polygloat.dtos.response.translations_view.ResponseParams;
@@ -30,25 +29,15 @@ public class TranslationService {
 
     private final TranslationRepository translationRepository;
     private final EntityManager entityManager;
-    private final RepositoryService repositoryService;
-    private final LanguageService languageService;
 
-    //avoid circular dependency
+    @Setter(onMethod = @__({@Autowired}))
+    private LanguageService languageService;
+
     @Setter(onMethod = @__({@Autowired}))
     private SourceService sourceService;
 
-    @SuppressWarnings("unchecked")
-    private void addToMap(Translation translation, Map<String, Object> map) {
-        for (String folderName : translation.getSource().getPath().getPath()) {
-            Object childMap = map.computeIfAbsent(folderName, k -> new LinkedHashMap<>());
-            if (childMap instanceof Map) {
-                map = (Map<String, Object>) childMap;
-                continue;
-            }
-            throw new InternalException(Message.DATA_CORRUPTED);
-        }
-        map.put(translation.getSource().getPath().getName(), translation.getText());
-    }
+    @Setter(onMethod = @__({@Autowired}))
+    private RepositoryService repositoryService;
 
     @SuppressWarnings("unchecked")
     public Map<String, Object> getTranslations(Set<String> abbrs, Long repositoryId) {
@@ -93,26 +82,6 @@ public class TranslationService {
         return new LinkedHashSet<>();
     }
 
-
-/*
-    @Transactional
-    public void setTranslations(Long repositoryId, SourceTranslationsDTO data) {
-        Repository repository = repositoryRepository.findById(repositoryId).orElseThrow(NotFoundException::new);
-
-        Source source = sourceService.getCreateOrModifySource(repository, data);
-        for (String lang : data.getTranslations().keySet()) {
-            Translation translation = source.getTranslation(lang).orElse(null);
-            if (translation == null) {
-                translation = new Translation();
-                translation.setLanguage(repository.getLanguage(lang).orElseThrow(NotFoundException::new));
-                translation.setSource(source);
-            }
-            translation.setText(data.getTranslations().get(lang));
-            translationRepository.save(translation);
-        }
-    }*/
-
-
     public Translation getOrCreate(Source source, Language language) {
         return get(source, language).orElseGet(() -> Translation.builder().language(language).source(source).build());
     }
@@ -136,20 +105,61 @@ public class TranslationService {
                 new ResponseParams(search, languages.stream().map(Language::getAbbreviation).collect(Collectors.toSet())));
     }
 
-    public void setTranslation(Source source, String abbreviation, String text) {
-        Language language = languageService.findByAbbreviation(abbreviation, source.getRepository())
-                .orElseThrow(() -> new NotFoundException(Message.LANGGUAGE_NOT_FOUND));
+    public void setTranslation(Source source, String languageAbbreviation, String text) {
+        Language language = languageService.findByAbbreviation(languageAbbreviation, source.getRepository())
+                .orElseThrow(() -> new NotFoundException(Message.LANGUAGE_NOT_FOUND));
         Translation translation = getOrCreate(source, language);
         translation.setText(text);
         translationRepository.save(translation);
     }
 
     public void setForSource(Source source, Map<String, String> translations) {
-        for (String abbr : translations.keySet()) {
-            if (translations.get(abbr) == null || translations.get(abbr).isEmpty()) {
-                throw new ValidationException(Message.TRANSLATION_TEXT_IS_REQUIRED);
+        for (Map.Entry<String, String> entry : translations.entrySet()) {
+            if (entry.getValue() == null || entry.getValue().isEmpty()) {
+                deleteIfExists(source, entry.getKey());
             }
-            setTranslation(source, abbr, translations.get(abbr));
+            setTranslation(source, entry.getKey(), entry.getValue());
         }
+    }
+
+    public void deleteIfExists(Source source, String languageAbbreviation) {
+        Language language = languageService.findByAbbreviation(languageAbbreviation, source.getRepository())
+                .orElseThrow(() -> new NotFoundException(Message.LANGUAGE_NOT_FOUND));
+        translationRepository.findOneBySourceAndLanguage(source, language).ifPresent(translationRepository::delete);
+    }
+
+
+    public void deleteIfExists(Source source, Language language) {
+        translationRepository.findOneBySourceAndLanguage(source, language).ifPresent(translationRepository::delete);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void addToMap(Translation translation, Map<String, Object> map) {
+        for (String folderName : translation.getSource().getPath().getPath()) {
+            Object childMap = map.computeIfAbsent(folderName, k -> new LinkedHashMap<>());
+            if (childMap instanceof Map) {
+                map = (Map<String, Object>) childMap;
+                continue;
+            }
+            throw new InternalException(Message.DATA_CORRUPTED);
+        }
+        map.put(translation.getSource().getPath().getName(), translation.getText());
+    }
+
+    public void deleteAllByRepository(Long repositoryId) {
+        translationRepository.deleteAllByRepositoryId(repositoryId);
+    }
+
+    public void deleteAllByLanguage(Long languageId) {
+        translationRepository.deleteAllByLanguageId(languageId);
+    }
+
+    public void deleteAllBySources(Collection<Long> ids) {
+        translationRepository.deleteAllBySourceIds(ids);
+    }
+
+    public void deleteAllBySource(Long id) {
+        translationRepository.deleteAllBySourceId(id);
+
     }
 }

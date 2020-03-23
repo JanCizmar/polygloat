@@ -12,11 +12,13 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SourceResponseDTO {
+    private Long id;
+
     private String name;
 
     private Map<String, String> translations = new LinkedHashMap<>();
 
     public static SourceResponseDTO fromQueryResult(SourceDTO sourceDTO) {
-        return new SourceResponseDTO(sourceDTO.getPath().getFullPathString(), sourceDTO.getTranslations());
+        return new SourceResponseDTO(sourceDTO.getId(), sourceDTO.getPath().getFullPathString(), sourceDTO.getTranslations());
     }
 }

@@ -17,5 +17,7 @@ public interface ApiKeyRepository extends JpaRepository<ApiKey, Long> {
     LinkedHashSet<ApiKey> getAllByUserAccountOrderById(UserAccount userAccount);
 
     Set<ApiKey> getAllByRepositoryId(Long repositoryId);
+
+    void deleteAllByRepositoryId(Long repositoryId);
 }
 

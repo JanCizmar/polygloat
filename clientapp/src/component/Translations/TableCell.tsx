@@ -1,19 +1,16 @@
 import * as React from 'react';
-import {FunctionComponent, useContext} from "react";
-import {Box, Theme} from "@material-ui/core";
-import {RowContext} from "./SourceTranslations";
-import {createStyles} from "@material-ui/core/styles";
-import {TranslationListContext} from "./TranslationsGrid";
+import {FunctionComponent, useContext} from 'react';
+import {Box} from "@material-ui/core";
+import {RowContext} from "./TranslationsRow";
+import {TranslationListContext} from "./TtranslationsGridContextProvider";
 
 export interface TranslationsTableCellProps {
 
 }
 
-const useStyles = createStyles((theme: Theme) => {
-
-});
-
 export const TableCell: FunctionComponent<TranslationsTableCellProps> = (props) => {
+
+
     let rowContext = useContext(RowContext);
     let listContext = useContext(TranslationListContext);
 
@@ -22,7 +19,7 @@ export const TableCell: FunctionComponent<TranslationsTableCellProps> = (props) 
     rowContext.lastRendered++;
 
     return (
-        <Box width={width+"%"} p={0.5}>
+        <Box width={width + "%"} p={0.5} display="flex" alignItems="center">
             {props.children}
         </Box>
     )

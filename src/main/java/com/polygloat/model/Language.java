@@ -3,7 +3,6 @@ package com.polygloat.model;
 import com.polygloat.dtos.request.LanguageDTO;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -14,7 +13,6 @@ import java.util.Set;
         @UniqueConstraint(columnNames = {"repository_id", "abbreviation"})
 
 })
-@Where(clause = "deleted = 'false'")
 public class Language extends AuditModel {
 
     @Id
@@ -24,7 +22,6 @@ public class Language extends AuditModel {
     private Long id;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "language")
-
     @Getter
     @Setter
     private Set<Translation> translations;
@@ -41,10 +38,6 @@ public class Language extends AuditModel {
     @Getter
     @Setter
     private String name;
-
-    @Getter
-    @Setter
-    private boolean deleted = false;
 
     public static Language fromRequestDTO(LanguageDTO dto) {
         Language language = new Language();

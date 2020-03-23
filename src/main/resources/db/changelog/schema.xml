@@ -194,4 +194,64 @@
     <changeSet author="jenik (generated)" id="1582652303794-27">
         <addForeignKeyConstraint baseColumnNames="user_account_id" baseTableName="api_key" constraintName="FKsryptvc972nlvw7we7fkr06mg" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="user_account" validate="true"/>
     </changeSet>
+    <changeSet author="jenik (generated)" id="1584656577008-19">
+        <dropColumn columnName="deleted" tableName="language"/>
+    </changeSet>
+    <changeSet author="jenik (generated)" id="1584656577008-20">
+        <dropColumn columnName="deleted" tableName="repository"/>
+    </changeSet>
+    <changeSet author="jenik (generated)" id="1584656577008-1">
+        <dropUniqueConstraint constraintName="UK81px5yg1ucqsijlxk3pnncfpb" tableName="language"/>
+    </changeSet>
+    <changeSet author="jenik (generated)" id="1584656577008-2">
+        <addUniqueConstraint columnNames="repository_id, abbreviation" constraintName="UK81px5yg1ucqsijlxk3pnncfpb" tableName="language"/>
+    </changeSet>
+    <changeSet author="jenik (generated)" id="1584656577008-3">
+        <dropUniqueConstraint constraintName="UK8y2j9ad1tpah5g4e786wyvli6" tableName="source"/>
+    </changeSet>
+    <changeSet author="jenik (generated)" id="1584656577008-4">
+        <addUniqueConstraint columnNames="repository_id, name" constraintName="UK8y2j9ad1tpah5g4e786wyvli6" tableName="source"/>
+    </changeSet>
+    <changeSet author="jenik (generated)" id="1584656577008-5">
+        <dropUniqueConstraint constraintName="UKbuaqj25lrtnfvw4rfr6a8us68" tableName="user_account"/>
+    </changeSet>
+    <changeSet author="jenik (generated)" id="1584656577008-6">
+        <addUniqueConstraint columnNames="third_party_auth_type, third_party_auth_id" constraintName="UKbuaqj25lrtnfvw4rfr6a8us68" tableName="user_account"/>
+    </changeSet>
+    <changeSet author="jenik (generated)" id="1584656577008-7">
+        <dropUniqueConstraint constraintName="UKcastjbvpeeus0r8lbpehiu0e4" tableName="user_account"/>
+    </changeSet>
+    <changeSet author="jenik (generated)" id="1584656577008-8">
+        <addUniqueConstraint columnNames="username" constraintName="UKcastjbvpeeus0r8lbpehiu0e4" tableName="user_account"/>
+    </changeSet>
+    <changeSet author="jenik (generated)" id="1584656577008-9">
+        <dropUniqueConstraint constraintName="UKecviceu2utnk423qkbx2ejony" tableName="repository"/>
+    </changeSet>
+    <changeSet author="jenik (generated)" id="1584656577008-10">
+        <addUniqueConstraint columnNames="name, created_by_id" constraintName="UKecviceu2utnk423qkbx2ejony" tableName="repository"/>
+    </changeSet>
+    <changeSet author="jenik (generated)" id="1584656577008-11">
+        <dropUniqueConstraint constraintName="UKfxvom47gi4qes6po1dsmhj25b" tableName="language"/>
+    </changeSet>
+    <changeSet author="jenik (generated)" id="1584656577008-12">
+        <addUniqueConstraint columnNames="repository_id, name" constraintName="UKfxvom47gi4qes6po1dsmhj25b" tableName="language"/>
+    </changeSet>
+    <changeSet author="jenik (generated)" id="1584656577008-13">
+        <dropUniqueConstraint constraintName="UKib8hbu2lm2peqra478nwfgrrm" tableName="invitation"/>
+    </changeSet>
+    <changeSet author="jenik (generated)" id="1584656577008-14">
+        <addUniqueConstraint columnNames="code" constraintName="UKib8hbu2lm2peqra478nwfgrrm" tableName="invitation"/>
+    </changeSet>
+    <changeSet author="jenik (generated)" id="1584656577008-15">
+        <dropUniqueConstraint constraintName="UKkyxcxq3siw777k16bvlhqydmj" tableName="translation"/>
+    </changeSet>
+    <changeSet author="jenik (generated)" id="1584656577008-16">
+        <addUniqueConstraint columnNames="source_id, language_id" constraintName="UKkyxcxq3siw777k16bvlhqydmj" tableName="translation"/>
+    </changeSet>
+    <changeSet author="jenik (generated)" id="1584656577008-17">
+        <dropUniqueConstraint constraintName="api_key_unique" tableName="api_key"/>
+    </changeSet>
+    <changeSet author="jenik (generated)" id="1584656577008-18">
+        <addUniqueConstraint columnNames="key" constraintName="api_key_unique" tableName="api_key"/>
+    </changeSet>
 </databaseChangeLog>

@@ -12,6 +12,7 @@ import {TextField} from '../../../common/form/fields/TextField';
 import {BaseFormView} from '../../BaseFormView';
 import {DashboardPage} from '../../../layout/DashboardPage';
 import {FieldArray} from "../../../common/form/fields/FieldArray";
+import {Validation} from "../../../../constants/GlobalValidationSchema";
 
 const actions = container.resolve(RepositoryActions);
 
@@ -42,14 +43,7 @@ export const RepositoryCreateView: FunctionComponent = () => {
             <BaseFormView lg={6} md={8} title={"Create repository"} initialValues={initialValues} onSubmit={onSubmit}
                           onCancel={() => setCancelled(true)}
                           saveActionLoadable={loadable}
-                          validationSchema={Yup.object().shape(
-                              {
-                                  name: Yup.string().required().min(3).max(100),
-                                  languages: Yup.array().required().of(Yup.object().shape({
-                                      name: Yup.string().label("name").required("This field is required").min(2).max(50),
-                                      abbreviation: Yup.string().label("name").required("This field is required").min(2).max(10)
-                                  }))
-                              })}
+                          validationSchema={Validation.REPOSITORY_CREATION}
             >
                 <>
                     <TextField label="Name" name="name" required={true}/>

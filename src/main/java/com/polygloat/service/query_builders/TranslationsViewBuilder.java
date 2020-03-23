@@ -33,6 +33,8 @@ public class TranslationsViewBuilder {
 
         Expression<String> fullPath = source.get(Source_.name);
 
+        selection.add(source.get(Source_.id));
+
         selection.add(fullPath);
 
         Join<Source, Repository> repository = source.join(Source_.repository);

@@ -6,7 +6,9 @@
 <h2>Some basic translations</h2>
 <div>
   {{ 'sampleApp.this_is_standard_text_somewhere_in_dom' | translate }}<br/>
-  {{ 'sampleApp.this_is_another_standard_text_somewhere_in_dom' | translate }}
+  {{ 'sampleApp.this_is_another_standard_text_somewhere_in_dom' | translate }}<br/>
+  {{ 'sampleApp.this_is_another_standard_text_somewhere_in_dom_with_param' | translate:params }}<br/>
+  {{ 'sampleApp.this_is_another_standard_text_somewhere_in_dom_with_param2' | translate:params }}
 </div>
 
 <h2>Service defined translation</h2>
@@ -17,7 +19,9 @@
 <h3>Textarea with placeholder and value in inner HTML</h3>
 <label>
   <textarea
-    placeholder="{{ 'sampleApp.this_is_textarea_with_placeholder_and_value' | translate }}">{{ 'sampleApp.this_is_textarea_with_placeholder_and_value' | translate }}</textarea>
+    placeholder="{{ 'sampleApp.this_is_textarea_with_placeholder_and_value' | translate:params }}">
+{{ 'sampleApp.this_is_textarea_with_placeholder_and_value' | translate:params }}
+  </textarea>
 </label>
 
 <h3>Textarea with translated value in inner HTML</h3>

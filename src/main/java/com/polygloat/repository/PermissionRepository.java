@@ -15,7 +15,8 @@ public interface PermissionRepository extends JpaRepository<Permission, Long> {
 
     LinkedHashSet<Permission> getAllByRepositoryAndUserNotNull(com.polygloat.model.Repository repository);
 
-    @Query("from Permission p join Repository r on r = p.repository where p.user = ?1 and r.deleted = false order by r.name")
+    @Query("from Permission p join Repository r on r = p.repository where p.user = ?1 order by r.name")
     LinkedHashSet<Permission> findAllByUser(UserAccount userAccount);
 
+    void deleteAllByRepositoryId(Long repositoryId);
 }

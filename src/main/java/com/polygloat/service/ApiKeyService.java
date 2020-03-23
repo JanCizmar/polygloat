@@ -63,4 +63,8 @@ public class ApiKeyService {
     public void editApiKey(ApiKey apiKey) {
         apiKeyRepository.save(apiKey);
     }
+
+    public void deleteAllByRepository(Long repositoryId) {
+        apiKeyRepository.deleteAllByRepositoryId(repositoryId);
+    }
 }

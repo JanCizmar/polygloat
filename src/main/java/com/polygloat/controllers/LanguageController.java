@@ -1,9 +1,11 @@
 package com.polygloat.controllers;
 
+import com.polygloat.constants.Message;
 import com.polygloat.dtos.request.LanguageDTO;
 import com.polygloat.dtos.request.validators.LanguageValidator;
 import com.polygloat.exceptions.NotFoundException;
 import com.polygloat.model.Language;
+import com.polygloat.model.Permission;
 import com.polygloat.model.Repository;
 import com.polygloat.service.LanguageService;
 import com.polygloat.service.RepositoryService;
@@ -31,7 +33,7 @@ public class LanguageController implements IController {
     public LanguageDTO createLanguage(@PathVariable("repositoryId") Long repositoryId,
                                       @RequestBody @Valid LanguageDTO dto) {
         Repository repository = repositoryService.findById(repositoryId).orElseThrow(NotFoundException::new);
-
+        securityService.checkRepositoryPermission(repositoryId, Permission.RepositoryPermissionType.MANAGE);
         languageValidator.validateCreate(dto, repository);
         Language language = languageService.createLanguage(dto, repository);
         return LanguageDTO.fromEntity(language);
@@ -39,9 +41,9 @@ public class LanguageController implements IController {
 
     @PostMapping(value = "/edit")
     public LanguageDTO editLanguage(@RequestBody @Valid LanguageDTO dto) {
-
         languageValidator.validateEdit(dto);
-
+        Language language = languageService.findById(dto.getId()).orElseThrow(() -> new NotFoundException(Message.LANGUAGE_NOT_FOUND));
+        securityService.checkRepositoryPermission(language.getRepository().getId(), Permission.RepositoryPermissionType.MANAGE);
         return LanguageDTO.fromEntity(languageService.editLanguage(dto));
     }
 
@@ -60,6 +62,8 @@ public class LanguageController implements IController {
 
     @DeleteMapping(value = "/{id}")
     public void deleteLanguage(@PathVariable Long id) {
+        Language language = languageService.findById(id).orElseThrow(() -> new NotFoundException(Message.LANGUAGE_NOT_FOUND));
+        securityService.checkRepositoryPermission(language.getRepository().getId(), Permission.RepositoryPermissionType.MANAGE);
         languageService.deleteLanguage(id);
     }
 }

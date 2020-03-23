@@ -2,6 +2,8 @@ package com.polygloat.controllers;
 
 import com.polygloat.helpers.JsonHelper;
 import com.polygloat.model.UserAccount;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.testng.annotations.BeforeMethod;
@@ -9,6 +11,8 @@ import org.testng.annotations.BeforeMethod;
 import static com.polygloat.controllers.LoggedRequestFactory.loggedGet;
 import static com.polygloat.controllers.LoggedRequestFactory.loggedPost;
 
+@SpringBootTest
+@AutoConfigureMockMvc
 public abstract class SignedInControllerTest extends AbstractControllerTest {
     UserAccount userAccount;
 

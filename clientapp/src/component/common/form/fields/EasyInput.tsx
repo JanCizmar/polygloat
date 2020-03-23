@@ -1,5 +1,5 @@
 import {default as React, FunctionComponent} from 'react';
-import {Input, InputProps} from '@material-ui/core';
+import {FormHelperText, Input, InputProps} from '@material-ui/core';
 import {useField} from 'formik';
 
 interface EasyInputProps {
@@ -12,5 +12,10 @@ type Props = EasyInputProps & InputProps
 export const EasyInput: FunctionComponent<Props> = (props) => {
 
     const [field, meta, helpers] = useField(props.name);
-    return <Input fullWidth={props.fullWidth ? props.fullWidth : true} {...field} {...props} error={!!meta.error}/>;
+    return (
+        <>
+            <Input {...field} {...props} error={!!meta.error}/>
+            <FormHelperText error>{meta.error}</FormHelperText>
+        </>
+    );
 };

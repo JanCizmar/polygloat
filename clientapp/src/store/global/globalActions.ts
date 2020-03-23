@@ -40,7 +40,7 @@ export class GlobalActions extends AbstractLoadableActions<GlobalState> {
             {...state, security: <SecurityDTO>{...state.security, jwtToken: null, allowPrivate: false}}
         ));
     login = this.buildLoginAction('LOGIN', v => this.securityService.login(v));
-    resetPasswordRequest = this.createPromiseAction('PASSWORD_RESET_REQUEST',
+    /*resetPasswordRequest = this.createPromiseAction('PASSWORD_RESET_REQUEST',
         (email) => this.securityService.resetPasswordRequest(email))
         .build.onPending((state, action) => {
             return <GlobalState>{...state, passwordResetLoading: true, passwordResetSent: false, passwordResetError: null};
@@ -53,7 +53,7 @@ export class GlobalActions extends AbstractLoadableActions<GlobalState> {
                 passwordResetLoading: false,
                 passwordResetError: action.payload.code
             };
-        });
+        });*/
     resetPasswordValidate = this.createPromiseAction<never, ErrorResponseDTO>('RESET_PASSWORD_VALIDATE',
         this.securityService.resetPasswordValidate)
         .build.onPending((state, action) => {
@@ -106,11 +106,10 @@ export class GlobalActions extends AbstractLoadableActions<GlobalState> {
                 confirmationDialog: null
             }));
 
-    get loadableDefinitions() {
-        return {
-            userData: this.createLoadableDefinition<UserDTO>(this.userService.getUserData),
-            remoteConfig: this.createLoadableDefinition<RemoteConfigurationDTO>(() => this.configService.getConfiguration())
-        }
+    readonly loadableDefinitions = {
+        userData: this.createLoadableDefinition<UserDTO>(this.userService.getUserData),
+        remoteConfig: this.createLoadableDefinition<RemoteConfigurationDTO>(() => this.configService.getConfiguration()),
+        resetPasswordRequest: this.createLoadableDefinition(this.securityService.resetPasswordRequest)
     };
 
     get prefix(): string {

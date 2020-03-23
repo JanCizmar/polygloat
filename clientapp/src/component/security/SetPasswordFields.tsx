@@ -6,11 +6,6 @@ interface SetPasswordFieldsProps {
 
 }
 
-export const setPasswordValidationSchema = {
-    password: Yup.string().min(8).max(100).required(),
-    passwordRepeat: Yup.string().oneOf([Yup.ref('password'), null], 'Passwords must match').required()
-};
-
 export const SetPasswordFields: FunctionComponent<SetPasswordFieldsProps> = (props) => {
     return (
         <>

@@ -12,7 +12,7 @@ import {NgxPolygloatModule} from "ngx-polygloat";
     BrowserModule,
     NgxPolygloatModule.forRoot({
       apiUrl: "http://localhost:8080",
-      apiKey: "g35eunaq1g4iq7asumihiidh33",
+      apiKey: "bf5iddr7dc47m74q7cg3tfkud4",
     })
   ],
   providers: [],

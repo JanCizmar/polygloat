@@ -1,9 +1,10 @@
 import {NodeHelper} from '../helpers/NodeHelper';
-import {PolygloatSimpleSpanElement} from '../Types';
+import {PolygloatData, PolygloatSimpleSpanElement} from '../Types';
 import {PolygloatService} from '../services/polygloatService';
 import {Properties} from '../Properties';
 import {container, injectable} from 'tsyringe';
 import {TranslationHighlighter} from '../TranslationHighlighter';
+import {Utils} from "tslint";
 
 @injectable()
 export class BasicTextHandler {
@@ -15,34 +16,39 @@ export class BasicTextHandler {
     }
 
     async refresh(node: Element) {
-        let input = (node as PolygloatSimpleSpanElement).__polygloat.input;
-        node.innerHTML = await this.service.getTranslation(input, this.properties.currentLanguage);
+        const data = (node as PolygloatSimpleSpanElement).__polygloat;
+        node.innerHTML = await this.service.translate(data.input, data.params, this.properties.currentLanguage);
     }
 
     async handleNewNode(node: Element): Promise<void> {
-        node.innerHTML = node.innerHTML.replace(
-            new RegExp(`${this.properties.config.inputPrefix}(.*?)${this.properties.config.inputPostfix}`, 'gm'),
-            '<span _polygloat>$1</span>');
+        let xPathResult = document.evaluate(`./text()[contains(.,'${this.properties.config.inputPrefix}')]`, node);
 
-        await this.renderTranslations(node, true, '.');
-    }
+        for (const element of NodeHelper.nodeListToArray(xPathResult)) {
+            //create virtual element to replace multiple text siblings in it
+            const spanPromises: Promise<PolygloatSimpleSpanElement>[] = [];
 
-    async renderTranslations(node: Element, addListener: boolean, xPathPrefix: string) {
-        let nodeList = document.evaluate(`${xPathPrefix}/span[@_polygloat]`, node);
-        for (const span of NodeHelper.nodeListToArray(nodeList)) {
-            let input = span.innerHTML;
+            element.textContent.replace(this.service.unWrapRegex, (_, g1) => {
+                spanPromises.push(this.createSpan(this.service.parseUnwrapped(g1)));
+                return null;
+            });
 
-            this.addPolygloatToPrototype(span);
-
-            if (addListener) {
-                this.highlighter.listen(span);
-            }
-
-            (span as PolygloatSimpleSpanElement).__polygloat = {input};
-
-            span.innerHTML = await this.service.getTranslation(input, this.properties.currentLanguage);
+            element.replaceWith(...await Promise.all(spanPromises));
         }
     }
+
+    readonly createSpan = async (data: PolygloatData): Promise<PolygloatSimpleSpanElement> => {
+        const span: PolygloatSimpleSpanElement = document.createElement("span") as PolygloatSimpleSpanElement;
+        span.setAttribute("_polygloat", "");
+
+        this.addPolygloatToPrototype(span);
+
+        span.__polygloat = {...data};
+        let translation = await this.service.getTranslation(data.input, this.properties.currentLanguage);
+        span.innerHTML = this.service.replaceParams(translation, data.params);
+
+        this.highlighter.listen(span);
+        return span;
+    };
 
     private addPolygloatToPrototype(span) {
         let spanPrototype = Object.getPrototypeOf(span);

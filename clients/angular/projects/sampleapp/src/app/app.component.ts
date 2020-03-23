@@ -25,4 +25,7 @@ export class AppComponent implements OnInit {
   setLang(lang: string) {
     this.translateService.setLang(lang);
   }
+
+  params = {name: "Honza", surname: "Cizmar", title: "title"};
+
 }

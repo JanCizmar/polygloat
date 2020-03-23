@@ -5,15 +5,11 @@ import com.polygloat.exceptions.NotFoundException;
 import com.polygloat.helpers.JsonHelper;
 import com.polygloat.model.Language;
 import com.polygloat.model.Repository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.transaction.annotation.Transactional;
 import org.testng.annotations.Test;
 
 import java.util.Optional;
@@ -25,26 +21,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-@Transactional
 public class LanguageControllerTest extends SignedInControllerTest implements ITest {
 
     private final LanguageDTO languageDTO = new LanguageDTO("en", "en");
     private final LanguageDTO languageDTOBlank = new LanguageDTO(null, "");
     private final LanguageDTO languageDTOCorrect = new LanguageDTO("Espanol", "es");
 
-
-    @Autowired
-    LanguageController languageController;
-    //  private MockMvc languageMvc;
-
-  /*  @BeforeMethod
-    public void setup() {
-        languageMvc = MockMvcBuilders.standaloneSetup(languageController).setControllerAdvice(new ExceptionHandlers()).build();
-    }*/
-
     @Test
-    @Rollback
     void createLanguage() throws Exception {
         Repository test = dbPopulator.createBase(generateUniqueString());
         createLanguageTestValidation(test.getId());
@@ -52,7 +35,6 @@ public class LanguageControllerTest extends SignedInControllerTest implements IT
     }
 
     @Test
-    @Rollback
     void editLanguage() throws Exception {
         Repository test = dbPopulator.createBase(generateUniqueString());
         Language en = test.getLanguage("en").orElseThrow(NotFoundException::new);
@@ -73,15 +55,14 @@ public class LanguageControllerTest extends SignedInControllerTest implements IT
     }
 
     @Test
-    @Rollback
     void findAllLanguages() throws Exception {
         Repository test = dbPopulator.createBase(generateUniqueString());
+        //commitTransaction();
         MvcResult mvcResult = performFindAll(test.getId()).andExpect(status().isOk()).andReturn();
         assertThat(decodeJson(mvcResult.getResponse().getContentAsString(), Set.class)).hasSize(2);
     }
 
     @Test
-    @Rollback
     void deleteLanguage() throws Exception {
         Repository test = dbPopulator.createBase(generateUniqueString());
         Language en = test.getLanguage("en").orElseThrow(NotFoundException::new);

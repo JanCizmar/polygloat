@@ -38,8 +38,6 @@ export const RepositoryPermissionsView: FunctionComponent = () => {
 
     let state = useSelector((state: AppState) => state.repositoryPermission);
 
-    useSelector((state: AppState) => state.global.security.jwtToken);
-
     useEffect(() => {
         if (!state.loadables.list.loading) {
             actions.loadableActions.list.dispatch(repositoryId);

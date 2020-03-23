@@ -8,30 +8,24 @@ import CheckCircleTwoToneIcon from '@material-ui/icons/CheckCircleTwoTone';
 import ErrorTwoToneIcon from '@material-ui/icons/ErrorTwoTone';
 import {MessageActions} from '../store/global/messageActions';
 import {ErrorResponseDTO} from "./response.types";
+import {VariantType} from "notistack";
 
 @singleton()
 export class messageService {
     constructor(private actions: MessageActions) {
     }
 
-    yell(message: ReactElement | string, undoAction?: Action) {
-        this.actions.showMessage.dispatch(new Message(message, undoAction));
+    yell(message: ReactElement | string, variant: VariantType) {
+        this.actions.showMessage.dispatch(new Message(message, variant));
     }
 
     success(message: string) {
-        this.yell(
-            <Box display="flex" alignItems="center">
-                <Box display="inline" mr={1}><CheckCircleTwoToneIcon htmlColor={green['500']}/></Box>{message}
-            </Box>);
+        this.yell(message, "success");
     }
 
     error(message: string) {
-        this.yell(
-            <Box display="flex" alignItems="center">
-                <Box display="inline" mr={1}><ErrorTwoToneIcon htmlColor={red['500']}/></Box>{message}
-            </Box>);
+        this.yell(message, "error");
     }
-
 }
 
 

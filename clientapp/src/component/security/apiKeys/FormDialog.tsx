@@ -12,6 +12,7 @@ import {FormikProps} from "formik";
 import {CheckBoxGroupMultiSelect} from "../../common/form/fields/CheckBoxGroupMultiSelect";
 import {ApiKeyDTO} from "../../../service/response.types";
 import {EditApiKeyDTO} from "../../../service/request.types";
+import {Validation} from "../../../constants/GlobalValidationSchema";
 
 interface Value {
     scopes: string[],
@@ -83,14 +84,6 @@ export const FormDialog: FunctionComponent<Props> = (props) => {
         }
     };
 
-    const validationSchema = Yup.object().shape({
-        repositoryId: props.editKey && props.editKey.repositoryId && Yup.number().required(),
-        scopes: Yup.mixed().test(
-            "is-set",
-            'Set at least one scope',
-            v => !!(v as Set<string>).size
-        )
-    });
 
     return (
         <Dialog open={true} onClose={onDialogClose} fullWidth maxWidth={"xs"}>
@@ -101,7 +94,7 @@ export const FormDialog: FunctionComponent<Props> = (props) => {
                 <StandardForm onSubmit={onSubmit}
                               onCancel={() => onDialogClose()}
                               initialValues={getInitialValues()}
-                              validationSchema={validationSchema}
+                              validationSchema={props.editKey && props.editKey.repositoryId ? Validation.EDIT_API_KEY : Validation.CREATE_API_KEY}
                               submitButtonInner={props.editKey ? "Save" : "Generate"}
                 >
                     {(formikProps: FormikProps<Value>) => <>

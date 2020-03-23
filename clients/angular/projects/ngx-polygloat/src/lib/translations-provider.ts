@@ -6,7 +6,6 @@ import {TranslateService} from "./translate.service";
 export class TranslationsProvider {
 
   constructor(private translateService: TranslateService) {
-    console.log("provider");
   }
 
   async load(options: PolygloatConfig) {

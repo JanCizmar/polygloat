@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
 @Data
 @Builder
@@ -19,7 +18,6 @@ public class EditSourceDTO {
     private String oldFullPathString;
 
     @NotBlank
-    @Size(min = 1, max = 300)
     private String newFullPathString;
 
     public PathDTO getOldPathDto() {

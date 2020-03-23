@@ -1,14 +1,13 @@
 import {TranslationData} from '../DTOs/TranslationData';
 import {Properties, Scope} from '../Properties';
 import {singleton} from 'tsyringe';
-
-type Translations = { [key: string]: string | Translations };
+import {PolygloatData, TranslationParams, Translations} from "../Types";
 
 @singleton()
 export class PolygloatService {
 
     private translationsCache: Map<string, Translations> = new Map<string, Translations>();
-    private fetchPromise: Promise<any>;
+    private fetchPromises: Promise<any>[] = [];
 
     constructor(private properties: Properties) {
     };
@@ -16,12 +15,12 @@ export class PolygloatService {
     async getTranslations(lang: string) {
         this.checkScopes("translations.view");
         if (this.translationsCache.get(lang) == undefined) {
-            if (!(this.fetchPromise instanceof Promise)) {
-                this.fetchPromise = this.fetchTranslations(lang);
+            if (!(this.fetchPromises[lang] instanceof Promise)) {
+                this.fetchPromises[lang] = this.fetchTranslations(lang);
             }
-            await this.fetchPromise;
+            await this.fetchPromises[lang];
         }
-        this.fetchPromise = undefined;
+        this.fetchPromises[lang] = undefined;
         return this.translationsCache.get(lang);
     }
 
@@ -33,17 +32,25 @@ export class PolygloatService {
 
     async getTranslation(name: string, lang: string = this.properties.currentLanguage): Promise<string> {
         await this.getTranslations(lang);
+        if (lang !== this.properties.defaultLanguage && !this.getFromCache(name, lang)) {
+            await this.getTranslations(this.properties.defaultLanguage);
+            return this.instant(name, this.properties.defaultLanguage);
+        }
         return this.instant(name, lang);
     }
 
     readonly getScopes = async () => (await fetch(this.getUrl(`scopes`))).json();
 
-    instant(name: string, lang: string): string {
+    instant(name: string, lang: string = this.properties.currentLanguage): string {
+        return this.getFromCache(name, lang) || this.getFromCache(name, this.properties.defaultLanguage) || name;
+    }
+
+    getFromCache(name: string, lang: string = this.properties.currentLanguage): string {
         const path = name.split('.');
         let root: string | Translations = this.translationsCache.get(lang);
         for (const item of path) {
             if (root[item] === undefined) {
-                return name;
+                return undefined;
             }
             root = root[item];
         }
@@ -91,20 +98,52 @@ export class PolygloatService {
         });
     }
 
+    async translate(input: string, params: TranslationParams, lang = this.properties.currentLanguage) {
+        return this.replaceParams(await this.getTranslation(input, lang), params)
+    }
+
     async replace(text: string, lang: string = this.properties.currentLanguage)
         : Promise<{ inputs: string[], newValue: string, oldValue: string }> {
         //to ensure, that translations are loaded before instant is called
         let inputs: string[] = [];
         await this.getTranslations(lang);
         let oldValue = text;
-        text = text.replace(
-            new RegExp(`${this.properties.config.inputPrefix}(.*?)${this.properties.config.inputPostfix}`, 'gm'),
-            (_, g1) => {
-                inputs.push(g1);
-                return this.instant(g1, lang);
-            });
 
+        text = text.replace(this.unWrapRegex, (_, g1) => {
+                let data = this.parseUnwrapped(g1);
+                inputs.push(data.input);
+                return this.replaceParams(this.instant(data.input, lang), data.params);
+            }
+        );
         return {inputs, newValue: text, oldValue};
+    }
+
+    readonly parseUnwrapped = (unWrappedString: string): PolygloatData => {
+        const strings = unWrappedString.split(/(?<!\\):|(?<!\\),/);
+        const result = {input: strings.shift(), params: {}};
+
+        while (strings.length) {
+            const [name, value] = strings.splice(0, 2);
+            result.params[name] = value;
+        }
+        return result;
+    };
+
+    readonly replaceParams = (translation: string, params: TranslationParams): string => {
+        let result = translation;
+        const regExp = (name) => new RegExp("(?<!\\\\){(?<!\\\\){\\\s*" + this.escapeRegExp(name) + "\\\s*(?<!\\\\)}(?<!\\\\)}");
+        Object.entries(params).forEach(([name, value]) =>
+            //replace all unescaped param template fields (the regex is this complicated because of lookbehinds)
+            result = result.replace(regExp(name), value));
+        return result;
+    };
+
+    readonly escapeRegExp = (string: string) => {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+    };
+
+    get unWrapRegex() {
+        return new RegExp(`${this.properties.config.inputPrefix}(.*?)${this.properties.config.inputPostfix}`, 'gm');
     }
 
     isKeyAllowed(...scopes: Scope[]) {

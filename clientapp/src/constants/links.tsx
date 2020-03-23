@@ -130,6 +130,7 @@ export class LINKS {
 
     static REPOSITORY_PERMISSIONS = Link.ofParent(LINKS.REPOSITORY_MANAGE, 'permissions');
 
-
     static REPOSITORY_LANGUAGES_CREATE = Link.ofParent(LINKS.REPOSITORY_LANGUAGES, 'add');
+
+    static REPOSITORY_IMPORT_EXPORT = Link.ofParent(LINKS.REPOSITORY, "import");
 }

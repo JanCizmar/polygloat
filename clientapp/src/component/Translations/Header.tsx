@@ -1,9 +1,9 @@
 import * as React from 'react';
 import {FunctionComponent, useContext} from 'react';
-import {Box} from "@material-ui/core";
+import {Box, Checkbox} from "@material-ui/core";
 import {TableCell} from "./TableCell";
-import {TranslationListContext} from "./TranslationsGrid";
-import {RowContext} from "./SourceTranslations";
+import {RowContext} from "./TranslationsRow";
+import {TranslationListContext} from "./TtranslationsGridContextProvider";
 
 export const Header: FunctionComponent = (props) => {
 
@@ -11,13 +11,22 @@ export const Header: FunctionComponent = (props) => {
 
     return (
         <Box display="flex" height={40}>
-
             <RowContext.Provider value={{data: null, lastRendered: 0}}>
-                {listContext.headerCells.map(k =>
-                    <TableCell>
-                        {k}
-                    </TableCell>
-                )}
+                <Box>
+                    <Checkbox checked={listContext.isAllChecked()}
+                              indeterminate={!listContext.isAllChecked() && listContext.isSomeChecked()}
+                              onChange={() => listContext.checkAllToggle()}/>
+                </Box>
+                <Box display="flex" flexGrow={1}>
+                    {listContext.headerCells.map((inner, key) =>
+                        <TableCell key={key}>
+                            {inner}
+                        </TableCell>
+                    )}
+                </Box>
+                {/*The size of advanced view icon in rows*/}
+                {/*<Box width={"24px"}>*/}
+                {/*</Box>*/}
             </RowContext.Provider>
         </Box>
     )

@@ -13,11 +13,14 @@ public class SourceDTO {
     private PathDTO path;
 
     @Getter
+    private Long id;
+
+    @Getter
     private Map<String, String> translations = new LinkedHashMap<>();
 
     public SourceDTO(Object[] queryResult) {
         LinkedList<Object> data = new LinkedList<>(Arrays.asList(queryResult));
-
+        this.id = (Long) data.removeFirst();
         this.path = PathDTO.fromFullPath((String) data.removeFirst());
 
         for (int i = 0; i < data.size(); i = i + 2) {
