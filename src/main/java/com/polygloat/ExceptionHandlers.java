@@ -6,6 +6,7 @@ import com.polygloat.dtos.request.validators.ValidationErrorType;
 import com.polygloat.dtos.request.validators.exceptions.ValidationException;
 import com.polygloat.exceptions.ErrorException;
 import com.polygloat.exceptions.ErrorResponseBody;
+import com.polygloat.exceptions.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -46,5 +47,10 @@ public class ExceptionHandlers {
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ErrorResponseBody> handleServerError(EntityNotFoundException ex) {
         return new ResponseEntity<>(new ErrorResponseBody(Message.RESOURCE_NOT_FOUND.getCode(), null), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ErrorResponseBody> handleNotFound(NotFoundException ex) {
+        return new ResponseEntity<>(new ErrorResponseBody(ex.getMsg().getCode(), null), HttpStatus.NOT_FOUND);
     }
 }

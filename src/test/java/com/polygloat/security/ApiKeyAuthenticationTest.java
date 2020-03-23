@@ -75,4 +75,12 @@ public class ApiKeyAuthenticationTest extends AbstractUserAppApiTest {
     }
 
 
+    @Test
+    public void accessWithApiKey_getLanguages() {
+        ApiKeyDTO apiKey = createBaseWithApiKey(ApiScope.TRANSLATIONS_VIEW);
+        performAction(buildAction().method(HttpMethod.GET).apiKey(apiKey.getKey()).url("/uaa/languages").expectedStatus(HttpStatus.FORBIDDEN));
+
+        apiKey = createBaseWithApiKey(ApiScope.TRANSLATIONS_EDIT);
+        performAction(buildAction().method(HttpMethod.GET).apiKey(apiKey.getKey()).url("/uaa/languages").expectedStatus(HttpStatus.OK));
+    }
 }

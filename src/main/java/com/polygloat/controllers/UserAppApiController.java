@@ -6,13 +6,11 @@ import com.polygloat.dtos.PathDTO;
 import com.polygloat.dtos.request.SetTranslationsDTO;
 import com.polygloat.exceptions.NotFoundException;
 import com.polygloat.model.ApiKey;
+import com.polygloat.model.Language;
 import com.polygloat.model.Repository;
 import com.polygloat.model.Source;
 import com.polygloat.security.AuthenticationFacade;
-import com.polygloat.service.RepositoryService;
-import com.polygloat.service.SecurityService;
-import com.polygloat.service.SourceService;
-import com.polygloat.service.TranslationService;
+import com.polygloat.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +30,7 @@ public class UserAppApiController implements IController {
     private final RepositoryService repositoryService;
     private final SecurityService securityService;
     private final AuthenticationFacade authenticationFacade;
+    private final LanguageService languageService;
 
     @GetMapping(value = "/{languages}")
     public Map<String, Object> getTranslations(@PathVariable("languages") String languages) {
@@ -63,6 +62,13 @@ public class UserAppApiController implements IController {
         Repository repository = repositoryService.findById(apiKey.getRepository().getId()).orElseThrow(() -> new NotFoundException(Message.REPOSITORY_NOT_FOUND));
         Source source = sourceService.getOrCreateSource(repository, PathDTO.fromFullPath(dto.getSourceFullPath()));
         translationService.setForSource(source, dto.getTranslations());
+    }
+
+    @GetMapping("/languages")
+    public Set<String> getLanguages() {
+        ApiKey apiKey = authenticationFacade.getApiKey();
+        securityService.checkApiKeyScopes(Set.of(ApiScope.TRANSLATIONS_EDIT), apiKey);
+        return languageService.findAll(apiKey.getRepository().getId()).stream().map(Language::getAbbreviation).collect(Collectors.toSet());
     }
 
     @GetMapping("/scopes")

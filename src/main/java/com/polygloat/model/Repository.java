@@ -23,6 +23,7 @@ public class Repository extends AuditModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @OrderBy("abbreviation")
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "repository")
     private Set<Language> languages = new LinkedHashSet<>();
 

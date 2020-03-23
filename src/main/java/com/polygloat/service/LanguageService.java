@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -72,7 +73,7 @@ public class LanguageService {
         return languageRepository.findByAbbreviationAndRepositoryId(abbreviation, repositoryId);
     }
 
-    public Set<Language> findByAbbreviations(Set<String> abbreviations, Long repositoryId) {
+    public Set<Language> findByAbbreviations(Collection<String> abbreviations, Long repositoryId) {
         Set<Language> langs = languageRepository.findAllByAbbreviationInAndRepositoryId(abbreviations, repositoryId);
         if (!langs.stream().map(Language::getAbbreviation).collect(Collectors.toSet()).containsAll(abbreviations)) {
             throw new NotFoundException(Message.LANGUAGE_NOT_FOUND);

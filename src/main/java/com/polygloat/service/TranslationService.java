@@ -54,28 +54,32 @@ public class TranslationService {
         return langTranslations;
     }
 
-    public Map<String, String> getSourceTranslationsResult(Long repositoryId, PathDTO path, Set<String> languages) {
+    public Map<String, String> getSourceTranslationsResult(Long repositoryId, PathDTO path, Set<String> languageAbbreviations) {
         Repository repository = repositoryService.findById(repositoryId).orElseThrow(NotFoundException::new);
         Source source = sourceService.getSource(repository, path).orElse(null);
 
-        if (languages == null) {
-            languages = languageService.getImplicitLanguages(repository).stream().map(Language::getAbbreviation).collect(Collectors.toSet());
+
+        Set<Language> languages;
+        if (languageAbbreviations == null) {
+            languages = languageService.getImplicitLanguages(repository);
+        } else {
+            languages = languageService.findByAbbreviations(languageAbbreviations, repositoryId);
         }
 
         Set<Translation> translations = getSourceTranslations(languages, repository, source);
 
         Map<String, String> translationsMap = translations.stream().collect(Collectors.toMap(v -> v.getLanguage().getAbbreviation(), Translation::getText));
 
-        for (String language : languages) {
-            if (translationsMap.keySet().stream().filter(l -> l.equals(language)).findAny().isEmpty()) {
-                translationsMap.put(language, "");
+        for (Language language : languages) {
+            if (translationsMap.keySet().stream().filter(l -> l.equals(language.getAbbreviation())).findAny().isEmpty()) {
+                translationsMap.put(language.getAbbreviation(), "");
             }
         }
 
         return translationsMap;
     }
 
-    private Set<Translation> getSourceTranslations(Set<String> languages, Repository repository, Source source) {
+    private Set<Translation> getSourceTranslations(Set<Language> languages, Repository repository, Source source) {
         if (source != null) {
             return translationRepository.getTranslations(source, repository, languages);
         }

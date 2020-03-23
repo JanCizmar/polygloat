@@ -8,6 +8,7 @@ export class PolygloatService {
 
     private translationsCache: Map<string, Translations> = new Map<string, Translations>();
     private fetchPromises: Promise<any>[] = [];
+    private languagePromise: Promise<string[]>;
 
     constructor(private properties: Properties) {
     };
@@ -24,10 +25,24 @@ export class PolygloatService {
         return this.translationsCache.get(lang);
     }
 
+    async getLanguages() {
+        if (!(this.languagePromise instanceof Promise)) {
+            this.languagePromise = (await fetch(this.getUrl(`languages`))).json();
+        }
+
+        const languages = await this.languagePromise;
+
+        let set = new Set(languages);
+        this.preferredLanguages = this.preferredLanguages.filter(l => set.has(l));
+
+        return languages;
+    }
+
     async fetchTranslations(lang: string) {
         //await new Promise(resolve => setTimeout(resolve, 5000));
         let requestResult = await fetch(this.getUrl(`${lang}`));
-        this.translationsCache.set(lang, (await requestResult.json())[lang]);
+        let data = (await requestResult.json());
+        this.translationsCache.set(lang, data[lang]);
     }
 
     async getTranslation(name: string, lang: string = this.properties.currentLanguage): Promise<string> {
@@ -57,10 +72,19 @@ export class PolygloatService {
         return root as string;
     }
 
-    getSourceTranslations = async (sourceText: string): Promise<TranslationData> => {
+    getSourceTranslations = async (sourceText: string, languages: string[] = [this.properties.currentLanguage]): Promise<TranslationData> => {
         this.checkScopes("translations.view");
-        let data = await (await fetch(this.getUrl(`source/${sourceText}`)))
-            .json();
+        let response = await fetch(this.getUrl(`source/${sourceText}/${languages.join(",")}`));
+        let data = await response.json();
+
+        if (response.status === 404) {
+            if (data.code && data.code === "language_not_found") {
+                this.preferredLanguages = await this.getLanguages();
+                console.error("Requested language not found, refreshing the page!");
+                location.reload();
+            }
+        }
+
         return new TranslationData(sourceText, data);
     };
 
@@ -154,6 +178,14 @@ export class PolygloatService {
         if (!this.isKeyAllowed(...scopes)) {
             throw new Error("Api key not permitted to do this, please add 'translations.view' scope.");
         }
+    }
+
+    set preferredLanguages(languages: string[]) {
+        localStorage.setItem("__polygloat_preferredLanguages", JSON.stringify(languages));
+    }
+
+    get preferredLanguages(): string[] {
+        return JSON.parse(localStorage.getItem("__polygloat_preferredLanguages"));
     }
 
     readonly getUrl = (path: string) => `${this.properties.config.apiUrl}/uaa/${path}?ak=${this.properties.config.apiKey}`;
