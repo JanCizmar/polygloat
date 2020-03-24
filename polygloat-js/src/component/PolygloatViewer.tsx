@@ -1,5 +1,5 @@
 import * as React from 'react';
-import TranslationDialog from './TranslatonDialog';
+import {TranslationDialog} from "./TranslationDialog";
 
 type ViewerProps = {
 }

@@ -25,16 +25,13 @@ export class PolygloatService {
         return this.translationsCache.get(lang);
     }
 
-    async getLanguages() {
+    async getLanguages(): Promise<Set<string>> {
         if (!(this.languagePromise instanceof Promise)) {
             this.languagePromise = (await fetch(this.getUrl(`languages`))).json();
         }
 
-        const languages = await this.languagePromise;
-
-        let set = new Set(languages);
-        this.preferredLanguages = this.preferredLanguages.filter(l => set.has(l));
-
+        const languages = new Set(await this.languagePromise as string[]);
+        this.preferredLanguages = new Set<string>(Array.from(this.preferredLanguages).filter(l => languages.has(l)));
         return languages;
     }
 
@@ -72,14 +69,14 @@ export class PolygloatService {
         return root as string;
     }
 
-    getSourceTranslations = async (sourceText: string, languages: string[] = [this.properties.currentLanguage]): Promise<TranslationData> => {
+    getSourceTranslations = async (sourceText: string, languages: Set<string> = new Set([this.properties.currentLanguage])): Promise<TranslationData> => {
         this.checkScopes("translations.view");
-        let response = await fetch(this.getUrl(`source/${sourceText}/${languages.join(",")}`));
+        let response = await fetch(this.getUrl(`source/${sourceText}/${Array.from(languages).join(",")}`));
         let data = await response.json();
 
         if (response.status === 404) {
             if (data.code && data.code === "language_not_found") {
-                this.preferredLanguages = await this.getLanguages();
+                this.preferredLanguages = new Set(await this.getLanguages());
                 console.error("Requested language not found, refreshing the page!");
                 location.reload();
             }
@@ -180,12 +177,12 @@ export class PolygloatService {
         }
     }
 
-    set preferredLanguages(languages: string[]) {
-        localStorage.setItem("__polygloat_preferredLanguages", JSON.stringify(languages));
+    set preferredLanguages(languages: Set<string>) {
+        localStorage.setItem("__polygloat_preferredLanguages", JSON.stringify(Array.from(languages)));
     }
 
-    get preferredLanguages(): string[] {
-        return JSON.parse(localStorage.getItem("__polygloat_preferredLanguages"));
+    get preferredLanguages(): Set<string> {
+        return new Set(JSON.parse(localStorage.getItem("__polygloat_preferredLanguages")));
     }
 
     readonly getUrl = (path: string) => `${this.properties.config.apiUrl}/uaa/${path}?ak=${this.properties.config.apiKey}`;
