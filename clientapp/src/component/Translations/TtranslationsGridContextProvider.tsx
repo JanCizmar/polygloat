@@ -37,7 +37,7 @@ export const TranslationGridContextProvider: FunctionComponent = (props) => {
     let selectedLanguages = actions.useSelector(s => s.selectedLanguages);
     let translationSaveLoadable = actions.useSelector(s => s.loadables.setTranslations);
 
-    const defaultPerPage = 10;
+    const defaultPerPage = 20;
 
     let messaging = container.resolve(messageService);
 

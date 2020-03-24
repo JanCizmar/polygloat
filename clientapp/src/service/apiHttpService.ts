@@ -62,7 +62,7 @@ export class ApiHttpService {
                 }
                 if (r.status == 403) {
                     redirectionActions.redirect.dispatch(LINKS.AFTER_LOGIN.build());
-                    this.messageService.error("Operation not permitted!")
+                    this.messageService.error("Operation not permitted!");
                     ApiHttpService.getResObject(r).then(b => reject({...b, __handled: true}));
                     return;
                 }
@@ -85,6 +85,11 @@ export class ApiHttpService {
 
     async get<T>(url, queryObject?: { [key: string]: any }): Promise<T> {
         return ApiHttpService.getResObject(await this.fetch(url + (!queryObject ? "" : "?" + this.buildQuery(queryObject))));
+    }
+
+    async getFile(url, queryObject?: { [key: string]: any }): Promise<Blob> {
+        const blob = await (await this.fetch(url + (!queryObject ? "" : "?" + this.buildQuery(queryObject)))).blob();
+        return blob;
     }
 
     async post<T>(url, body): Promise<T> {

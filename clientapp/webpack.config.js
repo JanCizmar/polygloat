@@ -24,9 +24,22 @@ module.exports = env => {
             rules: [{
                 test: /\.tsx?$/,
                 //use: ["babel-loader", 'webpack-conditional-loader'],
-                use: [isDevelopment && "ts-loader" || "babel-loader", 'webpack-conditional-loader'],
+                use: [isDevelopment && "ts-loader" || "babel-loader", 'webpack-conditional-loader',],
                 exclude: [/node_modules/, /lib/],
-            },
+            }, {
+                test: /\.svg$/,
+                use: [
+                    {
+                        loader: "babel-loader"
+                    },
+                    {
+                        loader: "react-svg-loader",
+                        options: {
+                            jsx: true // true outputs JSX tags
+                        }
+                    }
+                ]
+            }
             ]
         },
         optimization: {

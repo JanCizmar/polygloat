@@ -2,7 +2,7 @@ import {ChangeEvent, default as React, FunctionComponent, useEffect, useState} f
 import {useRouteMatch} from 'react-router-dom';
 import {PARAMS} from '../../../../constants/links';
 import {RepositoryPage} from '../RepositoryPage';
-import {Box, Button, FormHelperText, Input, LinearProgress, Paper, Typography} from '@material-ui/core';
+import {Box, Button, FormHelperText, Input, LinearProgress} from '@material-ui/core';
 import {BaseView} from '../../BaseView';
 import {useSelector} from 'react-redux';
 import {AppState} from '../../../../store';
@@ -14,15 +14,15 @@ import {ImportExportActions} from "../../../../store/repository/ImportExportActi
 import {container} from "tsyringe";
 
 type SubtreeType = { [key: string]: string | object };
+const actions = container.resolve(ImportExportActions);
 
-export const ImportExportView: FunctionComponent = () => {
+export const ImportView: FunctionComponent = () => {
     let match = useRouteMatch();
 
     const repositoryId = match.params[PARAMS.REPOSITORY_ID];
 
     let state = useSelector((state: AppState) => state.importExport.loadables.import);
 
-    const actions = container.resolve(ImportExportActions);
 
     const [data, setData] = useState(null);
     const [suggestedName, setSuggestedName] = useState("");
@@ -113,40 +113,41 @@ export const ImportExportView: FunctionComponent = () => {
 
     return (
         <RepositoryPage>
-            <BaseView title="Import/Export translations" xs={12} md={10} lg={8}>
-                <h2>Import translations</h2>
-                {
-                    (data &&
-                        <>
-                            <Preview/>
-                            <Box color="success.main" fontSize={21} fontWeight="400" mt={1}>Successfully loaded {entries.length} items.</Box>
-                            {!state.loaded &&
+            <BaseView title="Import translations" xs={12} md={10} lg={8}>
+                <Box mt={2}>
+                    {
+                        (data &&
                             <>
-                                <StandardForm initialValues={{languageAbbreviation: suggestedName}}
-                                              validationSchema={object().shape({
-                                                  languageAbbreviation: string().required()
-                                              })}
-                                              onSubmit={onImportSubmit}
-                                              onCancel={() => setData(null)}
-                                              loading={state.loading}
-                                              submitButtonInner="Do import!">
-                                    <TextField label="Language abbreviation" name={"languageAbbreviation"}/>
-                                </StandardForm>
-                                {state.loading &&
+                                <Preview/>
+                                <Box color="success.main" fontSize={21} fontWeight="400" mt={1}>Successfully loaded {entries.length} items.</Box>
+                                {!state.loaded &&
                                 <>
-                                    <Box justifyContent="center" display="flex" fontSize={20} color="text.secondary">Importing</Box>
-                                    <LinearProgress/>
-                                </>}
+                                    <StandardForm initialValues={{languageAbbreviation: suggestedName}}
+                                                  validationSchema={object().shape({
+                                                      languageAbbreviation: string().required()
+                                                  })}
+                                                  onSubmit={onImportSubmit}
+                                                  onCancel={() => setData(null)}
+                                                  loading={state.loading}
+                                                  submitButtonInner="Do import!">
+                                        <TextField label="Language abbreviation" name={"languageAbbreviation"}/>
+                                    </StandardForm>
+                                    {state.loading &&
+                                    <>
+                                        <Box justifyContent="center" display="flex" fontSize={20} color="text.secondary">Importing</Box>
+                                        <LinearProgress/>
+                                    </>}
+                                </>
+                                }
                             </>
-                            }
+                        )
+                        ||
+                        <>
+                            <FormHelperText>To import translations select json file.</FormHelperText>
+                            <Input type="file" onChange={fileSelected}/>
                         </>
-                    )
-                    ||
-                    <>
-                        <FormHelperText>To import translations select json file.</FormHelperText>
-                        <Input type="file" onChange={fileSelected}/>
-                    </>
-                }
+                    }
+                </Box>
             </BaseView>
         </RepositoryPage>
     );

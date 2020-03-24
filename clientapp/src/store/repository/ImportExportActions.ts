@@ -1,8 +1,4 @@
 import {container, singleton} from 'tsyringe';
-
-import {repositoryService} from '../../service/repositoryService';
-import {RepositoryDTO} from '../../service/response.types';
-import {LINKS} from "../../constants/links";
 import {AbstractLoadableActions, StateWithLoadables} from "../AbstractLoadableActions";
 import {importExportService} from "../../service/importExportService";
 
@@ -19,7 +15,8 @@ export class ImportExportActions extends AbstractLoadableActions<ImportExportSta
     private service = container.resolve(importExportService);
 
     loadableDefinitions = {
-        import: this.createLoadableDefinition(this.service.doImport)
+        import: this.createLoadableDefinition(this.service.doImport),
+        export: this.createLoadableDefinition(this.service.exportToJsons)
     };
 
     get prefix(): string {

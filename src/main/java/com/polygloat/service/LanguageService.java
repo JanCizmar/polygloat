@@ -1,5 +1,6 @@
 package com.polygloat.service;
 
+import com.polygloat.collections.LanguageSet;
 import com.polygloat.constants.Message;
 import com.polygloat.dtos.request.LanguageDTO;
 import com.polygloat.exceptions.NotFoundException;
@@ -14,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -52,13 +52,13 @@ public class LanguageService {
         return language;
     }
 
-    public Set<Language> getImplicitLanguages(Repository repository) {
-        return repository.getLanguages().stream().limit(2).collect(Collectors.toCollection(LinkedHashSet::new));
+    public LanguageSet getImplicitLanguages(Repository repository) {
+        return repository.getLanguages().stream().limit(2).collect(Collectors.toCollection(LanguageSet::new));
     }
 
     @Transactional
-    public Set<Language> findAll(Long repositoryId) {
-        return new LinkedHashSet<>(languageRepository.findAllByRepositoryId(repositoryId));
+    public LanguageSet findAll(Long repositoryId) {
+        return new LanguageSet(languageRepository.findAllByRepositoryId(repositoryId));
     }
 
     public Optional<Language> findById(Long id) {
@@ -73,12 +73,12 @@ public class LanguageService {
         return languageRepository.findByAbbreviationAndRepositoryId(abbreviation, repositoryId);
     }
 
-    public Set<Language> findByAbbreviations(Collection<String> abbreviations, Long repositoryId) {
+    public LanguageSet findByAbbreviations(Collection<String> abbreviations, Long repositoryId) {
         Set<Language> langs = languageRepository.findAllByAbbreviationInAndRepositoryId(abbreviations, repositoryId);
         if (!langs.stream().map(Language::getAbbreviation).collect(Collectors.toSet()).containsAll(abbreviations)) {
             throw new NotFoundException(Message.LANGUAGE_NOT_FOUND);
         }
-        return langs;
+        return new LanguageSet(langs);
     }
 
     @Transactional
@@ -93,7 +93,7 @@ public class LanguageService {
                 );
     }
 
-    public Set<Language> getLanguagesForTranslationsView(Set<String> languages, Repository repository) {
+    public LanguageSet getLanguagesForTranslationsView(Set<String> languages, Repository repository) {
         if (languages == null) {
             return getImplicitLanguages(repository);
         }

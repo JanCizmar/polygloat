@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {FunctionComponent, useContext, useEffect, useState} from 'react';
-import {Box, Fade, makeStyles, Theme, Tooltip, Typography} from "@material-ui/core";
+import {Box, makeStyles, Theme, Tooltip, Typography} from "@material-ui/core";
 import {createStyles} from "@material-ui/core/styles";
 import {MicroForm} from "../common/form/MicroForm";
 import {EasyInput} from "../common/form/fields/EasyInput";
@@ -39,8 +39,6 @@ export const EditableCell: FunctionComponent<EditableCellProps> = (props) => {
 
     const [editing, setEditing] = useState(false);
     const [overflow, setOverflow] = useState(false);
-    const [overflowChangeApplied, setOverflowChangeApplied] = useState(false);
-
 
     const handleEdit = () => {
         if (props.editEnabled) {
@@ -106,7 +104,7 @@ export const EditableCell: FunctionComponent<EditableCellProps> = (props) => {
 
     return (
         <Box flexGrow={1}>
-            <MicroForm onSubmit={(v: { value: any }) => props.onSubmit(v.value)} initialValues={{value: props.initialValue}}
+            <MicroForm onSubmit={(v: { value: any }) => props.onSubmit(v.value)} initialValues={{value: props.initialValue || ""}}
                        validationSchema={Yup.object().shape({value: props.validationSchema})}>
                 <EasyInput multiline name="value" fullWidth endAdornment={
                     <InputAdornment position="end">

@@ -12,6 +12,7 @@ import * as React from "react";
 import {useRepository} from "../../../hooks/useRepository";
 import {RepositoryPermissionType} from "../../../service/response.types";
 import ImportExportIcon from '@material-ui/icons/ImportExport';
+import SaveAltIcon from '@material-ui/icons/SaveAlt';
 
 export const RepositoryMenu = ({id}) => {
 
@@ -41,8 +42,10 @@ export const RepositoryMenu = ({id}) => {
                                       icon={<PersonAddIcon/>} text="Invite user"/>
                         <SideMenuItem linkTo={LINKS.REPOSITORY_PERMISSIONS.build({[PARAMS.REPOSITORY_ID]: id})}
                                       icon={<SupervisedUserCircleIcon/>} text="Permissions"/>
-                        <SideMenuItem linkTo={LINKS.REPOSITORY_IMPORT_EXPORT.build({[PARAMS.REPOSITORY_ID]: id})}
+                        <SideMenuItem linkTo={LINKS.REPOSITORY_IMPORT.build({[PARAMS.REPOSITORY_ID]: id})}
                                       icon={<ImportExportIcon/>} text="Import"/>
+                        <SideMenuItem linkTo={LINKS.REPOSITORY_EXPORT.build({[PARAMS.REPOSITORY_ID]: id})}
+                                      icon={<SaveAltIcon/>} text="Export"/>
                     </>
                 )}
             </List>

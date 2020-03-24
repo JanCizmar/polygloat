@@ -8,6 +8,8 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import {UserMenu} from '../security/UserMenu';
 import {Link} from "react-router-dom";
+import {PolygloatLogo} from "../common/icons/PolygloatLogo";
+import {Box} from "@material-ui/core";
 
 const drawerWidth = 240;
 
@@ -35,9 +37,6 @@ const useStyles = makeStyles(theme => ({
     },
     menuButtonHidden: {
         display: 'none',
-    },
-    title: {
-        flexGrow: 1
     },
     polygloatLink: {
         color: "inherit",
@@ -69,11 +68,21 @@ export function TopBar({onSideMenuOpen, open, isSideMenu, ...props}: TopBarProps
                 >
                     <MenuIcon/>
                 </IconButton>}
-                {/*
-                        // @ts-ignore */}
-                <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-                    <Link className={classes.polygloatLink} to={"/"}>Polygloat</Link> {props.subtitle && '- ' + props.subtitle}
-                </Typography>
+                <Box flexGrow={1} display="flex">
+                    <Box>
+                        <Link className={classes.polygloatLink} to={"/"}>
+                            <Box display="flex" alignItems="center">
+                                <Box pr={1} display="flex" justifyItems="center">
+                                    <PolygloatLogo fontSize="large"/>
+                                </Box>
+                                <Typography variant="h6" color="inherit">
+                                    Polygloat
+                                </Typography>
+                            </Box>
+                        </Link>
+                    </Box>
+                </Box>
+
                 <UserMenu/>
             </Toolbar>
         </AppBar>

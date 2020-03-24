@@ -15,15 +15,15 @@ export const SearchField: FunctionComponent = (props) => {
                 listContext.loadData(search);
                 setOldSearch(search);
             }
-        }, 1000);
+        }, 500);
         return () => clearTimeout(handler);
     }, [search]);
 
 
     return (
-        <Box>
+        <Box flexGrow={1}>
             <TextField id="standard-search"
-                       label="Search field"
+                       label="Search"
                        type="search"
                        value={search}
                        onChange={(e) => setSearch(e.target.value)}/>

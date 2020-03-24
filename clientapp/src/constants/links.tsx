@@ -132,5 +132,7 @@ export class LINKS {
 
     static REPOSITORY_LANGUAGES_CREATE = Link.ofParent(LINKS.REPOSITORY_LANGUAGES, 'add');
 
-    static REPOSITORY_IMPORT_EXPORT = Link.ofParent(LINKS.REPOSITORY, "import");
+    static REPOSITORY_IMPORT = Link.ofParent(LINKS.REPOSITORY, "import");
+
+    static REPOSITORY_EXPORT = Link.ofParent(LINKS.REPOSITORY, "export");
 }

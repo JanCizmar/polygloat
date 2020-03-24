@@ -11,8 +11,12 @@ import java.util.Set;
 @Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = {"repository_id", "name"}),
         @UniqueConstraint(columnNames = {"repository_id", "abbreviation"})
-
-})
+},
+        indexes = {
+                @Index(columnList = "abbreviation", name = "index_abbreviation"),
+                @Index(columnList = "abbreviation, repository_id", name = "index_abbreviation_source")
+        }
+)
 public class Language extends AuditModel {
 
     @Id

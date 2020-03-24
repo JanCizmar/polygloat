@@ -40,8 +40,8 @@ public class TranslationService {
     private RepositoryService repositoryService;
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> getTranslations(Set<String> abbrs, Long repositoryId) {
-        Set<Translation> allByLanguages = translationRepository.getTranslations(abbrs, repositoryId);
+    public Map<String, Object> getTranslations(Set<String> languageAbbreviations, Long repositoryId) {
+        Set<Translation> allByLanguages = translationRepository.getTranslations(languageAbbreviations, repositoryId);
 
         HashMap<String, Object> langTranslations = new LinkedHashMap<>();
         for (Translation translation : allByLanguages) {

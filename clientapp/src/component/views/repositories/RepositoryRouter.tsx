@@ -9,7 +9,8 @@ import {RepositorySettingsView} from "./repository/RepositorySettingsView";
 import {RepositoryProvider} from "../../../hooks/RepositoryProvider";
 import {LanguageCreateView} from "./languages/LanguageCreateView";
 import {PrivateRoute} from "../../common/PrivateRoute";
-import {ImportExportView} from "./imprt_export/ImportExportView";
+import {ImportView} from "./imprt_export/ImportView";
+import {ExportView} from "./imprt_export/ExportView";
 
 export const RepositoryRouter = () => {
     let match = useRouteMatch();
@@ -50,9 +51,13 @@ export const RepositoryRouter = () => {
                     <RepositoryPermissionsView/>
                 </Route>
 
-                <PrivateRoute path={LINKS.REPOSITORY_IMPORT_EXPORT.template}>
-                    <ImportExportView/>
+                <PrivateRoute exact path={LINKS.REPOSITORY_IMPORT.template}>
+                    <ImportView/>
                 </PrivateRoute>
+
+                <Route exact path={`${LINKS.REPOSITORY_EXPORT.template}`}>
+                    <ExportView/>
+                </Route>
             </RepositoryProvider>
         </Switch>
     );

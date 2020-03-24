@@ -3,7 +3,7 @@ import {FunctionComponent, useContext} from 'react';
 import {container} from "tsyringe";
 import {TranslationActions} from "../../store/repository/TranslationActions";
 import {useRepository} from "../../hooks/useRepository";
-import {Box, Button, IconButton, makeStyles, Slide, Theme, Tooltip} from "@material-ui/core";
+import {Box, Button, IconButton, Slide, Tooltip} from "@material-ui/core";
 import {TranslationsRow} from "./TranslationsRow";
 import {Header} from "./Header";
 import Paper from "@material-ui/core/Paper";
@@ -18,8 +18,6 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import {TranslationCreationDialog} from "./TranslationCreationDialog";
 import {useConfirmation} from "../../hooks/useConfirmation";
 import {TranslationListContext} from "./TtranslationsGridContextProvider";
-import {createStyles} from "@material-ui/core/styles";
-import {grey} from "@material-ui/core/colors";
 
 const actions = container.resolve(TranslationActions);
 
@@ -32,28 +30,29 @@ export const TranslationsGrid: FunctionComponent = (props) => {
         <>
             <Box mb={2}>
                 <Paper>
-                    <Box display="flex" p={3}>
+                    <Box display="flex" p={2} pl={1}>
                         <Box flexGrow={1} display="flex">
-                            <Box pr={2}>
-                                <Slide in={listContext.isSomeChecked()} direction="right" mountOnEnter unmountOnExit>
+                            <Slide in={listContext.isSomeChecked()} direction="right" mountOnEnter unmountOnExit>
+                                <Box pr={2}>
                                     <Tooltip title="Delete selected">
                                         <IconButton color="secondary"
                                                     onClick={() =>
                                                         useConfirmation()({
-                                                            onConfirm: () => actions.loadableActions.delete.dispatch(repositoryDTO.id, Array.from(listContext.checkedSources)),
+                                                            onConfirm: () => actions.loadableActions.delete
+                                                                .dispatch(repositoryDTO.id, Array.from(listContext.checkedSources)),
                                                             confirmButtonText: "Delete",
                                                             confirmButtonColor: "secondary",
-                                                            message: `Are you sure you want to delete all checked (${listContext.checkedSources.size}) translation sources?`,
+                                                            message: `Are you sure you want to delete all checked ` +
+                                                                `(${listContext.checkedSources.size}) translation sources?`,
                                                             title: "Delete confirmation"
                                                         })
-                                                        //
                                                     }>
                                             <DeleteIcon/>
                                         </IconButton>
                                     </Tooltip>
-                                </Slide>
-                            </Box>
-                            <Box pr={2}>
+                                </Box>
+                            </Slide>
+                            <Box pr={2} pl={1}>
                                 <LanguagesMenu/>
                             </Box>
                             <SearchField/>
