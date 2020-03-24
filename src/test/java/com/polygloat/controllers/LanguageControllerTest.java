@@ -57,7 +57,7 @@ public class LanguageControllerTest extends SignedInControllerTest implements IT
     @Test
     void findAllLanguages() throws Exception {
         Repository test = dbPopulator.createBase(generateUniqueString());
-        //commitTransaction();
+        commitTransaction();
         MvcResult mvcResult = performFindAll(test.getId()).andExpect(status().isOk()).andReturn();
         assertThat(decodeJson(mvcResult.getResponse().getContentAsString(), Set.class)).hasSize(2);
     }
