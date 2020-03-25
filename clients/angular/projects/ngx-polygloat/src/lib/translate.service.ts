@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 import {from, Observable} from 'rxjs';
 import {Polygloat, PolygloatConfig} from "polygloat";
 
@@ -8,8 +8,11 @@ export class TranslateService {
   constructor(private config: PolygloatConfig) {
   }
 
+  public readonly onLangChange: EventEmitter<never> = new EventEmitter<never>();
+
   private _polygloat: Polygloat;
   private runPromise: Promise<void>;
+  private currentLanguage: string;
 
   public get polygloat(): Polygloat {
     return this._polygloat;
@@ -24,6 +27,8 @@ export class TranslateService {
   }
 
   public setLang(lang: string) {
+    this.currentLanguage = lang;
+    this.onLangChange.emit();
     this.polygloat.lang = lang;
   }
 
@@ -38,7 +43,6 @@ export class TranslateService {
   public getDefaultLang(): string {
     return this.polygloat.defaultLanguage;
   }
-
 
   public getCurrentLang(): string {
     return this.polygloat.lang;

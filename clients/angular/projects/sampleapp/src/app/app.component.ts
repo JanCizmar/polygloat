@@ -14,18 +14,14 @@ export class AppComponent implements OnInit {
 
   text1: string;
 
-  async setTexts() {
-    this.text1 = await this.translateService.get('sampleApp.this_is_translation_retrieved_by_service').toPromise();
-  }
-
   async ngOnInit(): Promise<void> {
-    await this.setTexts();
+    this.translateService.get('sampleApp.this_is_translation_retrieved_by_service').subscribe(r => this.text1);
   }
 
   setLang(lang: string) {
     this.translateService.setLang(lang);
   }
 
-  params = {name: "Honza", surname: "Cizmar", title: "title"};
+  params = {name: "Honza", surname: "Cizmar"};
 
 }

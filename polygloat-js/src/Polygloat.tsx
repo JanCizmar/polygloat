@@ -4,7 +4,7 @@ import {CoreHandler} from './handlers/CoreHandler';
 import {NodeHelper} from './helpers/NodeHelper';
 import {PolygloatService} from './services/polygloatService';
 import {PolygloatConfig} from './PolygloatConfig';
-import {Mode, Properties} from './Properties';
+import {Properties} from './Properties';
 import {container} from 'tsyringe';
 import {EventService, EventType} from './services/EventService';
 import {TranslationParams} from "./Types";
@@ -51,7 +51,7 @@ export class Polygloat {
 
     constructor(config: PolygloatConfig) {
         this.properties.config = {...(new PolygloatConfig()), ...config};
-        this.properties.currentLanguage = this.properties.defaultLanguage;
+        this.properties.currentLanguage = this.properties.config.defaultLanguage;
     }
 
     public get lang() {
@@ -67,51 +67,32 @@ export class Polygloat {
         return this._service;
     }
 
-    public static async init(config: PolygloatConfig = new PolygloatConfig()) {
-        if (this.instance == null) {
-            this.instance = new Polygloat(config);
+    public async run(): Promise<void> {
+        if (this.properties.config.mode === "development") {
+            this.properties.scopes = await this.service.getScopes();
+            return await this.manage();
         }
     }
 
-    public static async run(config: PolygloatConfig): Promise<void> {
-        await this.init(config);
-        this.instance.properties.scopes = await this.instance.service.getScopes();
-        return await this.getInstance().manage();
-    }
-
-    public async run(): Promise<void> {
-        this.properties.scopes = await this.service.getScopes();
-        return await this.manage();
-    }
-
     public get defaultLanguage() {
-        return this.properties.defaultLanguage;
+        return this.properties.config.defaultLanguage;
     }
 
     translate = async (inputText: string, params: TranslationParams = {}, noWrap: boolean = false): Promise<string> => {
-        if (this.properties.mode == Mode.DEVELOP && !noWrap) {
+        if (this.properties.config.mode === 'development' && !noWrap) {
             return this.wrap(inputText, params);
         }
         return this.service.replaceParams(await this.service.getTranslation(inputText), params);
     };
 
     instant = (inputText: string, params: TranslationParams = {}, noWrap: boolean = false): string => {
-        if (this.properties.mode == Mode.DEVELOP && !noWrap) {
+        if (this.properties.config.mode === 'development' && !noWrap) {
             return this.wrap(inputText, params);
         }
         return this.service.replaceParams(this.service.instant(inputText), params);
     };
 
-    public static getInstance(): Polygloat {
-        if (this.instance === undefined) {
-            throw new Error("Polygloat is not initiated, run init function first.");
-        }
-        return this.instance;
-    }
-
-    // noinspection JSUnusedGlobalSymbols
     public manage = async () => {
-        // await this.handleSubtree(document.body);
         this.observer.observe(document.body, {attributes: true, childList: true, subtree: true, characterData: true});
         await this.service.getTranslations(this.lang);
     };

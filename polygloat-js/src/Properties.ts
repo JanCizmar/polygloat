@@ -4,15 +4,10 @@ import {singleton} from 'tsyringe';
 @singleton()
 export class Properties {
     config: PolygloatConfig = new PolygloatConfig();
-    currentLanguage: string = 'en';
-    defaultLanguage: string = this.config.defaultLanguage;
-    mode: Mode = Mode.DEVELOP;
+    currentLanguage: string = this.config.defaultLanguage;
     scopes: Scope[] = [];
 }
 
 export type Scope = "translations.edit" | "translations.view" | "sources.edit";
 
-export enum Mode {
-    DEVELOP = 'develop',
-    PRODUCTION = 'production',
-}
+export type Mode = 'development' | 'production';

@@ -10,9 +10,9 @@
     "dist": "dist"
   },
   "scripts": {
-    "build": "webpack --mode=production && tsc",
+    "build": "webpack --env.mode=production && tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "develop": "webpack --mode=development --watch"
+    "develop": "webpack --env.mode=development --watch"
   },
   "author": "JanCizmar",
   "license": "ISC",
@@ -47,6 +47,7 @@
     "babel-plugin-import": "^1.13.0",
     "babel-plugin-transform-typescript-metadata": "^0.2.2",
     "reflect-metadata": "^0.1.13",
+    "ts-loader": "^6.2.2",
     "tslint": "~5.15.0",
     "tsyringe": "^4.0.1",
     "typescript": "^3.5.3",

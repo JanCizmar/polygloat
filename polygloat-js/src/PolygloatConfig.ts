@@ -1,3 +1,5 @@
+import {Mode} from "./Properties";
+
 export class PolygloatConfig {
     tagAttributes?: { [key: string]: string[] } = {
         'textarea': ['placeholder'],
@@ -6,6 +8,8 @@ export class PolygloatConfig {
     defaultLanguage?: string = 'en';
     inputPrefix?: string = '%-%polygloat:';
     inputPostfix?: string = '%-%';
-    apiUrl: string;
-    apiKey: string;
+    apiUrl?: string;
+    apiKey?: string;
+    filesUrlPrefix?: string;
+    mode?: Mode = this.apiKey ? 'development' : 'production';
 }

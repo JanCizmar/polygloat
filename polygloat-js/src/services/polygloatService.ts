@@ -14,7 +14,6 @@ export class PolygloatService {
     };
 
     async getTranslations(lang: string) {
-        this.checkScopes("translations.view");
         if (this.translationsCache.get(lang) == undefined) {
             if (!(this.fetchPromises[lang] instanceof Promise)) {
                 this.fetchPromises[lang] = this.fetchTranslations(lang);
@@ -35,18 +34,45 @@ export class PolygloatService {
         return languages;
     }
 
+
+    async fetchTranslationsProduction(lang: string) {
+        let requestResult = await fetch(`${this.properties.config.filesUrlPrefix || "/"}${lang}.json`);
+        if (requestResult.status >= 400) {
+            //on error set language data as empty object to not break the flow
+            this.translationsCache.set(lang, {});
+            return;
+        }
+        let data = (await requestResult.json());
+        this.translationsCache.set(lang, data);
+    }
+
+
     async fetchTranslations(lang: string) {
-        //await new Promise(resolve => setTimeout(resolve, 5000));
+        if (this.properties.config.mode === "development") {
+            return await this.fetchTranslationsDevelopment(lang);
+        }
+        return await this.fetchTranslationsProduction(lang);
+    }
+
+    async fetchTranslationsDevelopment(lang: string) {
+        this.checkScopes("translations.view");
         let requestResult = await fetch(this.getUrl(`${lang}`));
+
+        if (requestResult.status >= 400) {
+            //on error set language data as empty object to not break the flow
+            this.translationsCache.set(lang, {});
+            return;
+        }
+
         let data = (await requestResult.json());
         this.translationsCache.set(lang, data[lang]);
     }
 
     async getTranslation(name: string, lang: string = this.properties.currentLanguage): Promise<string> {
         await this.getTranslations(lang);
-        if (lang !== this.properties.defaultLanguage && !this.getFromCache(name, lang)) {
-            await this.getTranslations(this.properties.defaultLanguage);
-            return this.instant(name, this.properties.defaultLanguage);
+        if (lang !== this.properties.config.defaultLanguage && !this.getFromCache(name, lang)) {
+            await this.getTranslations(this.properties.config.defaultLanguage);
+            return this.instant(name, this.properties.config.defaultLanguage);
         }
         return this.instant(name, lang);
     }
@@ -54,7 +80,7 @@ export class PolygloatService {
     readonly getScopes = async () => (await fetch(this.getUrl(`scopes`))).json();
 
     instant(name: string, lang: string = this.properties.currentLanguage): string {
-        return this.getFromCache(name, lang) || this.getFromCache(name, this.properties.defaultLanguage) || name;
+        return this.getFromCache(name, lang) || this.getFromCache(name, this.properties.config.defaultLanguage) || name;
     }
 
     getFromCache(name: string, lang: string = this.properties.currentLanguage): string {

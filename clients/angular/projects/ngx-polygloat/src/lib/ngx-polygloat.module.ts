@@ -22,6 +22,8 @@ export class NgxPolygloatModule {
 
   // @dynamic
   static forRoot(options: PolygloatConfig) {
+    options = {...new PolygloatConfig(), filesUrlPrefix: "/assets/i18n/", ...options};
+
     return {
       ngModule: NgxPolygloatModule,
       providers: [
