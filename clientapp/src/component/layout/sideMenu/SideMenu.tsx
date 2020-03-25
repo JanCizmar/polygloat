@@ -5,12 +5,12 @@ import {makeStyles} from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import IconButton from '@material-ui/core/IconButton';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 
 
 const drawerWidth = 240;
 
 const useStyles = makeStyles(theme => ({
-
     toolbarIcon: {
         display: 'flex',
         alignItems: 'center',
@@ -41,11 +41,11 @@ const useStyles = makeStyles(theme => ({
 }));
 
 interface SideMenuProps {
-    onSideMenuClose: () => void;
+    onSideMenuToggle: () => void;
     open: boolean;
 }
 
-export const SideMenu: FunctionComponent<SideMenuProps> = ({onSideMenuClose, open, children}) => {
+export const SideMenu: FunctionComponent<SideMenuProps> = ({onSideMenuToggle, open, children}) => {
     const classes = useStyles({});
 
     return (
@@ -55,10 +55,11 @@ export const SideMenu: FunctionComponent<SideMenuProps> = ({onSideMenuClose, ope
                 paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose),
             }}
             open={open}
+            color="secondary"
         >
             <div className={classes.toolbarIcon}>
-                <IconButton onClick={onSideMenuClose}>
-                    <ChevronLeftIcon/>
+                <IconButton onClick={onSideMenuToggle}>
+                    {open ? <ChevronLeftIcon/> : <ChevronRightIcon/>}
                 </IconButton>
             </div>
             {children}

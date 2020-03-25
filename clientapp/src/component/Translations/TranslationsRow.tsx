@@ -1,12 +1,11 @@
 import * as React from 'react';
 import {FunctionComponent, useContext} from 'react';
 import {SourceTranslationsDTO} from "../../service/response.types";
-import {Box, Checkbox, IconButton, makeStyles, Theme, Tooltip} from "@material-ui/core";
+import {Box, Checkbox, makeStyles, Theme} from "@material-ui/core";
 import {TableCell} from "./TableCell";
 import {SourceCell} from "./SourceCell";
 import {TranslationCell} from "./TranslationCell";
 import {grey} from "@material-ui/core/colors";
-import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 import {TranslationListContext} from "./TtranslationsGridContextProvider";
 import {createStyles} from "@material-ui/core/styles";
 
@@ -47,9 +46,9 @@ export const TranslationsRow: FunctionComponent<TranslationProps> = (props) => {
     return (
         <Box display="flex" className={classes.lineBox}>
             <RowContext.Provider value={contextValue}>
-                <Box display="flex" alignItems="center">
+                <Box display="flex" alignItems="center" justifyContent="center" style={{width: 40}}>
                     <Checkbox onChange={() => listContext.toggleSourceChecked(contextValue.data.id)}
-                              checked={listContext.isSourceChecked(contextValue.data.id)}/>
+                              checked={listContext.isSourceChecked(contextValue.data.id)} size="small" style={{padding: 3}}/>
                 </Box>
                 <Box display="flex" flexGrow={1} minWidth={0}>
                     <TableCell>

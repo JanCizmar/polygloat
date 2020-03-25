@@ -5,7 +5,7 @@ import {securityService} from '../../service/securityService';
 import {ErrorResponseDTO, RemoteConfigurationDTO, TokenDTO, UserDTO} from '../../service/response.types';
 import {userService} from "../../service/userService";
 import {ConfirmationDialogProps} from "../../component/common/ConfirmationDialog";
-import {AbstractLoadableActions, createLoadable, StateWithLoadables} from "../AbstractLoadableActions";
+import {AbstractLoadableActions, StateWithLoadables} from "../AbstractLoadableActions";
 
 export class GlobalState extends StateWithLoadables<GlobalActions> {
     authLoading: boolean = false;
@@ -14,14 +14,12 @@ export class GlobalState extends StateWithLoadables<GlobalActions> {
         jwtToken: localStorage.getItem('jwtToken') || null,
         loginErrorCode: null
     };
-    passwordResetLoading = false;
-    passwordResetSent = false;
-    passwordResetError: string = null;
     passwordResetSetLoading = false;
     passwordResetSetValidated = false;
     passwordResetSetError = null;
     passwordResetSetSucceed = false;
     confirmationDialog: ConfirmationDialogProps = null;
+    sideMenuOpen: boolean = true
 }
 
 
@@ -40,20 +38,7 @@ export class GlobalActions extends AbstractLoadableActions<GlobalState> {
             {...state, security: <SecurityDTO>{...state.security, jwtToken: null, allowPrivate: false}}
         ));
     login = this.buildLoginAction('LOGIN', v => this.securityService.login(v));
-    /*resetPasswordRequest = this.createPromiseAction('PASSWORD_RESET_REQUEST',
-        (email) => this.securityService.resetPasswordRequest(email))
-        .build.onPending((state, action) => {
-            return <GlobalState>{...state, passwordResetLoading: true, passwordResetSent: false, passwordResetError: null};
-        }).build.onFullFilled((state, action) => {
-            return <GlobalState>{...state, passwordResetSent: true, passwordResetLoading: false, passwordResetError: null};
-        }).build.onRejected((state, action) => {
-            return <GlobalState>{
-                ...state,
-                passwordResetSent: false,
-                passwordResetLoading: false,
-                passwordResetError: action.payload.code
-            };
-        });*/
+
     resetPasswordValidate = this.createPromiseAction<never, ErrorResponseDTO>('RESET_PASSWORD_VALIDATE',
         this.securityService.resetPasswordValidate)
         .build.onPending((state, action) => {
@@ -111,6 +96,11 @@ export class GlobalActions extends AbstractLoadableActions<GlobalState> {
         remoteConfig: this.createLoadableDefinition<RemoteConfigurationDTO>(() => this.configService.getConfiguration()),
         resetPasswordRequest: this.createLoadableDefinition(this.securityService.resetPasswordRequest)
     };
+
+    readonly toggleSideMenu = this.createAction('TOGGLE_SIDEMENU').build.on((state: GlobalState) => ({
+        ...state,
+        sideMenuOpen: !state.sideMenuOpen
+    } as GlobalState));
 
     get prefix(): string {
         return 'GLOBAL';

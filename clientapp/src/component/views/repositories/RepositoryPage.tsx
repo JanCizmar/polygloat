@@ -12,7 +12,7 @@ interface Props {
 
 export const RepositoryPage: FunctionComponent<Props> = (props) => {
     return (
-        <DashboardPage fullWidth={props.fullWidth} subtitle={useRepository().name} sideMenuItems={<RepositoryMenu id={useRepository().id}/>}>
+        <DashboardPage fullWidth={props.fullWidth} repositoryName={useRepository().name} sideMenuItems={<RepositoryMenu id={useRepository().id}/>}>
             {props.children}
         </DashboardPage>
     );

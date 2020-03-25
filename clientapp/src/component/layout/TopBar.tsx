@@ -4,9 +4,6 @@ import {makeStyles} from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
-import {UserMenu} from '../security/UserMenu';
 import {Link} from "react-router-dom";
 import {PolygloatLogo} from "../common/icons/PolygloatLogo";
 import {Box} from "@material-ui/core";
@@ -45,29 +42,15 @@ const useStyles = makeStyles(theme => ({
 }));
 
 interface TopBarProps {
-    onSideMenuOpen: () => void;
-    open: boolean
-    isSideMenu: Boolean
-    subtitle?: string
 }
 
-export function TopBar({onSideMenuOpen, open, isSideMenu, ...props}: TopBarProps) {
+export function TopBar(props: TopBarProps) {
     const classes = useStyles({});
 
 
     return (
-        <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
+        <AppBar position="absolute" className={clsx(classes.appBar)}>
             <Toolbar className={classes.toolbar}>
-                {isSideMenu &&
-                <IconButton
-                    edge="start"
-                    color="inherit"
-                    aria-label="open drawer"
-                    onClick={onSideMenuOpen}
-                    className={clsx(classes.menuButton, open && classes.menuButtonHidden)}
-                >
-                    <MenuIcon/>
-                </IconButton>}
                 <Box flexGrow={1} display="flex">
                     <Box>
                         <Link className={classes.polygloatLink} to={"/"}>
@@ -82,8 +65,6 @@ export function TopBar({onSideMenuOpen, open, isSideMenu, ...props}: TopBarProps
                         </Link>
                     </Box>
                 </Box>
-
-                <UserMenu/>
             </Toolbar>
         </AppBar>
     );

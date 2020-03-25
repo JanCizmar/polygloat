@@ -1,28 +1,46 @@
 import {TopBar} from './TopBar';
 import {SideMenu} from './sideMenu/SideMenu';
 import * as React from 'react';
-import {ReactElement, useState} from 'react';
+import {ReactElement} from 'react';
 import {Box} from "@material-ui/core";
+import {useSelector} from "react-redux";
+import {AppState} from "../../store";
+import {container} from "tsyringe";
+import {GlobalActions} from "../../store/global/globalActions";
+import {UserMenu} from "../security/UserMenu";
 
 interface MainMenuProps {
     sideMenuItems?: ReactElement;
-    subtitle?: string
+    repositoryName?: string
 }
+
+const actions = container.resolve(GlobalActions);
 
 export const MainMenu = ({sideMenuItems, ...props}: MainMenuProps) => {
 
-    const [open, setOpen] = useState(sideMenuItems && true);
+    let open = useSelector((state: AppState) => state.global.sideMenuOpen);
 
-    return <>
-        <TopBar subtitle={props.subtitle} onSideMenuOpen={() => setOpen(true)} isSideMenu={!!sideMenuItems} open={open}/>
+    return (
+        <>
+            {!props.repositoryName && <TopBar/> ||
 
-        {sideMenuItems &&
-        <SideMenu onSideMenuClose={() => setOpen(false)} open={open}>
-            {props.subtitle && <Box display="flex" p={2} alignItems="center" justifyContent="center" fontWeight="500" fontSize={25}>
-                {open && props.subtitle || props.subtitle.substr(0, 1)}
-            </Box>}
-            {sideMenuItems}
-        </SideMenu>
-        }
-    </>;
+            <SideMenu onSideMenuToggle={() => actions.toggleSideMenu.dispatch()} open={open}>
+                <Box display="flex" justifyContent="center" mt={2} mb={2}>
+                    <Box display="flex" flexDirection="column">
+                        {props.repositoryName &&
+                        <Box fontWeight="bold" display="flex" fontSize={open ? 20 : 25} mb={open ? 0 : 2} justifyContent={!open && "center"}>
+                            {open && props.repositoryName || props.repositoryName.substr(0, 1)}
+                        </Box>}
+
+                        <Box>
+                            <UserMenu variant={open ? "expanded" : "small"}/>
+                        </Box>
+                    </Box>
+                </Box>
+
+                {sideMenuItems}
+            </SideMenu>
+            }
+        </>
+    )
 };

@@ -8,6 +8,9 @@ import MaterialLink from '@material-ui/core/Link';
 import {MainMenu} from './MainMenu';
 import Grid from '@material-ui/core/Grid';
 import Container from '@material-ui/core/Container';
+import {Link} from "react-router-dom";
+import {LINKS} from "../../constants/links";
+import {PolygloatLogo} from "../common/icons/PolygloatLogo";
 
 function Copyright() {
     return (
@@ -40,7 +43,7 @@ const useStyles = makeStyles(theme => ({
 
 interface DashboardPageProps {
     sideMenuItems?: ReactElement;
-    subtitle?: string;
+    repositoryName?: string;
     fullWidth?: boolean
 }
 
@@ -50,16 +53,26 @@ export const DashboardPage: FunctionComponent<DashboardPageProps> = ({children, 
     return (
         <div className={classes.root}>
             <CssBaseline/>
-            <MainMenu subtitle={props.subtitle} sideMenuItems={sideMenuItems}/>
+            <MainMenu repositoryName={props.repositoryName} sideMenuItems={sideMenuItems}/>
             <main className={classes.content}>
-                <div className={classes.appBarSpacer}/>
-                <Container maxWidth={props.fullWidth ? false : "lg"} className={classes.container}>
-                    <Grid container spacing={3}>
-                        {children}
-                    </Grid>
-                </Container>
-                <Box pt={4}>
-                    <Copyright/>
+                <Box display="flex" flexDirection="column" flexGrow={1} minHeight="100%">
+                    {!props.repositoryName && <div className={classes.appBarSpacer}/>}
+                    <Box flexGrow={1}>
+                        <Container maxWidth={props.fullWidth ? false : "lg"} className={classes.container}>
+                            <Box mt={2}/>
+                            <Grid container spacing={3}>
+                                {children}
+                            </Grid>
+                        </Container>
+                    </Box>
+                    <Box pt={2} pb={4}>
+                        <Box display="flex" p={2} alignItems="center" justifyContent="center" fontWeight="500">
+                            <Link to={LINKS.ROOT.build()} style={{color: "inherit"}}>
+                                <PolygloatLogo opacity={0.2} style={{width: 40, height: 40, filter: "drop-shadow(0px 1px 1px rgba(0, 0, 0, 1))"}}/>
+                            </Link>
+                        </Box>
+                        <Copyright/>
+                    </Box>
                 </Box>
             </main>
         </div>

@@ -64,6 +64,7 @@ export class LINKS {
     /**
      * Authentication
      */
+    static ROOT = Link.ofRoot('');
 
     static LOGIN = Link.ofRoot('login');
 

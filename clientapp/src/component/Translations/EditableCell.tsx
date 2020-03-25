@@ -11,6 +11,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import * as Yup from 'yup';
 import {EditIconButton} from "../common/buttons/EditIconButton";
 import {TranslationListContext} from "./TtranslationsGridContextProvider";
+import EditIcon from "@material-ui/icons/Edit";
 
 export interface EditableCellProps {
     initialValue: any,
@@ -75,10 +76,18 @@ export const EditableCell: FunctionComponent<EditableCellProps> = (props) => {
 
     const classes = useStyles({});
 
-    // @ts-ignore
-    const textHolder = <Typography noWrap ref={ref}>
+    const textHolder = <Typography noWrap ref={ref} style={{fontSize: "inherit"}}>
         {props.initialValue}
     </Typography>;
+
+    const EditIconButton = () => <>
+        {
+            props.editEnabled &&
+            <IconButton aria-label="edit" color="default" className={classes.editButton} size="small">
+                <EditIcon fontSize="small"/>
+            </IconButton>
+        }
+    </>;
 
     if (!editing) {
         return <Box onClick={handleEdit}
@@ -87,16 +96,12 @@ export const EditableCell: FunctionComponent<EditableCellProps> = (props) => {
                 overflow ?
                     <>
                         <Tooltip title={props.initialValue}>{textHolder}</Tooltip>
-                        {
-                            props.editEnabled && <EditIconButton color="default" className={classes.editButton}/>
-                        }
+                        <EditIconButton/>
                     </>
                     :
                     <>
                         {textHolder}
-                        {
-                            props.editEnabled && <EditIconButton color="default" className={classes.editButton}/>
-                        }
+                        <EditIconButton/>
                     </>
             }
         </Box>

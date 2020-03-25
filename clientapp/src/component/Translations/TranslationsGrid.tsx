@@ -71,7 +71,7 @@ export const TranslationsGrid: FunctionComponent = (props) => {
             <Paper>
                 {listContext.listLoadable.data ?
                     <Box p={1} display="flex" justifyContent="flex-end">
-                        <Box display="flex" flexDirection="column" flexGrow={1} maxWidth="100%">
+                        <Box display="flex" flexDirection="column" flexGrow={1} maxWidth="100%" fontSize={14}>
                             <Header/>
                             {listContext.listLoadable.data.data.map(t => <TranslationsRow key={t.name} data={t}/>)}
                         </Box>
