@@ -1,6 +1,5 @@
 import {singleton} from 'tsyringe';
 import {repositoryService} from '../../../service/repositoryService';
-import {InvitationDTO} from '../../../service/response.types';
 import {AbstractLoadableActions, StateWithLoadables} from "../../AbstractLoadableActions";
 
 export class RepositoryInvitationState extends StateWithLoadables<RepositoryInvitationActions> {
@@ -30,7 +29,7 @@ export class RepositoryInvitationActions extends AbstractLoadableActions<Reposit
         delete: this.createDeleteDefinition("list", async (id) => {
             await this.repositoryService.deleteInvitation(id);
             return id;
-        })
+        }, (state) => ({...state, invitationCode: ""}))
     };
 
     constructor(private repositoryService: repositoryService) {

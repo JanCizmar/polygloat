@@ -28,62 +28,67 @@ const actions = container.resolve(RepositoryInvitationActions);
 
 export const RepositoryInviteView: FunctionComponent<RepositoryInviteVIewProps> = (props) => {
 
-    let match = useRouteMatch();
-    const repositoryId = match.params[PARAMS.REPOSITORY_ID];
+        let match = useRouteMatch();
+        const repositoryId = match.params[PARAMS.REPOSITORY_ID];
 
-    let state = useSelector((state: AppState) => state.repositoryInvitation);
+        let state = useSelector((state: AppState) => state.repositoryInvitation);
 
-    useEffect(() => {
-        actions.loadableActions.list.dispatch(repositoryId);
-    }, [state.invitationCode]);
+        useEffect(() => {
+            actions.loadableActions.list.dispatch(repositoryId);
+        }, [state.invitationCode]);
 
-    return (
-        <RepositoryPage>
-            <BaseView title="Invite user" xs={12} md={8} lg={6}>
-                {() => (
-                    <>
-                        <StandardForm loading={state.invitationLoading}
+        const onCancel = (id: number) => {
+            actions.loadableActions.delete.dispatch(id);
+        };
 
-                                      submitButtons={
-                                          <Button variant="contained" color="primary" type="submit" size="large">
-                                              Generate invitation link
-                                          </Button>}
+        return (
+            <RepositoryPage>
+                <BaseView title="Invite user" xs={12} md={8} lg={6}>
+                    {() => (
+                        <>
+                            <StandardForm loading={state.invitationLoading}
 
-                                      onSubmit={v => actions.generateCode.dispatch(repositoryId, v.type)} initialValues={{type: 'MANAGE'}}>
+                                          submitButtons={
+                                              <Button variant="contained" color="primary" type="submit" size="large">
+                                                  Generate invitation link
+                                              </Button>}
 
-                            <Select label="Invited user can" name="type" fullWidth>
-                                {Object.keys(repositoryPermissionTypes).map(k =>
-                                    <MenuItem key={k} value={k}>{repositoryPermissionTypes[k]}</MenuItem>)}
-                            </Select>
-                        </StandardForm>
+                                          onSubmit={v => actions.generateCode.dispatch(repositoryId, v.type)} initialValues={{type: 'MANAGE'}}>
 
-                        {state.invitationCode &&
-                        <Box mt={2}>
-                            <TextField fullWidth multiline InputProps={{
-                                readOnly: true,
-                            }} value={LINKS.ACCEPT_INVITATION.buildWithOrigin({[PARAMS.INVITATION_CODE]: state.invitationCode})}
-                                       label="Invitation link"/>
-                        </Box>}
+                                <Select label="Invited user can" name="type" fullWidth>
+                                    {Object.keys(repositoryPermissionTypes).map(k =>
+                                        <MenuItem key={k} value={k}>{repositoryPermissionTypes[k]}</MenuItem>)}
+                                </Select>
+                            </StandardForm>
 
-                        {state.loadables.list.loading && <BoxLoading/> || (state.loadables.list.data && !!state.loadables.list.data.length &&
-                            <Box mt={4}>
-                                <Typography variant="h6">Active invitation codes</Typography>
-                                <List>
-                                    {state.loadables.list.data.map(i => (
-                                        <ListItem key={i.id}>
-                                            <ListItemText>
-                                                {i.code.substr(0, 10)}...{i.code.substr(i.code.length - 10, 10)}
-                                                &nbsp;[<i>permission: {i.type}</i>]
-                                            </ListItemText>
-                                            <ListItemSecondaryAction>
-                                                <Button color="secondary" onClick={() => actions.loadableActions.delete.dispatch(i.id)}>Cancel</Button>
-                                            </ListItemSecondaryAction>
-                                        </ListItem>
-                                    ))}
-                                </List>
-                            </Box>)}
-                    </>)}
-            </BaseView>
-        </RepositoryPage>
-    );
-};
+                            {state.invitationCode &&
+                            <Box mt={2}>
+                                <TextField fullWidth multiline InputProps={{
+                                    readOnly: true,
+                                }} value={LINKS.ACCEPT_INVITATION.buildWithOrigin({[PARAMS.INVITATION_CODE]: state.invitationCode})}
+                                           label="Invitation link"/>
+                            </Box>}
+
+                            {state.loadables.list.loading && <BoxLoading/> || (state.loadables.list.data && !!state.loadables.list.data.length &&
+                                <Box mt={4}>
+                                    <Typography variant="h6">Active invitation codes</Typography>
+                                    <List>
+                                        {state.loadables.list.data.map(i => (
+                                            <ListItem key={i.id}>
+                                                <ListItemText>
+                                                    {i.code.substr(0, 10)}...{i.code.substr(i.code.length - 10, 10)}
+                                                    &nbsp;[<i>permission: {i.type}</i>]
+                                                </ListItemText>
+                                                <ListItemSecondaryAction>
+                                                    <Button color="secondary" onClick={() => onCancel(i.id)}>Cancel</Button>
+                                                </ListItemSecondaryAction>
+                                            </ListItem>
+                                        ))}
+                                    </List>
+                                </Box>)}
+                        </>)}
+                </BaseView>
+            </RepositoryPage>
+        );
+    }
+;
