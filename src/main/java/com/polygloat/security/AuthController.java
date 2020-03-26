@@ -131,7 +131,11 @@ public class AuthController {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(request.getEmail());
         message.setSubject("Password reset");
-        message.setText(request.getCallbackUrl() + "/" + Base64.encode(code + "," + request.getEmail()));
+
+        String url = request.getCallbackUrl() + "/" + Base64.encode(code + "," + request.getEmail());
+
+        message.setText("Hello!\n To reset your password click this link: \n" + url + "\n" + "\n" +
+                " If you have not requested password reset, please just ignore this e-mail.");
         message.setFrom(appConfiguration.getMailFrom());
         mailSender.send(message);
     }
