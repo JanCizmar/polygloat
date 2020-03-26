@@ -17,7 +17,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"repository_id", "name"}),
+        @UniqueConstraint(columnNames = {"repository_id", "name"}, name = "source_repository_id_name"),
 })
 public class Source extends AuditModel {
     @Id

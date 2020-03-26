@@ -15,6 +15,7 @@ import {useConfig} from "../hooks/useConfig";
 import {useUser} from "../hooks/useUser";
 import FullPageLoadingView from "./common/FullPageLoadingView";
 import {ApiKeysView} from "./security/apiKeys/ApiKeysView";
+import {UserSettings} from "./views/UserSettings";
 
 const LoginRouter = React.lazy(() => import(/* webpackChunkName: "login-router" */'./security/LoginRouter'));
 const SignUpView = React.lazy(() => import(/* webpackChunkName: "login-router" */'./security/SignUpView'));
@@ -106,8 +107,11 @@ export default class App extends React.Component {
                         <Route path={LINKS.ACCEPT_INVITATION.template}>
                             <AcceptInvitationHandler/>
                         </Route>
-                        <PrivateRoute exact path="/">
+                        <PrivateRoute exact path={LINKS.ROOT.template}>
                             <Redirect to={LINKS.REPOSITORIES.template}/>
+                        </PrivateRoute>
+                        <PrivateRoute exact path={LINKS.USER_SETTINGS.template}>
+                            <UserSettings/>
                         </PrivateRoute>
                         <PrivateRoute path={LINKS.REPOSITORIES.template}>
                             <RepositoriesRouter/>

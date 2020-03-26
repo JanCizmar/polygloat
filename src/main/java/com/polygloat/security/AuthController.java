@@ -4,7 +4,7 @@ import com.polygloat.configuration.AppConfiguration;
 import com.polygloat.constants.Message;
 import com.polygloat.dtos.request.ResetPassword;
 import com.polygloat.dtos.request.ResetPasswordRequest;
-import com.polygloat.dtos.request.SignUp;
+import com.polygloat.dtos.request.SignUpDto;
 import com.polygloat.exceptions.AuthenticationException;
 import com.polygloat.exceptions.BadRequestException;
 import com.polygloat.exceptions.NotFoundException;
@@ -150,7 +150,7 @@ public class AuthController {
 
     @PostMapping("/sign_up")
     @Transactional
-    public JwtAuthenticationResponse signUp(@RequestBody @Valid SignUp request) {
+    public JwtAuthenticationResponse signUp(@RequestBody @Valid SignUpDto request) {
         Invitation invitation = null;
 
         if (request.getInvitationCode() == null || request.getInvitationCode().isEmpty()) {

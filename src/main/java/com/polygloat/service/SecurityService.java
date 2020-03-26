@@ -66,4 +66,5 @@ public class SecurityService {
     private UserAccount getActiveUser() {
         return this.authenticationFacade.getUserAccount();
     }
+
 }

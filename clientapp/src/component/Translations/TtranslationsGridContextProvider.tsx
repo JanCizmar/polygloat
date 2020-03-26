@@ -54,6 +54,8 @@ export const TranslationGridContextProvider: FunctionComponent = (props) => {
         }
     }, [selectedLanguages]);
 
+    useEffect(() => () => actions.loadableReset.translations.dispatch(), []);
+
     const [checkedSources, setCheckedSources] = useState(new Set<number>());
 
     //set state accepts also a function, thats why the funcin returns function - to handle the react call

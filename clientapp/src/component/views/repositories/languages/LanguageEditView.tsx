@@ -1,9 +1,8 @@
 import * as React from 'react';
-import {useEffect, useState} from 'react';
+import {useEffect} from 'react';
 import {container} from 'tsyringe';
 import {LINKS, PARAMS} from '../../../../constants/links';
 import {useRouteMatch} from 'react-router-dom';
-import * as Yup from 'yup';
 import {TextField} from '../../../common/form/fields/TextField';
 import {RepositoryPage} from '../RepositoryPage';
 import {BaseFormView} from '../../BaseFormView';
@@ -11,8 +10,8 @@ import {LanguageActions} from '../../../../store/languages/LanguageActions';
 import {Button} from "@material-ui/core";
 import {useConfirmation} from "../../../../hooks/useConfirmation";
 import {LanguageDTO} from "../../../../service/response.types";
-import {useRedirect} from "../../../../hooks/useRedirect";
 import {Validation} from "../../../../constants/GlobalValidationSchema";
+import {useRedirect} from "../../../../hooks/useRedirect";
 
 const actions = container.resolve(LanguageActions);
 
@@ -22,11 +21,8 @@ export const LanguageEditView = () => {
 
     let match = useRouteMatch();
 
-
     const repositoryId = match.params[PARAMS.REPOSITORY_ID];
     const languageId = match.params[PARAMS.LANGUAGE_ID];
-
-    const [cancelled, setCancelled] = useState(false);
 
     let languageLoadable = actions.useSelector(s => s.loadables.language);
     let editLoadable = actions.useSelector(s => s.loadables.edit);
@@ -36,7 +32,19 @@ export const LanguageEditView = () => {
         if (!languageLoadable.loaded && !languageLoadable.loading) {
             actions.loadableActions.language.dispatch(repositoryId, languageId);
         }
+        return () => {
+            actions.loadableReset.edit.dispatch();
+            actions.loadableReset.language.dispatch();
+        }
     }, []);
+
+
+    useEffect(() => {
+        if (deleteLoadable.loaded) {
+            useRedirect(LINKS.REPOSITORY_LANGUAGES, {[PARAMS.REPOSITORY_ID]: repositoryId});
+        }
+        return () => actions.loadableReset.delete.dispatch();
+    }, [deleteLoadable.loaded]);
 
     const onSubmit = (values) => {
         const dto: LanguageDTO = {
@@ -46,14 +54,6 @@ export const LanguageEditView = () => {
         actions.loadableActions.edit.dispatch(repositoryId, dto);
     };
 
-    if (editLoadable.loaded || cancelled || deleteLoadable.loaded) {
-        setCancelled(false);
-        actions.loadableReset.edit.dispatch();
-        actions.loadableReset.delete.dispatch();
-        actions.loadableReset.language.dispatch();
-        useRedirect(LINKS.REPOSITORY_LANGUAGES, {[PARAMS.REPOSITORY_ID]: repositoryId});
-    }
-
     return (
         <RepositoryPage>
             <BaseFormView
@@ -61,7 +61,6 @@ export const LanguageEditView = () => {
                 title={'Language settings'}
                 initialValues={languageLoadable.data}
                 onSubmit={onSubmit}
-                onCancel={() => setCancelled(true)}
                 saveActionLoadable={editLoadable}
                 resourceLoadable={languageLoadable}
                 validationSchema={Validation.LANGUAGE}
@@ -80,10 +79,10 @@ export const LanguageEditView = () => {
                         Delete language
                     </Button>}
             >
-                <>
+                {() => <>
                     <TextField label="Name" name="name" required={true}/>
                     <TextField label="Abbreviation" name="abbreviation" required={true}/>
-                </>
+                </>}
             </BaseFormView>
         </RepositoryPage>
     );

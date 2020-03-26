@@ -1,6 +1,8 @@
 import {container, singleton} from 'tsyringe';
 import {ApiHttpService} from './apiHttpService';
 import {PermissionDTO, RepositoryDTO} from './response.types';
+import {useRedirect} from "../hooks/useRedirect";
+import {LINKS} from "../constants/links";
 
 const http = container.resolve(ApiHttpService);
 
@@ -16,11 +18,16 @@ export class repositoryService {
 
     public createRepository = async (values: Partial<RepositoryDTO>) => (await http.postNoJson(`repositories`, values)).json();
 
-    public deleteRepository = async (id) => http.delete('repositories/' + id);
+    public deleteRepository = async (id) => {
+        await http.delete('repositories/' + id);
+        useRedirect(LINKS.REPOSITORIES);
+    };
 
     public getPermissions = async (repositoryId): Promise<PermissionDTO[]> => http.get('permission/list/' + repositoryId);
 
-    public deletePermission = async (invitationId): Promise<void> => http.delete('permission/' + invitationId);
+    public deletePermission = async (invitationId): Promise<void> => {
+        await http.delete('permission/' + invitationId);
+    };
 
     loadRepository = (id): Promise<RepositoryDTO> => http.get("repositories/" + id);
 }

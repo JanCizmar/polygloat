@@ -12,7 +12,7 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"code"}),
+        @UniqueConstraint(columnNames = {"code"}, name = "invitation_code_unique"),
 })
 public class Invitation extends AuditModel {
     @Id

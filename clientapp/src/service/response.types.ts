@@ -78,6 +78,12 @@ export interface UserDTO {
     name: string,
 }
 
+export interface UserUpdateDTO {
+    email: string,
+    name: string,
+    password: string
+}
+
 export interface ApiKeyDTO {
     "id": number,
     "key": string,

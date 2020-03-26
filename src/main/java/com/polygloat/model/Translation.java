@@ -2,7 +2,6 @@ package com.polygloat.model;
 
 import lombok.*;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
 
 import javax.persistence.*;
 
@@ -12,7 +11,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"source_id", "language_id"}),
+        @UniqueConstraint(columnNames = {"source_id", "language_id"}, name = "translation_source_language"),
 })
 @Data
 public class Translation extends AuditModel {

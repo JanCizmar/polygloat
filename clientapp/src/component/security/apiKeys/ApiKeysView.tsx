@@ -2,13 +2,13 @@ import {default as React, FunctionComponent, useEffect} from 'react';
 import {BaseView} from '../../views/BaseView';
 import {container} from 'tsyringe';
 import {UserApiKeysActions} from "../../../store/api_keys/UserApiKeysActions";
-import {DashboardPage} from "../../layout/DashboardPage";
-import {Alert} from "../../common/Alert";
 import {Route, Switch, useRouteMatch} from 'react-router-dom';
 import {LINKS, PARAMS} from "../../../constants/links";
 import {FabAddButtonLink} from "../../common/buttons/FabAddButtonLink";
 import {FormDialog} from "./FormDialog";
 import {ApiKeysList} from "./ApiKeysList";
+import {EmptyListMessage} from "../../common/EmptyListMessage";
+import {PossibleRepositoryPage} from "../../views/PossibleRepositoryPage";
 
 export const ApiKeysView: FunctionComponent = () => {
 
@@ -42,14 +42,14 @@ export const ApiKeysView: FunctionComponent = () => {
     }, [deleteLoadable.loaded]);
 
     return (
-        <DashboardPage>
+        <PossibleRepositoryPage>
             <BaseView title="My api keys" xs={12} md={10} lg={8}
                       loading={list.loading}>
                 {() => (
                     <>
                         {
                             list.loaded && (!list.data.length ?
-                                <Alert severity="info">No api keys yet!</Alert> :
+                                <EmptyListMessage>No api keys yet!</EmptyListMessage> :
                                 <ApiKeysList data={list.data}/>)
                         }
                         <FabAddButtonLink to={LINKS.USER_API_KEYS_GENERATE.build()}/>
@@ -64,6 +64,6 @@ export const ApiKeysView: FunctionComponent = () => {
                     <FormDialog/>
                 </Route>
             </Switch>
-        </DashboardPage>
+        </PossibleRepositoryPage>
     );
 };

@@ -48,6 +48,15 @@ export class Validation {
             .test('checkEmailUnique', 'User with this e-mail already exists.', Validation.createEmailValidation())
     });
 
+    static readonly USER_SETTINGS = Yup.object().shape({
+            password: Yup.string().min(8).max(100),
+            passwordRepeat: Yup.string().notRequired().oneOf([Yup.ref('password'), null], 'Passwords must match'),
+            name: Yup.string().required(),
+            email: Yup.string().email().required()
+        }
+    );
+
+
     static readonly API_KEY_SCOPES = Yup.mixed().test(
         "is-set",
         'Set at least one scope',

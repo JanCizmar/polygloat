@@ -1,7 +1,9 @@
 package com.polygloat.service;
 
-import com.polygloat.dtos.request.SignUp;
-import com.polygloat.exceptions.NotFoundException;
+import com.polygloat.constants.Message;
+import com.polygloat.dtos.request.SignUpDto;
+import com.polygloat.dtos.request.UserUpdateRequestDTO;
+import com.polygloat.dtos.request.validators.exceptions.ValidationException;
 import com.polygloat.model.UserAccount;
 import com.polygloat.repository.UserAccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +35,7 @@ public class UserAccountService {
         return userAccount;
     }
 
-    public UserAccount createUser(SignUp request) {
+    public UserAccount createUser(SignUpDto request) {
         String encodedPassword = encodePassword(request.getPassword());
         UserAccount account = UserAccount.builder()
                 .name(request.getName())
@@ -84,5 +86,23 @@ public class UserAccountService {
     private String encodePassword(String rawPassword) {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         return bCryptPasswordEncoder.encode(rawPassword);
+    }
+
+    @Transactional
+    public void update(UserAccount userAccount, UserUpdateRequestDTO dto) {
+        if (!userAccount.getUsername().equals(dto.getEmail())) {
+            this.getByUserName(dto.getEmail()).ifPresent(i -> {
+                throw new ValidationException(Message.USERNAME_ALREADY_EXISTS);
+            });
+
+            userAccount.setUsername(dto.getEmail());
+        }
+
+        if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
+            userAccount.setPassword(encodePassword(dto.getPassword()));
+        }
+
+        userAccount.setName(dto.getName());
+        userAccountRepository.save(userAccount);
     }
 }

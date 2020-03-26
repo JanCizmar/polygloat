@@ -1,8 +1,7 @@
-import {DashboardPage} from '../../layout/DashboardPage';
 import * as React from 'react';
 import {useEffect} from 'react';
 import Box from '@material-ui/core/Box';
-import {connect} from 'react-redux';
+import {connect, useSelector} from 'react-redux';
 import {AppState} from '../../../store';
 import {container} from 'tsyringe';
 import {RepositoryActions} from '../../../store/repository/RepositoryActions';
@@ -16,6 +15,8 @@ import ListItemText from '@material-ui/core/ListItemText';
 import {SettingsIconButton} from '../../common/buttons/SettingsIconButton';
 import {Link} from 'react-router-dom';
 import {BaseView} from '../BaseView';
+import {EmptyListMessage} from "../../common/EmptyListMessage";
+import {PossibleRepositoryPage} from "../PossibleRepositoryPage";
 
 const actions = container.resolve(RepositoryActions);
 
@@ -28,16 +29,18 @@ export const RepositoryListView = connect((state: AppState) =>
     ({repositories: state.repositories.repositories, loading: state.repositories.repositoriesLoading}))(
     ({repositories, loading}: Props) => {
 
+        let repository = useSelector((state: AppState) => state.repositories.loadables.repository.loaded);
+
         useEffect(() => {
             actions.loadRepositories.dispatch();
         }, []);
 
         return (
-            <DashboardPage>
+            <PossibleRepositoryPage>
                 <BaseView title="Repositories" lg={5} md={7} loading={loading}>
                     {() => (
                         <>
-                            <List>
+                            {repositories.length && <List>
                                 {repositories.map(r =>
                                     <ListItemLink
                                         key={r.id}
@@ -52,14 +55,15 @@ export const RepositoryListView = connect((state: AppState) =>
                                             </Link>
                                         </ListItemSecondaryAction>}
                                     </ListItemLink>)}
-                            </List>
+                            </List> || <EmptyListMessage/>}
                             <Box display="flex" flexDirection="column" alignItems="flex-end" mt={2} pr={2}>
                                 <FabAddButtonLink to={LINKS.REPOSITORY_ADD.build()}/>
                             </Box>
                         </>
                     )}
                 </BaseView>
-            </DashboardPage>
+            </PossibleRepositoryPage>
         );
-    });
+    }
+);
 

@@ -91,6 +91,8 @@ export class LINKS {
 
     static USER_API_KEYS_EDIT = Link.ofParent(LINKS.USER_API_KEYS, 'edit/' + p(PARAMS.API_KEY_ID));
 
+    static USER_SETTINGS = Link.ofRoot('user');
+
     /**
      * Repository stuff
      */

@@ -2,7 +2,7 @@ import {SecurityDTO} from './types';
 import {singleton} from 'tsyringe';
 import {remoteConfigService} from '../../service/remoteConfigService';
 import {securityService} from '../../service/securityService';
-import {ErrorResponseDTO, RemoteConfigurationDTO, TokenDTO, UserDTO} from '../../service/response.types';
+import {ErrorResponseDTO, RemoteConfigurationDTO, TokenDTO} from '../../service/response.types';
 import {userService} from "../../service/userService";
 import {ConfirmationDialogProps} from "../../component/common/ConfirmationDialog";
 import {AbstractLoadableActions, StateWithLoadables} from "../AbstractLoadableActions";
@@ -100,7 +100,6 @@ export class GlobalActions extends AbstractLoadableActions<GlobalState> {
             }));
 
     readonly loadableDefinitions = {
-        userData: this.createLoadableDefinition<UserDTO>(this.userService.getUserData),
         remoteConfig: this.createLoadableDefinition<RemoteConfigurationDTO>(() => this.configService.getConfiguration(),
             (state, action) => {
                 let invitationCode = this.invitationCodeService.getCode();

@@ -75,6 +75,7 @@ export const UserMenu: FunctionComponent<UserMenuProps> = (props) => {
                             onClose={handleClose}
                 >
                     <MenuItem onClick={() => globalActions.logout.dispatch()}>Logout</MenuItem>
+                    <MenuItem component={Link} to={LINKS.USER_SETTINGS.build()}>Settings</MenuItem>
                     <MenuItem component={Link} to={LINKS.USER_API_KEYS.build()}>Api keys</MenuItem>
                 </StyledMenu>
             </div>

@@ -119,7 +119,8 @@ export const ImportView: FunctionComponent = () => {
                         (data &&
                             <>
                                 <Preview/>
-                                <Box color="success.main" fontSize={21} fontWeight="400" mt={1}>Successfully loaded {entries.length} items.</Box>
+                                <Box color="success.main" fontSize={21} fontWeight="400" mt={1}>Successfully loaded {entries.length} items.
+                                    Click "DO IMPORT" to continue.</Box>
                                 {!state.loaded &&
                                 <>
                                     <StandardForm initialValues={{languageAbbreviation: suggestedName}}

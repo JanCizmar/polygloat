@@ -1,6 +1,5 @@
 package com.polygloat.dtos.response;
 
-import com.polygloat.model.Permission;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserDTO {
+public class UserResponseDTO {
 
     private Long id;
 
@@ -18,7 +17,7 @@ public class UserDTO {
 
     private String username;
 
-    public static UserDTO fromEntity(com.polygloat.model.UserAccount user) {
-        return UserDTO.builder().username(user.getUsername()).name(user.getName()).id(user.getId()).build();
+    public static UserResponseDTO fromEntity(com.polygloat.model.UserAccount user) {
+        return UserResponseDTO.builder().username(user.getUsername()).name(user.getName()).id(user.getId()).build();
     }
 }

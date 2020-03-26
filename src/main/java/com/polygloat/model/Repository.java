@@ -11,7 +11,7 @@ import java.util.Set;
 
 @Entity
 @Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"name", "created_by_id"}),
+        @UniqueConstraint(columnNames = {"name", "created_by_id"}, name = "repository_name_created_by_id"),
 })
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor

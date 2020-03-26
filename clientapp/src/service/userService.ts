@@ -1,18 +1,19 @@
 import {singleton} from 'tsyringe';
 import {ApiHttpService} from './apiHttpService';
-import {CONFIG} from '../config';
-import {ErrorResponseDTO, TokenDTO, UserDTO} from './response.types';
-import {tokenService} from './tokenService';
-import {API_LINKS} from '../constants/apiLinks';
-import {LINKS} from '../constants/links';
+import {UserDTO, UserUpdateDTO} from './response.types';
 import {messageService} from './messageService';
-import {RedirectionActions} from '../store/global/redirectionActions';
 
 
 @singleton()
 export class userService {
-    constructor(private http: ApiHttpService) {
+    constructor(private http: ApiHttpService, private messagesService: messageService) {
     }
 
     public getUserData = (): Promise<UserDTO> => this.http.get("user");
+
+    public updateUserData = async (data: UserUpdateDTO): Promise<void> => {
+        await this.http.post("user", data);
+        this.messagesService.success("Successfully updated!");
+    };
+
 }

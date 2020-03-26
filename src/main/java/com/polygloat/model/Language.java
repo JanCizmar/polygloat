@@ -9,8 +9,8 @@ import java.util.Set;
 
 @Entity
 @Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"repository_id", "name"}),
-        @UniqueConstraint(columnNames = {"repository_id", "abbreviation"})
+        @UniqueConstraint(columnNames = {"repository_id", "name"}, name = "language_repository_name"),
+        @UniqueConstraint(columnNames = {"repository_id", "abbreviation"}, name = "language_abbreviation_name")
 },
         indexes = {
                 @Index(columnList = "abbreviation", name = "index_abbreviation"),

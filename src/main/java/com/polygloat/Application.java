@@ -1,7 +1,7 @@
 package com.polygloat;
 
 import com.polygloat.development.DbPopulatorReal;
-import com.polygloat.dtos.request.SignUp;
+import com.polygloat.dtos.request.SignUpDto;
 import com.polygloat.service.UserAccountService;
 import io.sentry.Sentry;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ public class Application {
         }
 
         if (initialUsername != null && initialPassword != null && userAccountService.getByUserName(initialUsername).isEmpty()) {
-            userAccountService.createUser(SignUp.builder().email(initialUsername).password(initialPassword).name(initialUsername).build());
+            userAccountService.createUser(SignUpDto.builder().email(initialUsername).password(initialPassword).name(initialUsername).build());
         }
     }
 

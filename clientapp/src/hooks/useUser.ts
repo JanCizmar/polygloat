@@ -1,24 +1,23 @@
 import {container} from 'tsyringe';
-import {GlobalActions} from '../store/global/globalActions';
 import {useSelector} from "react-redux";
 import {AppState} from "../store";
 import {useEffect} from "react";
-import {useConfig} from "./useConfig";
 import {UserDTO} from "../service/response.types";
+import {UserActions} from "../store/global/userActions";
 
-const globalActions = container.resolve(GlobalActions);
+const userActions = container.resolve(UserActions);
 
 export const useUser = (): UserDTO => {
-    let userDTO = useSelector((state: AppState) => state.global.loadables.userData.data);
-    let loadError = useSelector((state: AppState) => state.global.loadables.userData.error);
-    let loading = useSelector((state: AppState) => state.global.loadables.userData.loading);
+    let userDTO = useSelector((state: AppState) => state.user.loadables.userData.data);
+    let loadError = useSelector((state: AppState) => state.user.loadables.userData.error);
+    let loading = useSelector((state: AppState) => state.user.loadables.userData.loading);
     let jwt = useSelector((state: AppState) => state.global.security.jwtToken);
 
     let allowPrivate = useSelector((state: AppState) => state.global.security.allowPrivate);
 
     useEffect(() => {
         if (!userDTO && !loading && !loadError && jwt) {
-            globalActions.loadableActions.userData.dispatch();
+            userActions.loadableActions.userData.dispatch();
         }
     }, [userDTO, loading, loadError, jwt]);
 

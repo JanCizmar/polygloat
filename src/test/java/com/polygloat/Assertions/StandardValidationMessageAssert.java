@@ -18,7 +18,6 @@ public class StandardValidationMessageAssert extends AbstractAssert<StandardVali
         }
         return new StringAssert(actual.get(field)).describedAs("Message assertion on field %s", field);
     }
-
     public IntegerAssert errorCount() {
         return new IntegerAssert(actual.size());
     }

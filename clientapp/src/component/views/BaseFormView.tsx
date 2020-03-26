@@ -22,13 +22,13 @@ interface BaseFormViewProps {
 }
 
 export const BaseFormView: FunctionComponent<BaseFormViewProps & BaseViewProps> = (props) => {
+
     return (
-        <BaseView loading={props.resourceLoadable && props.resourceLoadable.loading || (props.resourceLoadable && !props.resourceLoadable.touched)} {...props}>
+        <BaseView loading={props.resourceLoadable && !props.resourceLoadable.data || (props.resourceLoadable && !props.resourceLoadable.touched)} {...props}>
             {props.saveActionLoadable && props.saveActionLoadable.error && <ResourceErrorComponent error={props.saveActionLoadable.error}/>}
 
             <StandardForm initialValues={props.initialValues} onSubmit={props.onSubmit}
                           onCancel={props.onCancel}
-                          loading={props.saving || (props.saveActionLoadable && props.saveActionLoadable.loading)}
                           validationSchema={props.validationSchema}
                           customActions={props.customActions}
                           submitButtons={props.submitButtons}

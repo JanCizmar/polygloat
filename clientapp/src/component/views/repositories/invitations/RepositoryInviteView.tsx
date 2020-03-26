@@ -19,6 +19,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import {BoxLoading} from '../../../common/BoxLoading';
+import {EmptyListMessage} from "../../../common/EmptyListMessage";
 
 interface RepositoryInviteVIewProps {
 
@@ -85,7 +86,7 @@ export const RepositoryInviteView: FunctionComponent<RepositoryInviteVIewProps> 
                                             </ListItem>
                                         ))}
                                     </List>
-                                </Box>)}
+                                </Box> || <EmptyListMessage/>)}
                         </>)}
                 </BaseView>
             </RepositoryPage>

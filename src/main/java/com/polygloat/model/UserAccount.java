@@ -8,8 +8,8 @@ import java.util.Set;
 
 @Entity
 @Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"username"}),
-        @UniqueConstraint(columnNames = {"third_party_auth_type", "third_party_auth_id"}),
+        @UniqueConstraint(columnNames = {"username"}, name = "useraccount_username"),
+        @UniqueConstraint(columnNames = {"third_party_auth_type", "third_party_auth_id"}, name = "useraccount_authtype_auth_id"),
 
 })
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)

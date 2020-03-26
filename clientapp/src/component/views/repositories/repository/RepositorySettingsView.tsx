@@ -1,24 +1,20 @@
 import * as React from 'react';
-import {FunctionComponent, useState} from 'react';
+import {FunctionComponent, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {AppState} from '../../../../store';
 import {container} from 'tsyringe';
 import {RepositoryActions} from '../../../../store/repository/RepositoryActions';
-import {LanguageDTO} from '../../../../service/response.types';
 import {LINKS} from '../../../../constants/links';
 import {Redirect} from 'react-router-dom';
 import * as Yup from 'yup';
 import {TextField} from '../../../common/form/fields/TextField';
 import {BaseFormView} from '../../BaseFormView';
-import {DashboardPage} from '../../../layout/DashboardPage';
-import {FieldArray} from "../../../common/form/fields/FieldArray";
 import {useRepository} from "../../../../hooks/useRepository";
 import {RepositoryPage} from "../RepositoryPage";
 import {Button} from "@material-ui/core";
 import {useConfirmation} from "../../../../hooks/useConfirmation";
 
 const actions = container.resolve(RepositoryActions);
-
 
 type ValueType = {
     name: string,
@@ -27,6 +23,8 @@ type ValueType = {
 export const RepositorySettingsView: FunctionComponent = () => {
 
     const loadable = useSelector((state: AppState) => state.repositories.loadables.editRepository);
+    const saveLoadable = useSelector((state: AppState) => state.repositories.loadables.editRepository);
+    const deleteLoadable = useSelector((state: AppState) => state.repositories.loadables.deleteRepository);
 
     let repository = useRepository();
 
@@ -35,6 +33,20 @@ export const RepositorySettingsView: FunctionComponent = () => {
     const onSubmit = (values) => {
         actions.loadableActions.editRepository.dispatch(repository.id, values);
     };
+
+    useEffect(() => {
+        if (saveLoadable.loaded) {
+            actions.loadableReset.repository.dispatch();
+        }
+        return () => actions.loadableReset.editRepository.dispatch();
+    }, [saveLoadable.loaded]);
+
+
+    useEffect(() => {
+        return () => {
+            actions.loadableReset.deleteRepository.dispatch();
+        }
+    }, []);
 
     const initialValues: ValueType = {name: repository.name};
 

@@ -4,26 +4,23 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SignUp {
+@Builder
+public class UserUpdateRequestDTO {
     @NotBlank
-    String name;
+    private String name;
 
+    @NotBlank
     @Email
-    @NotBlank
-    String email;
+    private String email;
 
-    @Length(min = 8, max = 100)
-    @NotBlank
-    String password;
-
-    String invitationCode;
+    @Size(min = 8, max = 100)
+    private String password;
 }

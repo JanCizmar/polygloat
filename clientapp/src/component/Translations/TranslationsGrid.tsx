@@ -18,6 +18,8 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import {TranslationCreationDialog} from "./TranslationCreationDialog";
 import {useConfirmation} from "../../hooks/useConfirmation";
 import {TranslationListContext} from "./TtranslationsGridContextProvider";
+import {EmptyListMessage} from "../common/EmptyListMessage";
+import {FabAddButtonLink} from "../common/buttons/FabAddButtonLink";
 
 const actions = container.resolve(TranslationActions);
 
@@ -28,59 +30,69 @@ export const TranslationsGrid: FunctionComponent = (props) => {
 
     return (
         <>
-            <Box mb={2}>
-                <Paper>
-                    <Box display="flex" p={2} pl={1}>
-                        <Box flexGrow={1} display="flex">
-                            <Slide in={listContext.isSomeChecked()} direction="right" mountOnEnter unmountOnExit>
-                                <Box pr={2}>
-                                    <Tooltip title="Delete selected">
-                                        <IconButton color="secondary"
-                                                    onClick={() =>
-                                                        useConfirmation()({
-                                                            onConfirm: () => actions.loadableActions.delete
-                                                                .dispatch(repositoryDTO.id, Array.from(listContext.checkedSources)),
-                                                            confirmButtonText: "Delete",
-                                                            confirmButtonColor: "secondary",
-                                                            message: `Are you sure you want to delete all checked ` +
-                                                                `(${listContext.checkedSources.size}) translation sources?`,
-                                                            title: "Delete confirmation"
-                                                        })
-                                                    }>
-                                            <DeleteIcon/>
-                                        </IconButton>
-                                    </Tooltip>
+            {listContext.listLoadable.data.paginationMeta.allCount === 0 &&
+            <>
+                <EmptyListMessage/>
+                <Box display="flex" justifyContent="center">
+                    <FabAddButtonLink to={LINKS.REPOSITORY_TRANSLATIONS_ADD.build({[PARAMS.REPOSITORY_ID]: repositoryDTO.id})}/>
+                </Box>
+            </>
+            ||
+            <>
+                <Box mb={2}>
+                    <Paper>
+                        <Box display="flex" p={2} pl={1}>
+                            <Box flexGrow={1} display="flex">
+                                <Slide in={listContext.isSomeChecked()} direction="right" mountOnEnter unmountOnExit>
+                                    <Box pr={2}>
+                                        <Tooltip title="Delete selected">
+                                            <IconButton color="secondary"
+                                                        onClick={() =>
+                                                            useConfirmation()({
+                                                                onConfirm: () => actions.loadableActions.delete
+                                                                    .dispatch(repositoryDTO.id, Array.from(listContext.checkedSources)),
+                                                                confirmButtonText: "Delete",
+                                                                confirmButtonColor: "secondary",
+                                                                message: `Are you sure you want to delete all checked ` +
+                                                                    `(${listContext.checkedSources.size}) translation sources?`,
+                                                                title: "Delete confirmation"
+                                                            })
+                                                        }>
+                                                <DeleteIcon/>
+                                            </IconButton>
+                                        </Tooltip>
+                                    </Box>
+                                </Slide>
+                                <Box pr={2} pl={1}>
+                                    <LanguagesMenu/>
                                 </Box>
-                            </Slide>
-                            <Box pr={2} pl={1}>
-                                <LanguagesMenu/>
+                                <SearchField/>
                             </Box>
-                            <SearchField/>
+                            <Box display="flex" alignItems="center">
+                                <Button component={Link} variant="outlined" color="primary"
+                                        to={LINKS.REPOSITORY_TRANSLATIONS_ADD.build({[PARAMS.REPOSITORY_ID]: repositoryDTO.id})}
+                                        startIcon={<AddIcon/>}
+                                >
+                                    Add
+                                </Button>
+                            </Box>
                         </Box>
-                        <Box display="flex" alignItems="center">
-                            <Button component={Link} variant="outlined" color="primary"
-                                    to={LINKS.REPOSITORY_TRANSLATIONS_ADD.build({[PARAMS.REPOSITORY_ID]: repositoryDTO.id})}
-                                    startIcon={<AddIcon/>}
-                            >
-                                Add
-                            </Button>
+                    </Paper>
+                </Box>
+                <Paper>
+                    {listContext.listLoadable.data ?
+                        <Box p={1} display="flex" justifyContent="flex-end">
+                            <Box display="flex" flexDirection="column" flexGrow={1} maxWidth="100%" fontSize={14}>
+                                <Header/>
+                                {listContext.listLoadable.data.data.map(t => <TranslationsRow key={t.name} data={t}/>)}
+                            </Box>
                         </Box>
-                    </Box>
+                        :
+                        <BoxLoading/>
+                    }
                 </Paper>
-            </Box>
-            <Paper>
-                {listContext.listLoadable.data ?
-                    <Box p={1} display="flex" justifyContent="flex-end">
-                        <Box display="flex" flexDirection="column" flexGrow={1} maxWidth="100%" fontSize={14}>
-                            <Header/>
-                            {listContext.listLoadable.data.data.map(t => <TranslationsRow key={t.name} data={t}/>)}
-                        </Box>
-                    </Box>
-                    :
-                    <BoxLoading/>
-                }
-            </Paper>
-            <Pagination/>
+                <Pagination/>
+            </>}
             <Switch>
                 <Route path={LINKS.REPOSITORY_TRANSLATIONS_ADD.template}>
                     <TranslationCreationDialog/>

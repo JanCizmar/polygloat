@@ -3,7 +3,7 @@ import {container, singleton} from 'tsyringe';
 import {repositoryService} from '../../service/repositoryService';
 import {RepositoryDTO} from '../../service/response.types';
 import {LINKS} from "../../constants/links";
-import {AbstractLoadableActions, StateWithLoadables} from "../AbstractLoadableActions";
+import {AbstractLoadableActions, createLoadable, Loadable, StateWithLoadables} from "../AbstractLoadableActions";
 
 export class RepositoriesState extends StateWithLoadables<RepositoryActions> {
     repositoriesLoading: boolean = true;
@@ -26,15 +26,16 @@ export class RepositoryActions extends AbstractLoadableActions<RepositoriesState
         });
 
 
-    get loadableDefinitions() {
-        return {
-            editRepository: this.createLoadableDefinition<null>((id, values) => this.service.editRepository(id, values), null,
-                "Successfully edited!", LINKS.REPOSITORIES),
-            createRepository: this.createLoadableDefinition((values) => this.service.createRepository(values),
-                null, "Repository created", LINKS.REPOSITORIES),
-            repository: this.createLoadableDefinition(this.service.loadRepository, null),
-            deleteRepository: this.createLoadableDefinition(this.service.deleteRepository, null, "Repository deleted", LINKS.REPOSITORIES),
-        }
+    loadableDefinitions = {
+        editRepository: this.createLoadableDefinition<null>((id, values) => this.service.editRepository(id, values), null,
+            "Successfully edited!", LINKS.REPOSITORIES),
+        createRepository: this.createLoadableDefinition((values) => this.service.createRepository(values),
+            null, "Repository created", LINKS.REPOSITORIES),
+        repository: this.createLoadableDefinition(this.service.loadRepository),
+        deleteRepository: this.createLoadableDefinition(this.service.deleteRepository, (state, action) =>
+            (
+                {...state, loadables: {...state.loadables, repository: {...createLoadable()} as Loadable<RepositoryDTO>}}
+            ), "Repository deleted!")
     };
 
 
