@@ -5,6 +5,7 @@ import com.polygloat.exceptions.BadRequestException;
 import com.polygloat.model.Invitation;
 import com.polygloat.model.Permission;
 import com.polygloat.model.Repository;
+import com.polygloat.model.UserAccount;
 import com.polygloat.repository.InvitationRepository;
 import com.polygloat.repository.PermissionRepository;
 import com.polygloat.security.AuthenticationFacade;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.validation.constraints.NotNull;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
@@ -46,21 +48,34 @@ public class InvitationService {
 
     @Transactional
     public void accept(String code) {
-        Invitation invitation = invitationRepository.findOneByCode(code).orElseThrow(() -> new BadRequestException(Message.INVITATION_CODE_DOES_NOT_EXIST_OR_EXPIRED));
+        this.accept(code, authenticationFacade.getUserAccount());
+    }
+
+    @Transactional
+    public void accept(String code, UserAccount userAccount) {
+        Invitation invitation = getInvitation(code);
 
         Permission permission = invitation.getPermission();
 
-        if (!this.permissionRepository.findOneByRepositoryIdAndUserId(permission.getRepository().getId(), authenticationFacade.getUserAccount().getId()).isEmpty()) {
+        if (this.permissionRepository.findOneByRepositoryIdAndUserId(permission.getRepository().getId(), userAccount.getId()).isPresent()) {
             throw new BadRequestException(Message.USER_ALREADY_HAS_PERMISSIONS);
         }
 
         permission.setInvitation(null);
-        permission.setUser(authenticationFacade.getUserAccount());
+        permission.setUser(userAccount);
         permissionRepository.save(permission);
 
         //avoid cascade delete
         invitation.setPermission(null);
         invitationRepository.delete(invitation);
+    }
+
+
+    @NotNull
+    public Invitation getInvitation(String code) {
+        return invitationRepository.findOneByCode(code).orElseThrow(() ->
+                //this exception is important for sign up service! Do not remove!!
+                new BadRequestException(Message.INVITATION_CODE_DOES_NOT_EXIST_OR_EXPIRED));
     }
 
     public Optional<Invitation> findById(Long id) {

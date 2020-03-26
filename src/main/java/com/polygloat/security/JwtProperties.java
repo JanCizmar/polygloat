@@ -1,5 +1,6 @@
 package com.polygloat.security;
 
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -8,14 +9,16 @@ import java.security.Key;
 
 @Component
 public class JwtProperties {
-    @Value("${app.jwtSecret}")
+    private static final byte[] DEFAULT_JWT = Keys.secretKeyFor(SignatureAlgorithm.HS512).getEncoded();
+
+    @Value("${app.jwtSecret:#{null}}")
     private String jwtSecret;
 
-    @Value("${app.jwtExpirationInMs}")
+    @Value("${app.jwtExpirationInMs:604800000}")
     private int jwtExpirationInMs;
 
     public Key getKey() {
-        return Keys.hmacShaKeyFor(jwtSecret.getBytes());
+        return Keys.hmacShaKeyFor(jwtSecret == null ? DEFAULT_JWT : jwtSecret.getBytes());
     }
 
     public int getJwtExpirationInMs() {

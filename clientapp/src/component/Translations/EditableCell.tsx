@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {FunctionComponent, useContext, useEffect, useState} from 'react';
-import {Box, makeStyles, Theme, Tooltip, Typography} from "@material-ui/core";
-import {createStyles} from "@material-ui/core/styles";
+import {Box, Theme, Tooltip, Typography} from "@material-ui/core";
 import {MicroForm} from "../common/form/MicroForm";
 import {EasyInput} from "../common/form/fields/EasyInput";
 import InputAdornment from "@material-ui/core/InputAdornment";
@@ -12,6 +11,7 @@ import * as Yup from 'yup';
 import {EditIconButton} from "../common/buttons/EditIconButton";
 import {TranslationListContext} from "./TtranslationsGridContextProvider";
 import EditIcon from "@material-ui/icons/Edit";
+import {createStyles, makeStyles} from "@material-ui/core/styles";
 
 export interface EditableCellProps {
     initialValue: any,

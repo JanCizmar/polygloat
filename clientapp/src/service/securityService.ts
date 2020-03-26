@@ -7,6 +7,8 @@ import {API_LINKS} from '../constants/apiLinks';
 import {LINKS} from '../constants/links';
 import {messageService} from './messageService';
 import {RedirectionActions} from '../store/global/redirectionActions';
+import {invitationCodeService} from "./invitationCodeService";
+import {invitationService} from "./invitationService";
 
 const API_URL = CONFIG.API_URL;
 
@@ -19,11 +21,16 @@ interface ResetPasswordPostRequest {
 @singleton()
 export class securityService {
     constructor(private http: ApiHttpService, private tokenService: tokenService, private messageService: messageService,
-                private redirectionActions: RedirectionActions) {
+                private redirectionActions: RedirectionActions,
+                private invitationCodeService: invitationCodeService,
+                private invitationService: invitationService) {
     }
 
     public authorizeOAuthLogin = async (type: string, code: string): Promise<TokenDTO> => {
-        let response = await fetch(`${API_URL}public/authorize_oauth/${type}/${code}`);
+        const invitationCode = this.invitationCodeService.getCode();
+        const invitationCodeQueryPart = invitationCode ? "?invitationCode=" + invitationCode : "";
+        let response = await fetch(`${API_URL}public/authorize_oauth/${type}/${code}${invitationCodeQueryPart}`);
+        this.invitationCodeService.disposeCode();
         return this.handleLoginResponse(response);
     };
 
@@ -103,6 +110,10 @@ export class securityService {
 
         this.tokenService.setToken(tokenDTO.accessToken);
 
+        if (this.invitationCodeService.getCode()) {
+            await this.invitationService.acceptInvitation(this.invitationCodeService.getCode());
+            this.invitationCodeService.disposeCode();
+        }
         return tokenDTO;
     }
 

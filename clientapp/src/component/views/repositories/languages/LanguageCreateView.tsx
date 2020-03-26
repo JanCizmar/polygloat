@@ -3,7 +3,6 @@ import {useState} from 'react';
 import {container} from 'tsyringe';
 import {LINKS, PARAMS} from '../../../../constants/links';
 import {Route, Switch, useRouteMatch} from 'react-router-dom';
-import * as Yup from 'yup';
 import {TextField} from '../../../common/form/fields/TextField';
 import {RepositoryPage} from '../RepositoryPage';
 import {BaseFormView} from '../../BaseFormView';
@@ -54,7 +53,6 @@ export const LanguageCreateView = () => {
             </BaseFormView>
             <Switch>
                 <Route exact path={LINKS.REPOSITORY_TRANSLATIONS_ADD.template}>
-
                 </Route>
             </Switch>
         </RepositoryPage>

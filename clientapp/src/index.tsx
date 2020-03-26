@@ -18,8 +18,8 @@ import FullPageLoading from "./component/common/FullPageLoadingView";
 import App from "./component/App";
 import {SnackbarProvider} from 'notistack';
 import RubikTTf from './fonts/Rubik/Rubik-Regular.woff2';
-import {createMuiTheme, ThemeProvider} from "@material-ui/core";
 import {blue, red} from "@material-ui/core/colors";
+import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
 
 const store = configureStore();
 

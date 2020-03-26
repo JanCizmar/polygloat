@@ -7,6 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import {Link} from "react-router-dom";
 import {PolygloatLogo} from "../common/icons/PolygloatLogo";
 import {Box} from "@material-ui/core";
+import {UserMenu} from "../security/UserMenu";
 
 const drawerWidth = 240;
 
@@ -65,6 +66,7 @@ export function TopBar(props: TopBarProps) {
                         </Link>
                     </Box>
                 </Box>
+                <UserMenu variant="expanded"/>
             </Toolbar>
         </AppBar>
     );

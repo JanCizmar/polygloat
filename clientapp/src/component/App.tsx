@@ -4,7 +4,7 @@ import {GlobalActions} from '../store/global/globalActions';
 import SnackBar from './common/SnackBar';
 import {BrowserRouter, Redirect, Route, Switch} from 'react-router-dom';
 import {container} from 'tsyringe';
-import {connect, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import {AppState} from '../store';
 import {LINKS} from '../constants/links';
 import {PrivateRoute} from './common/PrivateRoute';
@@ -15,7 +15,6 @@ import {useConfig} from "../hooks/useConfig";
 import {useUser} from "../hooks/useUser";
 import FullPageLoadingView from "./common/FullPageLoadingView";
 import {ApiKeysView} from "./security/apiKeys/ApiKeysView";
-import {RepositoryProvider} from "../hooks/RepositoryProvider";
 
 const LoginRouter = React.lazy(() => import(/* webpackChunkName: "login-router" */'./security/LoginRouter'));
 const SignUpView = React.lazy(() => import(/* webpackChunkName: "login-router" */'./security/SignUpView'));
@@ -55,7 +54,7 @@ const MandatoryDataProvider = (props) => {
 
     let allowPrivate = useSelector((state: AppState) => state.global.security.allowPrivate);
 
-    if (!config || (!userData && allowPrivate)) {
+    if (!config || (!userData && allowPrivate) && config.authentication) {
         return <FullPageLoadingView/>
     } else {
         return props.children;
@@ -80,7 +79,7 @@ const GlobalConfirmation = () => {
     return (<ConfirmationDialog open={!!state} {...state} onCancel={onCancel} onConfirm={onConfirm}/>);
 };
 
-export class AppImp extends React.Component<Props, null> {
+export default class App extends React.Component {
     componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
         errorActions.globalError.dispatch(error);
         throw error;
@@ -104,14 +103,14 @@ export class AppImp extends React.Component<Props, null> {
                         <Route path={LINKS.LOGIN.template}>
                             <LoginRouter/>
                         </Route>
+                        <Route path={LINKS.ACCEPT_INVITATION.template}>
+                            <AcceptInvitationHandler/>
+                        </Route>
                         <PrivateRoute exact path="/">
                             <Redirect to={LINKS.REPOSITORIES.template}/>
                         </PrivateRoute>
                         <PrivateRoute path={LINKS.REPOSITORIES.template}>
                             <RepositoriesRouter/>
-                        </PrivateRoute>
-                        <PrivateRoute path={LINKS.ACCEPT_INVITATION.template}>
-                            <AcceptInvitationHandler/>
                         </PrivateRoute>
                         <PrivateRoute path={`${LINKS.USER_API_KEYS.template}`}>
                             <ApiKeysView/>
@@ -124,8 +123,3 @@ export class AppImp extends React.Component<Props, null> {
         );
     }
 };
-
-export default connect((state: AppState) => (
-    {
-        remoteConfig: state.global.loadables.remoteConfig.data
-    }))(AppImp);

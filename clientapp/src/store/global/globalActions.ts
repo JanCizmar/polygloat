@@ -6,26 +6,31 @@ import {ErrorResponseDTO, RemoteConfigurationDTO, TokenDTO, UserDTO} from '../..
 import {userService} from "../../service/userService";
 import {ConfirmationDialogProps} from "../../component/common/ConfirmationDialog";
 import {AbstractLoadableActions, StateWithLoadables} from "../AbstractLoadableActions";
+import {invitationCodeService} from "../../service/invitationCodeService";
 
 export class GlobalState extends StateWithLoadables<GlobalActions> {
     authLoading: boolean = false;
     security: SecurityDTO = {
         allowPrivate: !!localStorage.getItem('jwtToken'),
         jwtToken: localStorage.getItem('jwtToken') || null,
-        loginErrorCode: null
+        loginErrorCode: null,
+        allowRegistration: false
     };
     passwordResetSetLoading = false;
     passwordResetSetValidated = false;
     passwordResetSetError = null;
     passwordResetSetSucceed = false;
     confirmationDialog: ConfirmationDialogProps = null;
-    sideMenuOpen: boolean = true
+    sideMenuOpen: boolean = true;
 }
 
 
 @singleton()
 export class GlobalActions extends AbstractLoadableActions<GlobalState> {
-    constructor(private configService: remoteConfigService, private securityService: securityService, private userService: userService) {
+    constructor(private configService: remoteConfigService,
+                private securityService: securityService,
+                private userService: userService,
+                private invitationCodeService: invitationCodeService) {
         super(new GlobalState());
     }
 
@@ -71,10 +76,13 @@ export class GlobalActions extends AbstractLoadableActions<GlobalState> {
         (state, action) => {
             return {
                 ...state,
-                security: {...state.security, allowPrivate: true, jwtToken: action.payload.accessToken, loginErrorCode: null}
+                security: {...state.security, allowPrivate: true, jwtToken: action.payload, loginErrorCode: null, allowRegistration: true}
             };
         });
 
+    allowRegistration = this.createAction('ALLOW_REGISTRATION').build.on((state: GlobalState) => {
+        return {...state, security: {...state.security, allowRegistration: true}}
+    });
 
     openConfirmation = this.createAction('OPEN_CONFIRMATION',
         (options: ConfirmationDialogProps) => (options))
@@ -93,7 +101,18 @@ export class GlobalActions extends AbstractLoadableActions<GlobalState> {
 
     readonly loadableDefinitions = {
         userData: this.createLoadableDefinition<UserDTO>(this.userService.getUserData),
-        remoteConfig: this.createLoadableDefinition<RemoteConfigurationDTO>(() => this.configService.getConfiguration()),
+        remoteConfig: this.createLoadableDefinition<RemoteConfigurationDTO>(() => this.configService.getConfiguration(),
+            (state, action) => {
+                let invitationCode = this.invitationCodeService.getCode();
+                return {
+                    ...state,
+                    security: {
+                        ...state.security,
+                        allowPrivate: !action.payload.authentication || state.security.allowPrivate,
+                        allowRegistration: action.payload.allowRegistrations || !!invitationCode //if user has invitation code, registration is allowed
+                    }
+                };
+            }),
         resetPasswordRequest: this.createLoadableDefinition(this.securityService.resetPasswordRequest)
     };
 
@@ -101,6 +120,9 @@ export class GlobalActions extends AbstractLoadableActions<GlobalState> {
         ...state,
         sideMenuOpen: !state.sideMenuOpen
     } as GlobalState));
+
+
+    readonly setInvitationCode = this.createAction('SET_INVITATION_CODE').build.on((state: GlobalState) => ({}));
 
     get prefix(): string {
         return 'GLOBAL';
@@ -120,7 +142,7 @@ export class GlobalActions extends AbstractLoadableActions<GlobalState> {
             )).build.onRejected((state, action) => ({
                 ...state,
                 authLoading: false,
-                security: <SecurityDTO>{loginErrorCode: action.payload.code}
+                security: <SecurityDTO>{allowRegistration: state.security.allowRegistration, loginErrorCode: action.payload.code}
             }));
     }
 }

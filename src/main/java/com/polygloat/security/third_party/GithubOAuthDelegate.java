@@ -1,12 +1,17 @@
 package com.polygloat.security.third_party;
 
+import com.polygloat.configuration.AppConfiguration;
 import com.polygloat.constants.Message;
 import com.polygloat.exceptions.AuthenticationException;
+import com.polygloat.model.Invitation;
 import com.polygloat.model.UserAccount;
 import com.polygloat.security.JwtTokenProvider;
 import com.polygloat.security.payload.JwtAuthenticationResponse;
+import com.polygloat.service.InvitationService;
 import com.polygloat.service.UserAccountService;
+import com.sun.istack.Nullable;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,10 +25,13 @@ import java.util.Map;
 import java.util.Optional;
 
 @Component
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class GithubOAuthDelegate {
     private final JwtTokenProvider tokenProvider;
     private final UserAccountService userAccountService;
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
+    private final AppConfiguration appConfiguration;
+    private final InvitationService invitationService;
 
     @Value("${polygloat.security.github.client-secret:#{null}}")
     private String githubClientSecret;
@@ -37,14 +45,7 @@ public class GithubOAuthDelegate {
     @Value("${polygloat.security.github.user-link:#{null}}")
     private String githubUserLink;
 
-    @Autowired
-    GithubOAuthDelegate(JwtTokenProvider tokenProvider, UserAccountService userAccountService, RestTemplate restTemplate) {
-        this.tokenProvider = tokenProvider;
-        this.userAccountService = userAccountService;
-        this.restTemplate = restTemplate;
-    }
-
-    public JwtAuthenticationResponse getTokenResponse(String receivedCode) {
+    public JwtAuthenticationResponse getTokenResponse(String receivedCode, @Nullable String invitationCode) {
         HashMap<String, String> body = new HashMap<>();
         body.put("client_id", githubClientId);
         body.put("client_secret", githubClientSecret);
@@ -88,12 +89,25 @@ public class GithubOAuthDelegate {
                     throw new AuthenticationException(Message.USERNAME_ALREADY_EXISTS);
                 });
 
+                Invitation invitation = null;
+
+                if (invitationCode == null) {
+                    appConfiguration.checkAllowedRegistrations();
+                } else {
+                    invitation = invitationService.getInvitation(invitationCode);
+                }
+
                 UserAccount newUserAccount = new UserAccount();
                 newUserAccount.setUsername(githubEmail.getEmail());
                 newUserAccount.setName(userResponse.getName());
                 newUserAccount.setThirdPartyAuthId(userResponse.getId());
                 newUserAccount.setThirdPartyAuthType("github");
                 userAccountService.createUser(newUserAccount);
+
+                if (invitation != null) {
+                    invitationService.accept(invitation.getCode(), newUserAccount);
+                }
+
                 return newUserAccount;
             });
 

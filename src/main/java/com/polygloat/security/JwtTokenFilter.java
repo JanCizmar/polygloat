@@ -1,34 +1,28 @@
 package com.polygloat.security;
 
-import com.polygloat.exceptions.NotFoundException;
+import com.polygloat.configuration.AppConfiguration;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.filter.GenericFilterBean;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
-public class JwtTokenFilter extends GenericFilterBean {
-    private JwtTokenProvider jwtTokenProvider;
-
-    @Autowired
-    public JwtTokenFilter(JwtTokenProvider jwtTokenProvider) {
-        this.jwtTokenProvider = jwtTokenProvider;
-    }
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+public class JwtTokenFilter extends OncePerRequestFilter {
+    private final JwtTokenProvider jwtTokenProvider;
+    private final AppConfiguration configuration;
 
     @Override
-    public void doFilter(ServletRequest req, ServletResponse res, FilterChain filterChain)
-            throws IOException, ServletException {
-
-        JwtToken token = jwtTokenProvider.resolveToken((HttpServletRequest) req);
+    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws ServletException, IOException {
+        JwtToken token = jwtTokenProvider.resolveToken(req);
 
         if (token != null && jwtTokenProvider.validateToken(token)) {
             try {
@@ -39,5 +33,10 @@ public class JwtTokenFilter extends GenericFilterBean {
             }
         }
         filterChain.doFilter(req, res);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return !configuration.isAuthentication();
     }
 }

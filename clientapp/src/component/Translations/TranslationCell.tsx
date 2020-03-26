@@ -3,7 +3,6 @@ import {FunctionComponent, useContext} from 'react';
 import {RowContext} from "./TranslationsRow";
 import {useRepository} from "../../hooks/useRepository";
 import {RepositoryPermissionType} from "../../service/response.types";
-import * as Yup from 'yup';
 import {EditableCell} from "./EditableCell";
 import {container} from "tsyringe";
 import {TranslationActions} from "../../store/repository/TranslationActions";
@@ -19,7 +18,6 @@ export const TranslationCell: FunctionComponent<TranslationsTableCellProps> = (p
     let repositoryDTO = useRepository();
 
     let context = useContext(RowContext);
-
 
     const handleSubmit = (v) => {
         actions.loadableActions.setTranslations.dispatch(repositoryDTO.id, {sourceFullPath: context.data.name, translations: {[props.abbreviation]: v}});

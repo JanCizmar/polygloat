@@ -7,13 +7,15 @@ import {messageService} from './messageService';
 import {SignUpType} from '../component/security/SignUpView';
 import {RedirectionActions} from '../store/global/redirectionActions';
 import {GlobalActions} from '../store/global/globalActions';
+import {invitationCodeService} from "./invitationCodeService";
 
 @singleton()
 export class signUpService {
     constructor(private http: ApiHttpService, private tokenService: tokenService,
                 private messageService: messageService,
                 private redirectionActions: RedirectionActions,
-                private globalActions: GlobalActions) {
+                private globalActions: GlobalActions,
+                private invitationCodeService: invitationCodeService) {
     }
 
     public validateEmail = async (email: string): Promise<boolean> => {
@@ -21,10 +23,11 @@ export class signUpService {
     };
 
     public signUp = async (data: SignUpType): Promise<void> => {
-        const request = {...data};
+        const request = {...data, invitationCode: this.invitationCodeService.getCode()} as SignUpType;
         delete request.passwordRepeat;
         let response = await this.http.post('public/sign_up', request) as TokenDTO;
         this.messageService.success('Thanks for your sign up');
+        this.invitationCodeService.disposeCode();
         this.tokenService.setToken(response.accessToken);
         this.globalActions.setJWTToken.dispatch(response.accessToken);
         this.redirectionActions.redirect.dispatch(LINKS.AFTER_LOGIN.build());

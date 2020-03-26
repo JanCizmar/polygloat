@@ -1,10 +1,9 @@
 package com.polygloat.dtos.request;
 
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Email;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
 @Data
@@ -13,9 +12,12 @@ public class SignUp {
     String name;
 
     @Email
+    @NotBlank
     String email;
 
-    @Min(8)
-    @Max(100)
+    @Length(min = 8, max = 100)
+    @NotBlank
     String password;
+
+    String invitationCode;
 }

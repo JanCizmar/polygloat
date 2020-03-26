@@ -1,6 +1,6 @@
 import {singleton} from 'tsyringe';
-import {repositoryService} from '../../../service/repositoryService';
 import {AbstractLoadableActions, StateWithLoadables} from "../../AbstractLoadableActions";
+import {invitationService} from "../../../service/invitationService";
 
 export class RepositoryInvitationState extends StateWithLoadables<RepositoryInvitationActions> {
     invitationLoading: boolean = false;
@@ -11,7 +11,7 @@ export class RepositoryInvitationState extends StateWithLoadables<RepositoryInvi
 export class RepositoryInvitationActions extends AbstractLoadableActions<RepositoryInvitationState> {
 
     generateCode = this.createPromiseAction('GENERATE_CODE',
-        (repositoryId, type) => this.repositoryService.generateInvitationCode(repositoryId, type))
+        (repositoryId, type) => this.invitationService.generateInvitationCode(repositoryId, type))
         .build.onPending((state, action) => {
             return {...state, invitationCode: null, invitationLoading: true};
         }).build.onFullFilled((state, action) => {
@@ -21,18 +21,18 @@ export class RepositoryInvitationActions extends AbstractLoadableActions<Reposit
         });
 
     acceptInvitation = this.createPromiseAction('ACCEPT_INVITATION',
-        (code) => this.repositoryService.acceptInvitation(code));
+        (code) => this.invitationService.acceptInvitation(code));
 
 
     loadableDefinitions = {
-        list: this.createLoadableDefinition(this.repositoryService.getInvitations),
+        list: this.createLoadableDefinition(this.invitationService.getInvitations),
         delete: this.createDeleteDefinition("list", async (id) => {
-            await this.repositoryService.deleteInvitation(id);
+            await this.invitationService.deleteInvitation(id);
             return id;
         }, (state) => ({...state, invitationCode: ""}))
     };
 
-    constructor(private repositoryService: repositoryService) {
+    constructor(private invitationService: invitationService) {
         super(new RepositoryInvitationState());
     }
 

@@ -1,6 +1,8 @@
 package com.polygloat.configuration;
 
 
+import com.polygloat.constants.Message;
+import com.polygloat.exceptions.BadRequestException;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -16,9 +18,6 @@ public class AppConfiguration {
 
     @Value("${app.jwtExpirationInMs:604800000}")
     private Long jwtExpirationInMs;
-
-    @Value("${app.jwtSecret:#{null}}")
-    private String jwtSecret;
 
     @Value("${polygloat.authentication:true}")
     private boolean authentication;
@@ -89,4 +88,10 @@ public class AppConfiguration {
 
     @Value("${polygloat.mail.from:no-reply@polygloat.com}")
     private String mailFrom;
+
+    public void checkAllowedRegistrations() {
+        if (!this.isAllowRegistrations()) {
+            throw new BadRequestException(Message.REGISTRATIONS_NOT_ALLOWED);
+        }
+    }
 }

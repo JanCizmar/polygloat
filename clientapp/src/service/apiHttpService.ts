@@ -72,7 +72,7 @@ export class ApiHttpService {
                 }
                 //use input error, result should contain json
                 if (r.status >= 400 && r.status <= 500) {
-                    this.messageService.error("Bad request!");
+                    //this.messageService.error("Bad request!");
                     ApiHttpService.getResObject(r).then(b => reject(b));
                 } else {
                     resolve(r);

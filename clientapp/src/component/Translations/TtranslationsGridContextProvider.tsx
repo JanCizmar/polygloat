@@ -6,7 +6,7 @@ import FullPageLoadingView from "../common/FullPageLoadingView";
 import {TranslationActions} from "../../store/repository/TranslationActions";
 import {useRepository} from "../../hooks/useRepository";
 import {Loadable} from "../../store/AbstractLoadableActions";
-import {TranslationsDataResponse} from "../../service/response.types";
+import {RepositoryPermissionType, TranslationsDataResponse} from "../../service/response.types";
 
 export const TranslationListContext = React.createContext<TranslationListContextType>(null);
 
@@ -27,6 +27,7 @@ export type TranslationListContextType = {
     isAllChecked: () => boolean,
     isSomeChecked: () => boolean
     checkedSources: Set<number>
+    showCheckBoxes: boolean
 }
 
 export const TranslationGridContextProvider: FunctionComponent = (props) => {
@@ -155,7 +156,8 @@ export const TranslationGridContextProvider: FunctionComponent = (props) => {
         },
         isAllChecked,
         isSomeChecked,
-        checkedSources
+        checkedSources,
+        showCheckBoxes: repositoryDTO.permissionType === RepositoryPermissionType.MANAGE
     };
 
     return (

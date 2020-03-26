@@ -54,7 +54,7 @@ export const LoginView: FunctionComponent<LoginProps> = (props) => {
                               submitButtons={
                                   <>
                                       <Box display="flex" justifyContent="space-between">
-                                          {remoteConfig.allowRegistrations &&
+                                          {security.allowRegistration &&
                                           <Button size="large" component={Link} to={LINKS.SIGN_UP.build()}>
                                               Sign up
                                           </Button>

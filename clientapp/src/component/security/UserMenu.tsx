@@ -1,5 +1,5 @@
 import {default as React, FunctionComponent, useState} from 'react';
-import {Button, MenuProps, withStyles} from '@material-ui/core';
+import {Button, MenuProps} from '@material-ui/core';
 import {container} from 'tsyringe';
 import {GlobalActions} from '../../store/global/globalActions';
 import {useSelector} from 'react-redux';
@@ -12,6 +12,7 @@ import {Link} from "react-router-dom";
 import {LINKS} from "../../constants/links";
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import PersonIcon from '@material-ui/icons/Person';
+import withStyles from "@material-ui/core/styles/withStyles";
 
 interface UserMenuProps {
     variant: "small" | "expanded"

@@ -8,13 +8,16 @@ import com.polygloat.dtos.request.SignUp;
 import com.polygloat.exceptions.AuthenticationException;
 import com.polygloat.exceptions.BadRequestException;
 import com.polygloat.exceptions.NotFoundException;
+import com.polygloat.model.Invitation;
 import com.polygloat.model.UserAccount;
 import com.polygloat.security.payload.ApiResponse;
 import com.polygloat.security.payload.JwtAuthenticationResponse;
 import com.polygloat.security.payload.LoginRequest;
 import com.polygloat.security.third_party.GithubOAuthDelegate;
+import com.polygloat.service.InvitationService;
 import com.polygloat.service.UserAccountService;
 import com.unboundid.util.Base64;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.codehaus.jackson.node.TextNode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,29 +32,23 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsImpl;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/public")
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AuthController {
 
-    private AuthenticationManager authenticationManager;
-    private JwtTokenProvider tokenProvider;
-    private GithubOAuthDelegate githubOAuthDelegate;
-    private AppConfiguration appConfiguration;
-    private UserAccountService userAccountService;
-    private JavaMailSender mailSender;
-
-    @Autowired
-    AuthController(AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider, GithubOAuthDelegate githubOAuthDelegate, AppConfiguration appConfiguration,
-                   UserAccountService userAccountService, JavaMailSender mailSender) {
-        this.authenticationManager = authenticationManager;
-        this.tokenProvider = tokenProvider;
-        this.githubOAuthDelegate = githubOAuthDelegate;
-        this.appConfiguration = appConfiguration;
-        this.userAccountService = userAccountService;
-        this.mailSender = mailSender;
-    }
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenProvider tokenProvider;
+    private final GithubOAuthDelegate githubOAuthDelegate;
+    private final AppConfiguration appConfiguration;
+    private final UserAccountService userAccountService;
+    private final JavaMailSender mailSender;
+    private final InvitationService invitationService;
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     @PostMapping("/generatetoken")
@@ -152,20 +149,32 @@ public class AuthController {
     }
 
     @PostMapping("/sign_up")
-    public JwtAuthenticationResponse signUp(@RequestBody SignUp request) {
-        checkAllowedRegistrations();
+    @Transactional
+    public JwtAuthenticationResponse signUp(@RequestBody @Valid SignUp request) {
+        Invitation invitation = null;
+
+        if (request.getInvitationCode() == null || request.getInvitationCode().isEmpty()) {
+            appConfiguration.checkAllowedRegistrations();
+        } else {
+            invitation = invitationService.getInvitation(request.getInvitationCode());//it throws an exception
+        }
+
         userAccountService.getByUserName(request.getEmail()).ifPresent(u -> {
             throw new BadRequestException(Message.USERNAME_ALREADY_EXISTS);
         });
 
         UserAccount user = userAccountService.createUser(request);
+
+        if (invitation != null) {
+            invitationService.accept(invitation.getCode(), user);
+        }
+
         return new JwtAuthenticationResponse(this.tokenProvider.generateToken(user.getId()).toString());
     }
 
     @PostMapping(value = "/validate_email", consumes = MediaType.APPLICATION_JSON_VALUE)
     public boolean validateEmail(@RequestBody TextNode email) {
-        checkAllowedRegistrations();
-        return !userAccountService.getByUserName(email.asText()).isPresent();
+        return userAccountService.getByUserName(email.asText()).isEmpty();
     }
 
     private UserAccount validateEmailCode(String code, String email) {
@@ -184,15 +193,12 @@ public class AuthController {
         return userAccount;
     }
 
-    private void checkAllowedRegistrations() {
-        if (!this.appConfiguration.isAllowRegistrations()) {
-            throw new BadRequestException(Message.REGISTRATIONS_NOT_ALLOWED);
-        }
-    }
 
     @GetMapping("/authorize_oauth/{serviceType}/{code}")
-    public JwtAuthenticationResponse authenticateUser(@PathVariable("serviceType") String serviceType, @PathVariable("code") String code) {
-        return githubOAuthDelegate.getTokenResponse(code);
+    public JwtAuthenticationResponse authenticateUser(@PathVariable("serviceType") String serviceType,
+                                                      @PathVariable("code") String code,
+                                                      @RequestParam(value = "invitationCode", required = false) String invitationCode) {
+        return githubOAuthDelegate.getTokenResponse(code, invitationCode);
     }
 }
 

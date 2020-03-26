@@ -11,12 +11,14 @@ interface BaseFormViewProps {
     saving?: boolean;
     initialValues: object;
     onSubmit: (v: object) => void,
-    onCancel: () => void,
+    onCancel?: () => void,
     validationSchema: ObjectSchema,
     resourceLoadable?: Loadable<any>,
     saveActionLoadable?: Loadable<any>,
     redirectAfter?: Link;
-    customActions?: ReactNode
+    customActions?: ReactNode;
+    submitButtons?: ReactNode;
+    submitButtonInner?: ReactNode;
 }
 
 export const BaseFormView: FunctionComponent<BaseFormViewProps & BaseViewProps> = (props) => {
@@ -29,6 +31,8 @@ export const BaseFormView: FunctionComponent<BaseFormViewProps & BaseViewProps> 
                           loading={props.saving || (props.saveActionLoadable && props.saveActionLoadable.loading)}
                           validationSchema={props.validationSchema}
                           customActions={props.customActions}
+                          submitButtons={props.submitButtons}
+                          submitButtonInner={props.submitButtonInner}
             >
                 {props.children}
             </StandardForm>

@@ -2,11 +2,8 @@ package com.polygloat.configuration;
 
 import com.polygloat.security.JwtTokenFilter;
 import com.polygloat.security.api_key_auth.ApiAuthFilter;
-import com.polygloat.service.ApiKeyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -69,14 +66,4 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
-
-    /*@Bean
-    public FilterRegistrationBean<ApiAuthFilter> apiAuthFilter() {
-        FilterRegistrationBean<ApiAuthFilter> registrationBean = new FilterRegistrationBean<>();
-
-        registrationBean.setFilter(new ApiAuthFilter(apiKeyService));
-        registrationBean.addUrlPatterns("/uaa/*");
-
-        return registrationBean;
-    }*/
 }
