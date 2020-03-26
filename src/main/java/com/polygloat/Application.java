@@ -1,6 +1,8 @@
 package com.polygloat;
 
 import com.polygloat.development.DbPopulatorReal;
+import com.polygloat.dtos.request.SignUp;
+import com.polygloat.service.UserAccountService;
 import io.sentry.Sentry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +15,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 public class Application {
     @Autowired
     public Application(DbPopulatorReal populator,
-                       @Value("${app.populate:true}") boolean populate,
+                       UserAccountService userAccountService,
+                       @Value("${app.populate:false}") boolean populate,
+                       @Value("${app.initialUsername:#{null}}") String initialUsername,
+                       @Value("${app.initialPassword:#{null}}") String initialPassword,
                        @Value("${sentry.enabled:false}") boolean sentry,
                        @Value("${sentry.dsn:null}") String sentryDSN) {
         if (populate) {
@@ -22,6 +27,10 @@ public class Application {
 
         if (sentry) {
             Sentry.init(sentryDSN);
+        }
+
+        if (initialUsername != null && initialPassword != null && userAccountService.getByUserName(initialUsername).isEmpty()) {
+            userAccountService.createUser(SignUp.builder().email(initialUsername).password(initialPassword).name(initialUsername).build());
         }
     }
 

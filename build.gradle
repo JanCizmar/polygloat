@@ -119,9 +119,9 @@ task unpack(type: Copy) {
 }
 
 docker {
-    dockerfile file('docker/spring/Dockerfile')
+    dockerfile file('docker/app/Dockerfile')
     name "polygloat/polygloat"
-    copySpec.from(tasks.unpack.outputs, 'docker/spring').into("dependency")
+    copySpec.from(tasks.unpack.outputs, 'docker/app').into("dependency")
     buildArgs(['DEPENDENCY': "dependency"])
 }
 
@@ -164,7 +164,6 @@ task appNpmBuild(type: NpmTask) {
     environment = [
             'target': 'appbundle'
     ]
-
 }
 
 task copyToBuild(type: Copy) {

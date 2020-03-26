@@ -33,7 +33,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     //this is used to authorize user's app calls with genrated api key
                     .authorizeRequests()
                     .antMatchers("/api/public/**", "/webjars/**", "/swagger-ui.html", "/swagger-resources/**", "/v2/api-docs").permitAll()
-                    .anyRequest().authenticated()
+                    .antMatchers("/api/**", "/uaa", "/uaa/**").authenticated()
                     .and().sessionManagement()
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and();
             return;

@@ -43,7 +43,7 @@ public class PublicConfigurationDTO {
 
         public GithubPublicConfigDTO(String clientId) {
             this.clientId = clientId;
-            this.enabled = !clientId.isEmpty();
+            this.enabled = clientId != null && !clientId.isEmpty();
         }
     }
 }
