@@ -54,7 +54,7 @@ export abstract class AbstractActions<StateType> {
         }
     }
 
-    public customReducer(state: StateType, action: ActionType<any>): StateType {
+    public customReducer(state: StateType, action: ActionType<any>, appState): StateType {
         return state;
     }
 }

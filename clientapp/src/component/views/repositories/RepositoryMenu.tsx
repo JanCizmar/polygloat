@@ -13,10 +13,13 @@ import {useRepository} from "../../../hooks/useRepository";
 import {RepositoryPermissionType} from "../../../service/response.types";
 import ImportExportIcon from '@material-ui/icons/ImportExport';
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
+import {useConfig} from "../../../hooks/useConfig";
+import VpnKeyIcon from '@material-ui/icons/VpnKey';
 
 export const RepositoryMenu = ({id}) => {
 
     let repositoryDTO = useRepository();
+    let config = useConfig();
 
     return (
         <div>
@@ -38,17 +41,29 @@ export const RepositoryMenu = ({id}) => {
                                       icon={<SettingsIcon/>} text="Repository settings"/>
                         <SideMenuItem linkTo={LINKS.REPOSITORY_LANGUAGES.build({[PARAMS.REPOSITORY_ID]: id})}
                                       icon={<FlagIcon/>} text="Languages"/>
-                        <SideMenuItem linkTo={LINKS.REPOSITORY_INVITATION.build({[PARAMS.REPOSITORY_ID]: id})}
-                                      icon={<PersonAddIcon/>} text="Invite user"/>
-                        <SideMenuItem linkTo={LINKS.REPOSITORY_PERMISSIONS.build({[PARAMS.REPOSITORY_ID]: id})}
-                                      icon={<SupervisedUserCircleIcon/>} text="Permissions"/>
+
+                        {config.authentication && <>
+                            <SideMenuItem linkTo={LINKS.REPOSITORY_INVITATION.build({[PARAMS.REPOSITORY_ID]: id})}
+                                          icon={<PersonAddIcon/>} text="Invite user"/>
+                            <SideMenuItem linkTo={LINKS.REPOSITORY_PERMISSIONS.build({[PARAMS.REPOSITORY_ID]: id})}
+                                          icon={<SupervisedUserCircleIcon/>} text="Permissions"/>
+                        </>}
+
                         <SideMenuItem linkTo={LINKS.REPOSITORY_IMPORT.build({[PARAMS.REPOSITORY_ID]: id})}
                                       icon={<ImportExportIcon/>} text="Import"/>
-                        <SideMenuItem linkTo={LINKS.REPOSITORY_EXPORT.build({[PARAMS.REPOSITORY_ID]: id})}
-                                      icon={<SaveAltIcon/>} text="Export"/>
                     </>
                 )}
+                <SideMenuItem linkTo={LINKS.REPOSITORY_EXPORT.build({[PARAMS.REPOSITORY_ID]: id})}
+                              icon={<SaveAltIcon/>} text="Export"/>
             </List>
+            {!config.authentication &&
+            <>
+                <Divider/>
+                <List>
+                    <SideMenuItem linkTo={LINKS.USER_API_KEYS.build()}
+                                  icon={<VpnKeyIcon/>} text="Api keys"/>
+                </List>
+            </>}
         </div>
     );
 };

@@ -27,8 +27,8 @@ const globalActionsIns = container.resolve(GlobalActions);
 const errorActionsIns = container.resolve(ErrorActions);
 const redirectionActionsIns = container.resolve(RedirectionActions);
 
-const appReducer = combineReducers({
-    translations: implicitReducer.create(container.resolve(TranslationActions)),
+const appReducer = (appState, action) => combineReducers({
+    translations: implicitReducer.create(container.resolve(TranslationActions), appState),
     global: implicitReducer.create(globalActionsIns),
     repositories: implicitReducer.create(repositoryActionsIns),
     languages: implicitReducer.create(languageActionsIns),
@@ -41,7 +41,7 @@ const appReducer = combineReducers({
     importExport: implicitReducer.create(container.resolve(ImportExportActions)),
     userApiKey: implicitReducer.create(container.resolve(UserApiKeysActions)),
     user: implicitReducer.create(container.resolve(UserActions))
-});
+})(appState, action);
 
 const rootReducer = (state, action): ReturnType<typeof appReducer> => {
     /**

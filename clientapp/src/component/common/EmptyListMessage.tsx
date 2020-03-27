@@ -11,11 +11,13 @@ interface FullPageLoadingProps {
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
-        box: {
+        goat: {
             filter: "grayscale(75%) blur(0.3px)",
-            opacity: "0.2",
-
+            opacity: "0.09",
         },
+        text: {
+            opacity: "0.3"
+        }
     }),
 );
 
@@ -24,9 +26,11 @@ export const EmptyListMessage: FunctionComponent<FullPageLoadingProps> = (props)
 
     return (
         <>
-            <Box p={8} className={classes.box} display="flex" justifyContent="center" flexDirection="column" alignItems="center">
-                <SadGoat width={200}/>
-                <Box p={4}>
+            <Box p={8} display="flex" justifyContent="center" flexDirection="column" alignItems="center">
+                <Box className={classes.goat}>
+                    <SadGoat width={200}/>
+                </Box>
+                <Box p={4} className={classes.text}>
                     <Typography>This list is empty. Add something to continue.</Typography>
                 </Box>
             </Box>

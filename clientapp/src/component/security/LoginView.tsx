@@ -54,11 +54,13 @@ export const LoginView: FunctionComponent<LoginProps> = (props) => {
                               submitButtons={
                                   <>
                                       <Box display="flex" justifyContent="space-between">
-                                          {security.allowRegistration &&
-                                          <Button size="large" component={Link} to={LINKS.SIGN_UP.build()}>
-                                              Sign up
-                                          </Button>
-                                          }
+                                          <Box>
+                                              {security.allowRegistration &&
+                                              <Button size="large" component={Link} to={LINKS.SIGN_UP.build()}>
+                                                  Sign up
+                                              </Button>
+                                              }
+                                          </Box>
                                           {remoteConfig.passwordResettable &&
                                           <Button component={Link} to={LINKS.RESET_PASSWORD_REQUEST.build()}>Reset password</Button>
                                           }
@@ -83,8 +85,6 @@ export const LoginView: FunctionComponent<LoginProps> = (props) => {
                     <TextField name="username" label="Username"/>
                     <TextField name="password" type="password" label="Password"/>
                 </StandardForm>
-
-
             </BaseView>
         </DashboardPage>
     );

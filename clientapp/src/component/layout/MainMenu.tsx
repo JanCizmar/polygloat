@@ -28,7 +28,7 @@ export const MainMenu = ({sideMenuItems, ...props}: MainMenuProps) => {
                 <Box display="flex" justifyContent="center" mt={2} mb={2}>
                     <Box display="flex" flexDirection="column">
                         {props.repositoryName &&
-                        <Box fontWeight="bold" display="flex" fontSize={open ? 20 : 25} mb={open ? 0 : 2} justifyContent={!open && "center"}>
+                        <Box fontWeight="bold" display="flex" fontSize={open ? 20 : 25} mb={open ? 0 : 2} justifyContent={!open && "center" || "initial"}>
                             {open && props.repositoryName || props.repositoryName.substr(0, 1)}
                         </Box>}
 

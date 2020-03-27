@@ -35,7 +35,7 @@ public class ExportController implements IController {
 
     @GetMapping(value = "/jsonZip", produces = "application/zip")
     public ResponseEntity<StreamingResponseBody> doExportJsonZip(@PathVariable("repositoryId") Long repositoryId) {
-        Repository repository = securityService.checkRepositoryPermission(repositoryId, Permission.RepositoryPermissionType.EDIT).getRepository();
+        Repository repository = securityService.checkRepositoryPermission(repositoryId, Permission.RepositoryPermissionType.VIEW).getRepository();
         LanguageSet languages = languageService.findAll(repositoryId);
         return ResponseEntity
                 .ok()

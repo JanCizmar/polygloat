@@ -32,7 +32,7 @@ export class RepositoryActions extends AbstractLoadableActions<RepositoriesState
         createRepository: this.createLoadableDefinition((values) => this.service.createRepository(values),
             null, "Repository created", LINKS.REPOSITORIES),
         repository: this.createLoadableDefinition(this.service.loadRepository),
-        deleteRepository: this.createLoadableDefinition(this.service.deleteRepository, (state, action) =>
+        deleteRepository: this.createLoadableDefinition(this.service.deleteRepository, (state, action): RepositoriesState =>
             (
                 {...state, loadables: {...state.loadables, repository: {...createLoadable()} as Loadable<RepositoryDTO>}}
             ), "Repository deleted!")

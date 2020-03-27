@@ -3,9 +3,10 @@ import {AbstractLoadableActions, StateWithLoadables} from "../AbstractLoadableAc
 import {translationService} from "../../service/translationService";
 import {AppState} from "../index";
 import {useSelector} from "react-redux";
-import {TranslationsDataResponse} from "../../service/response.types";
+import {LanguageDTO} from "../../service/response.types";
 import {ActionType} from "../Action";
 import {LanguageActions} from "../languages/LanguageActions";
+import {selectedLanguagesService} from "../../service/selectedLanguagesService";
 
 export class TranslationsState extends StateWithLoadables<TranslationActions> {
     selectedLanguages: string[] = [];
@@ -17,7 +18,7 @@ const languageActions = container.resolve(LanguageActions);
 
 @singleton()
 export class TranslationActions extends AbstractLoadableActions<TranslationsState> {
-    constructor() {
+    constructor(private selectedLanguagesService: selectedLanguagesService) {
         super(new TranslationsState());
     }
 
@@ -40,13 +41,17 @@ export class TranslationActions extends AbstractLoadableActions<TranslationsStat
         return useSelector((state: AppState) => selector(state.translations))
     }
 
-    customReducer(state: TranslationsState, action: ActionType<any>): TranslationsState {
+    customReducer(state: TranslationsState, action: ActionType<any>, appState): TranslationsState {
+        appState = appState as AppState; // otherwise circular reference
         switch (action.type) {
             case languageActions.loadableActions.list.fulfilledType:
                 //reseting translations state on language change
                 return {
                     ...state,
-                    selectedLanguages: [],
+                    selectedLanguages: Array.from(
+                        this.selectedLanguagesService.getUpdated(appState.repositories.loadables.repository.data.id,
+                            new Set(action.payload.map((l: LanguageDTO) => l.abbreviation)))
+                    ),
                     loadables: {
                         ...state.loadables,
                         translations:

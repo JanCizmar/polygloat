@@ -3,16 +3,22 @@ import {ApiHttpService} from './apiHttpService';
 import {messageService} from './messageService';
 import {TranslationsDataResponse, TranslationsObject} from './response.types';
 import {TranslationCreationValue} from "../component/Translations/TranslationCreationDialog";
+import {selectedLanguagesService} from "./selectedLanguagesService";
 
 
 @singleton()
 export class translationService {
-    constructor(private http: ApiHttpService, private messaging: messageService) {
+    constructor(private http: ApiHttpService, private messaging: messageService, private selectedLanguagesService: selectedLanguagesService) {
     }
 
-    public getTranslations = async (repositoryId: number, langs?: string[], search?: string, limit?: number, offset?: number): Promise<TranslationsDataResponse> =>
-        (await this.http.get(`repository/${repositoryId}/translations/view`,
+    public getTranslations = async (repositoryId: number, langs?: string[], search?: string, limit?: number, offset?: number): Promise<TranslationsDataResponse> => {
+        const result: TranslationsDataResponse = (await this.http.get(`repository/${repositoryId}/translations/view`,
             {search, languages: langs ? langs.join(',') : null, limit, offset}));
+
+        this.selectedLanguagesService.setForRepository(repositoryId, new Set(result.params.languages));
+
+        return result;
+    };
 
     createSource = (repositoryId: number, value: TranslationCreationValue) => this.http.post(`repository/${repositoryId}/sources/create`, {
         sourceFullPath: value.source,
