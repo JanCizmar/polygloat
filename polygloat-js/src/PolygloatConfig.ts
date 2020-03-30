@@ -11,5 +11,5 @@ export class PolygloatConfig {
     apiUrl?: string;
     apiKey?: string;
     filesUrlPrefix?: string;
-    mode?: Mode = this.apiKey ? 'development' : 'production';
+    mode?: Mode;
 }

@@ -1,7 +1,7 @@
 {
   "name": "polygloat",
-  "version": "0.0.1",
-  "description": "",
+  "version": "0.0.5",
+  "description": "Library providing ability to translate messages directly in context of developed application.",
   "main": "dist/polygloat.umd.js",
   "types": "lib/index.d.ts",
   "declaration": true,
@@ -23,7 +23,6 @@
   "dependencies": {
     "@material-ui/core": "^4.6.1",
     "@material-ui/icons": "^4.5.1",
-    "@types/node": "^13.9.2",
     "clsx": "^1.0.4",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
@@ -31,6 +30,7 @@
     "webpack-cli": "^3.3.10"
   },
   "devDependencies": {
+    "@types/node": "^13.9.2",
     "@babel/cli": "^7.7.4",
     "@babel/core": "^7.7.4",
     "@babel/plugin-proposal-class-properties": "^7.7.4",

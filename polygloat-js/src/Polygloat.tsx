@@ -51,6 +51,8 @@ export class Polygloat {
 
     constructor(config: PolygloatConfig) {
         this.properties.config = {...(new PolygloatConfig()), ...config};
+        this.properties.config.mode = this.properties.config.mode || this.properties.config.apiKey ? "development" : "production";
+
         this.properties.currentLanguage = this.properties.config.defaultLanguage;
     }
 
@@ -108,3 +110,5 @@ export class Polygloat {
 
     private readonly escapeParam = (string: string) => string.replace(",", "\\,").replace(":", "\\:");
 }
+
+export default Polygloat;

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<h1>??aaa:param:data,param2:data2\,with\:escaped\,stuff}}</h1>
+
+<script src="polygloat.window.js"></script>
+<script>const pg = new polygloat.Polygloat({
+    apiKey: "kld65v4h4729mh48lcdu2jdcv3",
+    apiUrl: "http://localhost:8080",
+    defaultLanguage: "aaa",
+    inputPrefix: "??",
+    inputPostfix: "}}"
+});
+pg.run().then(() => {
+    //now translations are loaded, maybe release progress bar?
+    pg.handleSubtree(document.body);
+});
+</script>
+</body>
+</html>

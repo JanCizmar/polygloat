@@ -6,14 +6,14 @@ const WebpackBundleAnalyzer = require("webpack-bundle-analyzer")
 module.exports = env => {
     const isDevelopment = env.mode === "development";
 
-    return {
+    const makeTarget = (target) => ({
         entry: "./src/index.ts",
         devtool: isDevelopment && 'inline-source-map',
         output: {
-            filename: "polygloat.umd.js",
+            filename: "polygloat." + target + ".js",
             path: path.resolve(__dirname, 'dist'),
-            library: 'polygloat-js',
-            libraryTarget: 'umd'
+            library: 'polygloat',
+            libraryTarget: target
         },
         resolve: {
             extensions: [".webpack.js", ".web.js", ".ts", ".js", ".tsx"]
@@ -30,5 +30,7 @@ module.exports = env => {
         plugins: [
             //new WebpackBundleAnalyzer()
         ]
-    }
+    });
+
+    return [makeTarget("umd"), makeTarget("window")];
 };

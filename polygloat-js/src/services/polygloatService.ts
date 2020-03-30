@@ -65,7 +65,7 @@ export class PolygloatService {
         }
 
         let data = (await requestResult.json());
-        this.translationsCache.set(lang, data[lang]);
+        this.translationsCache.set(lang, data[lang] || {});
     }
 
     async getTranslation(name: string, lang: string = this.properties.currentLanguage): Promise<string> {
@@ -77,7 +77,15 @@ export class PolygloatService {
         return this.instant(name, lang);
     }
 
-    readonly getScopes = async () => (await fetch(this.getUrl(`scopes`))).json();
+    readonly getScopes = async () => {
+        const response = await fetch(this.getUrl(`scopes`));
+        if (response.status >= 400) {
+            console.error("Error getting scopes. Trying to switch to production mode!");
+            this.properties.config.mode = "production";
+        }
+        return await response.json();
+
+    };
 
     instant(name: string, lang: string = this.properties.currentLanguage): string {
         return this.getFromCache(name, lang) || this.getFromCache(name, this.properties.config.defaultLanguage) || name;
@@ -166,7 +174,7 @@ export class PolygloatService {
     }
 
     readonly parseUnwrapped = (unWrappedString: string): PolygloatData => {
-        const strings = unWrappedString.split(/(?<!\\):|(?<!\\),/);
+        const strings = unWrappedString.match(/(?:[^\\,:\n]|\\.)+/g);
         const result = {input: strings.shift(), params: {}};
 
         while (strings.length) {
@@ -178,7 +186,7 @@ export class PolygloatService {
 
     readonly replaceParams = (translation: string, params: TranslationParams): string => {
         let result = translation;
-        const regExp = (name) => new RegExp("(?<!\\\\){(?<!\\\\){\\\s*" + this.escapeRegExp(name) + "\\\s*(?<!\\\\)}(?<!\\\\)}");
+        const regExp = (name) => new RegExp("\\{\\{\\s*" + this.escapeRegExp(name) + "\\s*\\}\\}");
         Object.entries(params).forEach(([name, value]) =>
             //replace all unescaped param template fields (the regex is this complicated because of lookbehinds)
             result = result.replace(regExp(name), value));
@@ -190,7 +198,9 @@ export class PolygloatService {
     };
 
     get unWrapRegex() {
-        return new RegExp(`${this.properties.config.inputPrefix}(.*?)${this.properties.config.inputPostfix}`, 'gm');
+        return new RegExp(
+            `${this.escapeRegExp(this.properties.config.inputPrefix)}(.*?)${this.escapeRegExp(this.properties.config.inputPostfix)}`,
+            'gm');
     }
 
     isKeyAllowed(...scopes: Scope[]) {
