@@ -36,8 +36,16 @@ export class TranslateService {
     return from(this.translate(input, params));
   }
 
+  public getSafe(input: string, params = {}): Observable<string> {
+    return from(this.translate(input, params, true));
+  }
+
   public instant(input: string, params = {}): string {
     return this.polygloat.instant(input, params);
+  }
+
+  public instantSafe(input: string, params = {}): string {
+    return this.polygloat.instant(input, params, true);
   }
 
   public getDefaultLang(): string {
@@ -48,8 +56,8 @@ export class TranslateService {
     return this.polygloat.lang;
   }
 
-  private async translate(input: string, params = {}): Promise<string> {
+  private async translate(input: string, params = {}, noWrap = false): Promise<string> {
     await this.start(this.config);
-    return await this.polygloat.translate(input, params);
+    return await this.polygloat.translate(input, params, noWrap);
   }
 }

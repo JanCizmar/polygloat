@@ -11,6 +11,7 @@ import {TranslationParams} from "./Types";
 
 // Start observing the target node for configured mutations
 export class Polygloat {
+    private static time = 0;
     private static instance: Polygloat;
     public properties: Properties = container.resolve(Properties);
     private _service: PolygloatService = container.resolve(PolygloatService);
@@ -36,14 +37,13 @@ export class Polygloat {
         });
 
     private async handleSubtree(target: Node) {
+        console.log("handling subtree", target);
         let nodes: XPathResult = document.evaluate(`.//*[contains(text(), \'${this.properties.config.inputPrefix}\')]`, target);
-        let inputNodes = document.evaluate('.//input', target);
-
-        let polygloatInputs = NodeHelper.nodeListToArray(inputNodes)
+        let inputNodes = (target as Element).getElementsByTagName("input");// document.evaluate('.//input', target);
+        let polygloatInputs = Array.from(inputNodes)//NodeHelper.nodeListToArray(inputNodes)
             .filter(i => (i as HTMLInputElement).value.indexOf(this.properties.config.inputPrefix) > -1);
 
         const newNodes = NodeHelper.nodeListToArray(nodes).concat(polygloatInputs);
-
         if (newNodes.length) {
             await this.coreHandler.onNewNodes(newNodes);
         }

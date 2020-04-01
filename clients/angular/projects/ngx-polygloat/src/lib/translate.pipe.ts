@@ -1,5 +1,6 @@
 import {Pipe, PipeTransform} from '@angular/core';
 import {TranslateService} from "./translate.service";
+import {Observable} from "rxjs";
 
 @Pipe({
   name: 'translate',
@@ -9,15 +10,19 @@ export class TranslatePipe implements PipeTransform {
   value = '';
   lastHash: string;
 
-  constructor(private translateService: TranslateService) {
+  constructor(protected translateService: TranslateService) {
   }
 
   private getHash(input: string, params: object, language: string): string {
     return JSON.stringify({input, params, language});
   }
 
+  protected get resultProvider(): (input, params) => Observable<string> {
+    return this.translateService.get;
+  }
+
   private onLangChange(input, params) {
-    this.translateService.get(input, params).subscribe(r => {
+    this.resultProvider(input, params).subscribe(r => {
       this.value = r;
     });
   }

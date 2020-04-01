@@ -26,6 +26,7 @@ export class CoreHandler {
             let textInputParent = NodeHelper.nodeListToArray(
                 document.evaluate('./ancestor-or-self::*[name() = \'textarea\' or name() = \'input\']', node));
             if (textInputParent.length < 1) {
+
                 await this.basicTextHandler.handleNewNode(node);
                 continue;
             }

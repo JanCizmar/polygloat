@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Polygloat, PolygloatConfig} from "polygloat";
+import {PolygloatConfig} from "polygloat";
 import {TranslateService} from "./translate.service";
 
 @Injectable()

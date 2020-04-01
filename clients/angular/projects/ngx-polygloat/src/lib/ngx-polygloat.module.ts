@@ -3,11 +3,13 @@ import {TranslatePipe} from './translate.pipe';
 import {TranslationsProvider} from './translations-provider';
 import {PolygloatConfig} from "polygloat";
 import {TranslateService} from "./translate.service";
+import {STranslatePipe} from "./stranslate.pipe";
 
 // @dynamic
 @NgModule({
   declarations: [
     TranslatePipe,
+    STranslatePipe
   ],
   imports: [
     //CommonModule,
@@ -15,6 +17,7 @@ import {TranslateService} from "./translate.service";
   ],
   exports: [
     TranslatePipe,
+    STranslatePipe
   ],
   providers: []
 })
