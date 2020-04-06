@@ -2,10 +2,12 @@ import {PolygloatService} from '../services/polygloatService';
 import {container} from 'tsyringe';
 import {TranslationHighlighter} from '../TranslationHighlighter';
 import {PolygloatTextAreaElement, PolygloatTextInputElement} from '../Types';
+import {Properties} from "../Properties";
 
 export abstract class TextInputHandler {
-    private service: PolygloatService = container.resolve(PolygloatService);
-    private highlighter: TranslationHighlighter = container.resolve(TranslationHighlighter);
+    private service = container.resolve(PolygloatService);
+    private highlighter = container.resolve(TranslationHighlighter);
+    private properties = container.resolve(Properties);
 
     async refresh(node: Element) {
         let textArea: PolygloatTextAreaElement = node as PolygloatTextAreaElement;
@@ -45,7 +47,9 @@ export abstract class TextInputHandler {
                 touched: !!textInputElement.__polygloat.touched
             };
 
-            this.highlighter.listen(node);
+            if (this.properties.config.mode == "development") {
+                this.highlighter.listen(node);
+            }
         }
     }
 

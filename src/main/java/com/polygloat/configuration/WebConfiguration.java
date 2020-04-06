@@ -1,6 +1,5 @@
 package com.polygloat.configuration;
 
-import com.polygloat.development.DbPopulatorReal;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +19,7 @@ public class WebConfiguration implements WebMvcConfigurer {
                 .setViewName("forward:/");
         registry.addViewController("/**/{spring:\\w+}")
                 .setViewName("forward:/");
-        registry.addViewController("/{spring:\\w+}/**{spring:?!(\\.js|\\.css)$}")
+        registry.addViewController("/{spring:\\w+}/**{spring:?!(\\.js|\\.css||\\.woff2)$}")
                 .setViewName("forward:/");
     }
 

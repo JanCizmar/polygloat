@@ -18,7 +18,7 @@ export class TranslatePipe implements PipeTransform {
   }
 
   protected get resultProvider(): (input, params) => Observable<string> {
-    return this.translateService.get;
+    return (input, params) => this.translateService.get(input, params);
   }
 
   private onLangChange(input, params) {

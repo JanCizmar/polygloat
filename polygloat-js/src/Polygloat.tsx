@@ -21,10 +21,9 @@ export class Polygloat {
         async (mutationsList: MutationRecord[]) => {
             for (let mutation of mutationsList) {
                 if (mutation.type === 'characterData') {
-                    //todo: handle this
-                    /*if (!!mutation.target.parentElement) {
+                    if (!!mutation.target.parentElement) {
                         await this.coreHandler.onNewNodes([mutation.target.parentElement]);
-                    }*/
+                    }
                 }
 
                 if (mutation.type === 'childList') {
@@ -37,7 +36,6 @@ export class Polygloat {
         });
 
     private async handleSubtree(target: Node) {
-        console.log("handling subtree", target);
         let nodes: XPathResult = document.evaluate(`.//*[contains(text(), \'${this.properties.config.inputPrefix}\')]`, target);
         let inputNodes = (target as Element).getElementsByTagName("input");// document.evaluate('.//input', target);
         let polygloatInputs = Array.from(inputNodes)//NodeHelper.nodeListToArray(inputNodes)

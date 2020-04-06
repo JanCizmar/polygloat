@@ -1,10 +1,10 @@
 {
   "name": "ngx-polygloat",
   "description": "Angular implementation of polygloat translation system",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "peerDependencies": {
     "@angular/common": "^8.2.14",
     "@angular/core": "^8.2.14",
-    "polygloat": "0.0.5"
+    "polygloat": "0.0.6"
   }
 }

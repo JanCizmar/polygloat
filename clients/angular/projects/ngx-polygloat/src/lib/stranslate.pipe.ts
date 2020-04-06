@@ -14,7 +14,7 @@ export class STranslatePipe extends TranslatePipe {
   }
 
   protected get resultProvider(): (input, params) => Observable<string> {
-    return this.translateService.getSafe;
+    return (input, params) => this.translateService.getSafe(input, params);
   }
 
 }

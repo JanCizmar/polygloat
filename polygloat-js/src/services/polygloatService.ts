@@ -77,14 +77,21 @@ export class PolygloatService {
         return this.instant(name, lang);
     }
 
-    readonly getScopes = async () => {
-        const response = await fetch(this.getUrl(`scopes`));
-        if (response.status >= 400) {
-            console.error("Error getting scopes. Trying to switch to production mode!");
-            this.properties.config.mode = "production";
-        }
-        return await response.json();
+    private switchToProductionOnError() {
+        console.error("Error getting scopes. Trying to switch to production mode!");
+        this.properties.config.mode = "production";
+    }
 
+    readonly getScopes = async () => {
+        try {
+            const response = await fetch(this.getUrl(`scopes`));
+            if (response.status >= 400) {
+                this.switchToProductionOnError();
+            }
+            return await response.json();
+        } catch (e) {
+            this.switchToProductionOnError();
+        }
     };
 
     instant(name: string, lang: string = this.properties.currentLanguage): string {

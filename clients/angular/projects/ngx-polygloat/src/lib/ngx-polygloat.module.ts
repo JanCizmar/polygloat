@@ -1,9 +1,9 @@
-import {APP_INITIALIZER, NgModule} from '@angular/core';
+import {APP_INITIALIZER, ModuleWithProviders, NgModule} from '@angular/core';
 import {TranslatePipe} from './translate.pipe';
 import {TranslationsProvider} from './translations-provider';
-import {PolygloatConfig} from "polygloat";
 import {TranslateService} from "./translate.service";
 import {STranslatePipe} from "./stranslate.pipe";
+import {PolygloatConfig} from "./polygloatConfig";
 
 // @dynamic
 @NgModule({
@@ -24,9 +24,9 @@ import {STranslatePipe} from "./stranslate.pipe";
 export class NgxPolygloatModule {
 
   // @dynamic
-  static forRoot(options: PolygloatConfig) {
+  // @dynamic
+  static forRoot(options: PolygloatConfig): ModuleWithProviders<NgxPolygloatModule> {
     options = {...new PolygloatConfig(), filesUrlPrefix: "/assets/i18n/", ...options};
-
     return {
       ngModule: NgxPolygloatModule,
       providers: [
@@ -41,6 +41,6 @@ export class NgxPolygloatModule {
         },
         {provide: PolygloatConfig, useValue: options}
       ],
-    }
+    };
   }
 }
