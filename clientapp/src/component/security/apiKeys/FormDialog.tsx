@@ -3,16 +3,16 @@ import {LINKS} from "../../../constants/links";
 import {Box, Dialog, DialogContent, DialogTitle, MenuItem} from "@material-ui/core";
 import {StandardForm} from "../../common/form/StandardForm";
 import {Select} from "../../common/form/fields/Select";
-import {default as React, FunctionComponent, useEffect, useState} from "react";
+import {default as React, FunctionComponent, useEffect} from "react";
 import {container} from "tsyringe";
 import {UserApiKeysActions} from "../../../store/api_keys/UserApiKeysActions";
 import {BoxLoading} from "../../common/BoxLoading";
-import * as Yup from 'yup';
 import {FormikProps} from "formik";
 import {CheckBoxGroupMultiSelect} from "../../common/form/fields/CheckBoxGroupMultiSelect";
 import {ApiKeyDTO} from "../../../service/response.types";
 import {EditApiKeyDTO} from "../../../service/request.types";
 import {Validation} from "../../../constants/GlobalValidationSchema";
+import FullPageLoadingView from "../../common/FullPageLoadingView";
 
 interface Value {
     scopes: string[],
@@ -84,30 +84,39 @@ export const FormDialog: FunctionComponent<Props> = (props) => {
         }
     };
 
+    if (repositories.loading || scopes.loading) {
+        return <FullPageLoadingView/>
+    }
 
     return (
         <Dialog open={true} onClose={onDialogClose} fullWidth maxWidth={"xs"}>
             <DialogTitle>Generate api key</DialogTitle>
             <DialogContent>
-                {(repositories.loading || scopes.loading || props.loading) && <BoxLoading/>}
-                {(repositories.loaded && scopes.loaded) &&
-                <StandardForm onSubmit={onSubmit}
-                              onCancel={() => onDialogClose()}
-                              initialValues={getInitialValues()}
-                              validationSchema={props.editKey && props.editKey.repositoryId ? Validation.EDIT_API_KEY : Validation.CREATE_API_KEY}
-                              submitButtonInner={props.editKey ? "Save" : "Generate"}
-                >
-                    {(formikProps: FormikProps<Value>) => <>
-                        {!props.editKey && <Select fullWidth name="repositoryId"
-                                                   label="Repository"
-                                                   renderValue={v => repositories.data.find(r => r.id === v).name}>
-                            {repositories.data.map(r => <MenuItem key={r.id} value={r.id}>{r.name}</MenuItem>)}
-                        </Select>}
-                        <Box mt={2}>
-                            <CheckBoxGroupMultiSelect label="Scopes" name="scopes" options={getAvailableScopes(formikProps.values.repositoryId)}/>
-                        </Box>
-                    </>}
-                </StandardForm>
+                {(repositories.loaded && repositories.data.length === 0)
+                && "Can not add api key without repository. Add repository first :("
+                ||
+                <>
+                    {(repositories.loading || scopes.loading || props.loading) && <BoxLoading/>}
+                    {(repositories.loaded && scopes.loaded) &&
+                    <StandardForm onSubmit={onSubmit}
+                                  onCancel={() => onDialogClose()}
+                                  initialValues={getInitialValues()}
+                                  validationSchema={props.editKey && props.editKey.repositoryId ? Validation.EDIT_API_KEY : Validation.CREATE_API_KEY}
+                                  submitButtonInner={props.editKey ? "Save" : "Generate"}
+                    >
+                        {(formikProps: FormikProps<Value>) => <>
+                            {!props.editKey && <Select fullWidth name="repositoryId"
+                                                       label="Repository"
+                                                       renderValue={v => repositories.data.find(r => r.id === v).name}>
+                                {repositories.data.map(r => <MenuItem key={r.id} value={r.id}>{r.name}</MenuItem>)}
+                            </Select>}
+                            <Box mt={2}>
+                                <CheckBoxGroupMultiSelect label="Scopes" name="scopes" options={getAvailableScopes(formikProps.values.repositoryId)}/>
+                            </Box>
+                        </>}
+                    </StandardForm>
+                    }
+                </>
                 }
             </DialogContent>
         </Dialog>)

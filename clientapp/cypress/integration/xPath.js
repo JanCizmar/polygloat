@@ -13,3 +13,7 @@ export const getAnyContainingText = (text, tag = "*", nth = 1, allowWrapped = tr
 export const getAnyContainingAriaLabelAttribute = (text, tag = "*", nth = 1, allowWrapped = true) =>
     `//${tag}${allowWrapped ? "//*" : ""}[contains(translate(@aria-label,` +
     `'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'), '${text.toLowerCase()}')][${nth}]`;
+
+export const getInput = (name, nth = 1, allowWrapped = true) =>
+    `//input[translate(@name,` +
+    `'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz') = '${name.toLowerCase()}'][${nth}]`;

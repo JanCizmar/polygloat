@@ -3,7 +3,7 @@ import * as React from 'react';
 import SettingsIcon from '@material-ui/icons/Settings';
 
 export function SettingsIconButton(props: IconButtonProps) {
-    return <IconButton aria-label="delete" {...props}>
+    return <IconButton aria-label="settings" {...props}>
         <SettingsIcon/>
     </IconButton>;
 }

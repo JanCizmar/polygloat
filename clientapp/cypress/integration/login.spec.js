@@ -1,11 +1,11 @@
 /// <reference types="cypress" />
-import {login} from "./shared";
+import {host, login} from "./shared";
 
 require('cypress-xpath');
 
 context('Login', () => {
     beforeEach(() => {
-        cy.visit('http://localhost:8080');
+        cy.visit(host);
     });
 
     it('Will login', () => {

@@ -105,4 +105,8 @@ public class UserAccountService {
         userAccount.setName(dto.getName());
         userAccountRepository.save(userAccount);
     }
+
+    public boolean isAnyUserAccount() {
+        return userAccountRepository.count() > 0;
+    }
 }

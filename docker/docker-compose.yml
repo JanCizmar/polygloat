@@ -4,13 +4,13 @@ services:
   db:
     image: postgres:11
     volumes:
-      - ./db-data:/var/lib/postgresql/data/
+      - ../build/db-data:/var/lib/postgresql/data/
     environment:
       - POSTGRES_PASSWORD=postgres
   app:
     image: polygloat/polygloat
     ports:
-      - "80:8080"
+      - ${exposePort}:8080
     env_file:
       - .env
     depends_on:

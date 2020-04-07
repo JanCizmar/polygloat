@@ -29,7 +29,8 @@ public class Application {
             Sentry.init(sentryDSN);
         }
 
-        if (initialUsername != null && initialPassword != null && userAccountService.getByUserName(initialUsername).isEmpty()) {
+        if (initialUsername != null && initialPassword != null && !userAccountService.isAnyUserAccount() &&
+                userAccountService.getByUserName(initialUsername).isEmpty()) {
             userAccountService.createUser(SignUpDto.builder().email(initialUsername).password(initialPassword).name(initialUsername).build());
         }
     }
