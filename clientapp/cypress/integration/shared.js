@@ -4,11 +4,12 @@ import {clickAdd} from "./global";
 
 require('cypress-xpath');
 
-export const host = process.env.host || "http://localhost:8080";
+export const host = Cypress.env("host") || "http://localhost:8080";
 export const defaultUsername = process.env.defaultUsername || "admin";
 export const defaultPassword = process.env.defaultPassword || "admin";
 
 export const login = (username = defaultUsername, password = defaultPassword) => {
+    cy.log(process.env);
     cy.xpath('//input[@name="username"]')
         .type(username).should('have.value', username);
     cy.xpath('//input[@name="password"]')

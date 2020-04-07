@@ -7,7 +7,8 @@ services:
 script:
   - ./gradlew build
   - ./gradlew buildProdDocker
-  - docker run -d -p8082:8080 polygloat/polygloat
+  - docker run -d -p8082:8080 polygloat/polygloat --name app
   - cd clientapp
   - npm install
-  - npx cypress run --spec cypress/integration/login.spec.js
+  - 'docker logs -f app | grep -qe "started on port(s): 8080"'
+  - npx cypress run --env host=http://localhost:8082 --spec cypress/integration/login.spec.js
