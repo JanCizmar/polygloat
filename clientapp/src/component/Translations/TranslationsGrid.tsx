@@ -1,84 +1,48 @@
 import * as React from 'react';
 import {FunctionComponent, useContext} from 'react';
-import {container} from "tsyringe";
-import {TranslationActions} from "../../store/repository/TranslationActions";
 import {useRepository} from "../../hooks/useRepository";
-import {Box, Button, IconButton, Slide, Tooltip} from "@material-ui/core";
+import {Box} from "@material-ui/core";
 import {TranslationsRow} from "./TranslationsRow";
 import {Header} from "./Header";
 import Paper from "@material-ui/core/Paper";
-import {LanguagesMenu} from "../common/form/LanguagesMenu";
 import {BoxLoading} from "../common/BoxLoading";
-import {SearchField} from "./SearchField";
 import {Pagination} from "./Pagination";
 import {LINKS, PARAMS} from "../../constants/links";
-import {Link, Route, Switch} from "react-router-dom";
-import AddIcon from '@material-ui/icons/Add';
-import DeleteIcon from '@material-ui/icons/Delete';
+import {Route, Switch} from "react-router-dom";
 import {TranslationCreationDialog} from "./TranslationCreationDialog";
-import {useConfirmation} from "../../hooks/useConfirmation";
 import {TranslationListContext} from "./TtranslationsGridContextProvider";
 import {EmptyListMessage} from "../common/EmptyListMessage";
 import {FabAddButtonLink} from "../common/buttons/FabAddButtonLink";
+import {MenuBar} from "./MenuBar";
 
-const actions = container.resolve(TranslationActions);
 
 export const TranslationsGrid: FunctionComponent = (props) => {
     let repositoryDTO = useRepository();
 
     const listContext = useContext(TranslationListContext);
 
+
     return (
         <>
             {listContext.listLoadable.data.paginationMeta.allCount === 0 &&
             <>
-                <EmptyListMessage/>
-                <Box display="flex" justifyContent="center">
-                    <FabAddButtonLink to={LINKS.REPOSITORY_TRANSLATIONS_ADD.build({[PARAMS.REPOSITORY_ID]: repositoryDTO.id})}/>
-                </Box>
+                {listContext.listLoadable.data.params.search &&
+                <>
+                    <MenuBar/>
+                    <EmptyListMessage/>
+                </>
+                ||
+                <>
+                    <EmptyListMessage/>
+                    <Box display="flex" justifyContent="center">
+                        <FabAddButtonLink to={LINKS.REPOSITORY_TRANSLATIONS_ADD.build({[PARAMS.REPOSITORY_ID]: repositoryDTO.id})}/>
+                    </Box>
+                </>
+                }
             </>
             ||
             <>
-                <Box mb={2}>
-                    <Paper>
-                        <Box display="flex" p={2} pl={1}>
-                            <Box flexGrow={1} display="flex">
-                                <Slide in={listContext.isSomeChecked()} direction="right" mountOnEnter unmountOnExit>
-                                    <Box pr={2}>
-                                        <Tooltip title="Delete selected">
-                                            <IconButton color="secondary"
-                                                        onClick={() =>
-                                                            useConfirmation()({
-                                                                onConfirm: () => actions.loadableActions.delete
-                                                                    .dispatch(repositoryDTO.id, Array.from(listContext.checkedSources)),
-                                                                confirmButtonText: "Delete",
-                                                                confirmButtonColor: "secondary",
-                                                                message: `Are you sure you want to delete all checked ` +
-                                                                    `(${listContext.checkedSources.size}) translation sources?`,
-                                                                title: "Delete confirmation"
-                                                            })
-                                                        }>
-                                                <DeleteIcon/>
-                                            </IconButton>
-                                        </Tooltip>
-                                    </Box>
-                                </Slide>
-                                <Box pr={2} pl={1}>
-                                    <LanguagesMenu/>
-                                </Box>
-                                <SearchField/>
-                            </Box>
-                            <Box display="flex" alignItems="center">
-                                <Button component={Link} variant="outlined" color="primary"
-                                        to={LINKS.REPOSITORY_TRANSLATIONS_ADD.build({[PARAMS.REPOSITORY_ID]: repositoryDTO.id})}
-                                        startIcon={<AddIcon/>}
-                                >
-                                    Add
-                                </Button>
-                            </Box>
-                        </Box>
-                    </Paper>
-                </Box>
+                <MenuBar/>
                 <Paper>
                     {listContext.listLoadable.data ?
                         <Box p={1} display="flex" justifyContent="flex-end">

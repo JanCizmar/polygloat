@@ -23,9 +23,7 @@ export const RepositoryRouter = () => {
         <Switch>
             <RepositoryProvider id={match.params[PARAMS.REPOSITORY_ID]}>
                 <Route path={LINKS.REPOSITORY_TRANSLATIONS.template}>
-                    <React.Suspense fallback={<div>Loading...</div>}>
-                        <TranslationsView/>
-                    </React.Suspense>
+                    <TranslationsView/>
                 </Route>
                 <Route exact path={LINKS.REPOSITORY_EDIT.template}>
                     <RepositorySettingsView/>

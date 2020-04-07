@@ -7,12 +7,11 @@ import {RepositoryActions} from '../../../../store/repository/RepositoryActions'
 import {LanguageDTO} from '../../../../service/response.types';
 import {LINKS} from '../../../../constants/links';
 import {Redirect} from 'react-router-dom';
-import * as Yup from 'yup';
 import {TextField} from '../../../common/form/fields/TextField';
 import {BaseFormView} from '../../BaseFormView';
-import {DashboardPage} from '../../../layout/DashboardPage';
 import {FieldArray} from "../../../common/form/fields/FieldArray";
 import {Validation} from "../../../../constants/GlobalValidationSchema";
+import {PossibleRepositoryPage} from "../../PossibleRepositoryPage";
 
 const actions = container.resolve(RepositoryActions);
 
@@ -39,7 +38,7 @@ export const RepositoryCreateView: FunctionComponent = () => {
     }
 
     return (
-        <DashboardPage>
+        <PossibleRepositoryPage>
             <BaseFormView lg={6} md={8} title={"Create repository"} initialValues={initialValues} onSubmit={onSubmit}
                           onCancel={() => setCancelled(true)}
                           saveActionLoadable={loadable}
@@ -58,6 +57,6 @@ export const RepositoryCreateView: FunctionComponent = () => {
                     </FieldArray>
                 </>
             </BaseFormView>
-        </DashboardPage>
+        </PossibleRepositoryPage>
     );
 };

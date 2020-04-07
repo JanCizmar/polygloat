@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {useEffect} from 'react';
 import Box from '@material-ui/core/Box';
-import {connect, useSelector} from 'react-redux';
+import {connect} from 'react-redux';
 import {AppState} from '../../../store';
 import {container} from 'tsyringe';
 import {RepositoryActions} from '../../../store/repository/RepositoryActions';
@@ -28,8 +28,6 @@ interface Props {
 export const RepositoryListView = connect((state: AppState) =>
     ({repositories: state.repositories.repositories, loading: state.repositories.repositoriesLoading}))(
     ({repositories, loading}: Props) => {
-
-        let repository = useSelector((state: AppState) => state.repositories.loadables.repository.loaded);
 
         useEffect(() => {
             actions.loadRepositories.dispatch();

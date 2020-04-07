@@ -1,5 +1,5 @@
 import * as React from "react";
-import {FunctionComponent} from "react";
+import {FunctionComponent, useEffect} from "react";
 import {container} from "tsyringe";
 import {RepositoryActions} from "../store/repository/RepositoryActions";
 import {useSelector} from "react-redux";
@@ -19,12 +19,14 @@ export const RepositoryProvider: FunctionComponent<{ id: number }> = (props) => 
     const idChanged = repositoryDTOLoadable.dispatchParams && repositoryDTOLoadable.dispatchParams[0] !== props.id;
 
 
-    if (init || idChanged) {
-        repositoryActions.loadableActions.repository.dispatch(props.id);
-        return <FullPageLoadingView/>
-    }
+    useEffect(() => {
+        if (init || idChanged) {
+            repositoryActions.loadableActions.repository.dispatch(props.id);
+        }
+    }, []);
 
-    if (repositoryDTOLoadable.loading) {
+
+    if (repositoryDTOLoadable.loading || init || idChanged) {
         return <FullPageLoadingView/>
     }
 
