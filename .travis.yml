@@ -7,7 +7,7 @@ services:
 script:
   - ./gradlew build
   - ./gradlew buildProdDocker
-  - docker run -d -p8082:8080 polygloat/polygloat --name app
+  - docker run -d -p8082:8080 --name app polygloat/polygloat
   - cd clientapp
   - npm install
   - 'docker logs -f app | grep -qe "started on port(s): 8080"'
