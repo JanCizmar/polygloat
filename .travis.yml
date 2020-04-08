@@ -10,5 +10,5 @@ script:
   - docker run -d -p8082:8080 --name app polygloat/polygloat
   - cd clientapp
   - npm install
-  - 'docker logs -f app | grep -qe "started on port(s): 8080"'
+  - 'until docker logs --since 5m app | grep -m 1 "started on port(s): 8080"; do : ; done'
   - npx cypress run --env host=http://localhost:8082 --spec cypress/integration/login.spec.js
