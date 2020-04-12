@@ -6,3 +6,8 @@ out/
 
 /polygloat-js/dist/
 /polygloat-js/lib/
+/docs-examples-from-docusaurus/
+/polygloat.iml
+/polygloat.ipr
+/polygloat.iws
+/src/main/resources/application.properties
