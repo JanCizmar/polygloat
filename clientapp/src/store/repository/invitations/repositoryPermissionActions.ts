@@ -1,10 +1,6 @@
 import {singleton} from 'tsyringe';
 import {repositoryService} from '../../../service/repositoryService';
-import {PermissionDTO} from '../../../service/response.types';
 import {AbstractLoadableActions, StateWithLoadables} from "../../AbstractLoadableActions";
-
-const listName = 'permissionsList';
-const deleteName = 'permissionDelete';
 
 export class RepositoryPermissionState extends StateWithLoadables<RepositoryPermissionActions> {
 }
@@ -17,7 +13,10 @@ export class RepositoryPermissionActions extends AbstractLoadableActions<Reposit
         delete: this.createDeleteDefinition("list", async (id) => {
             await this.repositoryService.deletePermission(id);
             return id;
-        })
+        }),
+        edit: this.createLoadableDefinition((this.repositoryService.editPermission), (state) => {
+            return this.resetLoadable(state, "list");
+        }, "Permission successfully edited!")
     };
 
     constructor(private repositoryService: repositoryService) {

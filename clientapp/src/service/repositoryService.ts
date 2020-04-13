@@ -1,6 +1,6 @@
 import {container, singleton} from 'tsyringe';
 import {ApiHttpService} from './apiHttpService';
-import {PermissionDTO, RepositoryDTO} from './response.types';
+import {PermissionDTO, PermissionEditDTO, RepositoryDTO} from './response.types';
 import {useRedirect} from "../hooks/useRedirect";
 import {LINKS} from "../constants/links";
 
@@ -28,6 +28,8 @@ export class repositoryService {
     public deletePermission = async (invitationId): Promise<void> => {
         await http.delete('permission/' + invitationId);
     };
+
+    readonly editPermission = async (dto: PermissionEditDTO): Promise<void> => http.post('permission/edit', dto);
 
     loadRepository = (id): Promise<RepositoryDTO> => http.get("repositories/" + id);
 }

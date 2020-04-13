@@ -21,6 +21,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import CheckIcon from '@material-ui/icons/Check';
 import {useConfirmation} from '../../../../hooks/useConfirmation';
 import {useUser} from "../../../../hooks/useUser";
+import {PermissionEditDTO} from "../../../../service/response.types";
 
 const PermissionSelect = () => (
     <Select name="type" className={null}>
@@ -42,8 +43,7 @@ export const RepositoryPermissionsView: FunctionComponent = () => {
         if (!state.loadables.list.loading) {
             actions.loadableActions.list.dispatch(repositoryId);
         }
-    }, []);
-
+    }, [state.loadables.list.loaded]);
 
     let confirmation = useConfirmation({title: 'Revoke access'});
 
@@ -59,7 +59,9 @@ export const RepositoryPermissionsView: FunctionComponent = () => {
                     <List>
                         {state.loadables.list.data && state.loadables.list.data.map(p => (
                             <ListItem key={p.id}>
-                                <MicroForm initialValues={{type: p.type}} onSubmit={() => {
+                                <MicroForm initialValues={{type: p.type}} onSubmit={(v) => {
+                                    actions.loadableActions.edit.dispatch({permissionId: p.id, type: v.type} as PermissionEditDTO);
+                                    setEditingId(null);
                                 }}>
                                     <ListItemText>
                                         {p.userFullName} | {p.username}
@@ -70,14 +72,17 @@ export const RepositoryPermissionsView: FunctionComponent = () => {
                                     <ListItemSecondaryAction>
                                         {p.id === editingId &&
                                         <>
-                                            <Button color="primary">
+                                            <Button color="primary" type="submit">
                                                 <CheckIcon/>
                                             </Button>
                                             <Button onClick={() => setEditingId(null)}><CloseIcon/></Button>
                                         </>
                                         ||
                                         <>
-                                            <Button color="primary" onClick={() => setEditingId(p.id)}>
+                                            <Button color="primary" onClick={(e) => {
+                                                e.preventDefault();
+                                                setEditingId(p.id)
+                                            }}>
                                                 <EditIcon/>
                                             </Button>
                                             <Button color="secondary" onClick={

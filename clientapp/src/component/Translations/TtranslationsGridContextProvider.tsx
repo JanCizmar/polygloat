@@ -7,6 +7,7 @@ import {TranslationActions} from "../../store/repository/TranslationActions";
 import {useRepository} from "../../hooks/useRepository";
 import {Loadable} from "../../store/AbstractLoadableActions";
 import {RepositoryPermissionType, TranslationsDataResponse} from "../../service/response.types";
+import {useRouteMatch} from "react-router-dom";
 
 export const TranslationListContext = React.createContext<TranslationListContextType>(null);
 
@@ -54,7 +55,9 @@ export const TranslationGridContextProvider: FunctionComponent = (props) => {
         }
     }, [selectedLanguages]);
 
-    useEffect(() => () => actions.loadableReset.translations.dispatch(), []);
+    const url = useRouteMatch().url;
+
+    // useEffect(() => () => actions.loadableReset.translations.dispatch(), []);
 
     const [checkedSources, setCheckedSources] = useState(new Set<number>());
 

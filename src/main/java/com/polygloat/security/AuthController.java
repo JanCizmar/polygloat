@@ -50,9 +50,8 @@ public class AuthController {
     private final JavaMailSender mailSender;
     private final InvitationService invitationService;
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     @PostMapping("/generatetoken")
-    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<JwtAuthenticationResponse> authenticateUser(@RequestBody LoginRequest loginRequest) {
         if (loginRequest.getUsername().isEmpty() || loginRequest.getPassword().isEmpty()) {
             return new ResponseEntity(new ApiResponse(false, Message.USERNAME_OR_PASSWORD_INVALID.getCode()),
                     HttpStatus.BAD_REQUEST);

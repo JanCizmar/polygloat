@@ -93,3 +93,7 @@ export interface ApiKeyDTO {
     "repositoryName": string,
 }
 
+export interface PermissionEditDTO {
+    "permissionId": number,
+    "type": RepositoryPermissionType
+}

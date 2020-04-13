@@ -51,4 +51,10 @@ public class PermissionService {
         Permission permission = Permission.builder().type(Permission.RepositoryPermissionType.MANAGE).repository(repository).user(userAccount).build();
         create(permission);
     }
+
+    @Transactional
+    public void editPermission(Permission permission, Permission.RepositoryPermissionType type) {
+        permission.setType(type);
+        permissionRepository.save(permission);
+    }
 }

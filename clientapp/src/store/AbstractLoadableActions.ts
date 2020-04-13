@@ -91,9 +91,9 @@ export abstract class AbstractLoadableActions<StateType extends StateWithLoadabl
             });
     }
 
-    public abstract get loadableDefinitions(): { [key: string]: LoadableDefinition<any, any> };
+    public abstract get loadableDefinitions(): { [key: string]: LoadableDefinition<StateType, any> };
 
-    public get loadableActions(): { [K in keyof this['loadableDefinitions']]: PromiseAction<StateType, any, any> } {
+    public get loadableActions(): { [K in keyof this['loadableDefinitions']]: PromiseAction<any, any, StateType> } {
         if (!this._loadableActions) {
             this._loadableActions = <any>this.generateLoadableActions()
         }
@@ -104,17 +104,20 @@ export abstract class AbstractLoadableActions<StateType extends StateWithLoadabl
         const loadableResets = {};
         for (let loadableName in this.loadableDefinitions) {
             loadableResets[loadableName] = this.createAction(loadableName.toUpperCase() + "_RESET").build.on((state: StateWithLoadables<any>) => {
-                return {...state, loadables: {...state.loadables, [loadableName]: createLoadable()}};
+                return this.resetLoadable(state, loadableName);
             })
         }
         return <any>loadableResets;
     }
 
+    protected resetLoadable(state, loadableName) {
+        return {...state, loadables: {...state.loadables, [loadableName]: createLoadable()}};
+    }
 
     private generateLoadableActions() {
         const loadableActions = {};
         for (let loadableName in this.loadableDefinitions) {
-            const definition = this.loadableDefinitions[loadableName];
+            const definition: LoadableDefinition<StateType, any> = this.loadableDefinitions[loadableName];
             loadableActions[loadableName] = this.createLoadableAction(
                 loadableName, definition.payloadProvider, definition.then, definition.successMessage, definition.redirectAfter);
         }

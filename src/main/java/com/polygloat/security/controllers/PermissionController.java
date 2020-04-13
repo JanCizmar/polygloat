@@ -1,6 +1,7 @@
 package com.polygloat.security.controllers;
 
 import com.polygloat.constants.Message;
+import com.polygloat.dtos.request.PermissionEditDto;
 import com.polygloat.dtos.response.PermissionDTO;
 import com.polygloat.exceptions.BadRequestException;
 import com.polygloat.exceptions.NotFoundException;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -43,6 +45,15 @@ public class PermissionController {
             throw new BadRequestException(Message.CAN_NOT_REVOKE_OWN_PERMISSIONS);
         }
         permissionService.delete(permission);
+    }
+
+    @PostMapping("edit")
+    public void editPermission(@RequestBody @Valid PermissionEditDto dto) {
+        Permission permission = permissionService.findById(dto.getPermissionId()).orElseThrow(
+                () -> new NotFoundException(Message.PERMISSION_NOT_FOUND));
+
+        securityService.checkRepositoryPermission(permission.getRepository().getId(), Permission.RepositoryPermissionType.MANAGE);
+        permissionService.editPermission(permission, dto.getType());
     }
 }
 

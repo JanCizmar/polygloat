@@ -8,7 +8,7 @@ import Paper from "@material-ui/core/Paper";
 import {BoxLoading} from "../common/BoxLoading";
 import {Pagination} from "./Pagination";
 import {LINKS, PARAMS} from "../../constants/links";
-import {Route, Switch} from "react-router-dom";
+import {Route} from "react-router-dom";
 import {TranslationCreationDialog} from "./TranslationCreationDialog";
 import {TranslationListContext} from "./TtranslationsGridContextProvider";
 import {EmptyListMessage} from "../common/EmptyListMessage";
@@ -57,11 +57,9 @@ export const TranslationsGrid: FunctionComponent = (props) => {
                 </Paper>
                 <Pagination/>
             </>}
-            <Switch>
-                <Route path={LINKS.REPOSITORY_TRANSLATIONS_ADD.template}>
-                    <TranslationCreationDialog/>
-                </Route>
-            </Switch>
+            <Route path={LINKS.REPOSITORY_TRANSLATIONS_ADD.template}>
+                <TranslationCreationDialog/>
+            </Route>
         </>
     )
 };
