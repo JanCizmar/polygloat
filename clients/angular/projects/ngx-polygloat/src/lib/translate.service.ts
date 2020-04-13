@@ -34,32 +34,26 @@ export class TranslateService {
   }
 
   public get(input: string, params = {}): Observable<string> {
-    //return Observable.create(a => a.next(input));
     return from(this.translate(input, params));
   }
 
   public getSafe(input: string, params = {}): Observable<string> {
-    //return Observable.create(a => a.next(input));
     return from(this.translate(input, params, true));
   }
 
   public instant(input: string, params = {}): string {
-    // return "aaaa";
     return this.polygloat.instant(input, params);
   }
 
   public instantSafe(input: string, params = {}): string {
-    //  return "aaaa";
     return this.polygloat.instant(input, params, true);
   }
 
   public getDefaultLang(): string {
-    // return "en";
     return this.polygloat.defaultLanguage;
   }
 
   public getCurrentLang(): string {
-    //  return "en";
     return this.polygloat.lang;
   }
 

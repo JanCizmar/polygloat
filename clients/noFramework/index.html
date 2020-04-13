@@ -4,31 +4,34 @@
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
-<body>
 
+<body>
 <div id="loading" style="position: fixed; top:0; left: 0; width: 100%; height: 100%;
             background-color: white; display: flex; align-items: center; justify-content: center;">
     Loading...
 </div>
 
-<h1>??aaa:param:data,param2:data2\,with\:escaped\,stuff}}</h1>
-
-<div id="target"></div>
+<h1>{{hello_world}}</h1>
+<h1>{{peter_has_n_dogs:dogsCount:5}}</h1>
+<h1 id="target"></h1>
 
 <script src="../../polygloat-js/dist/polygloat.window.js"></script>
 <script>const pg = new polygloat.Polygloat({
-    apiKey: "kld65v4h4729mh48lcdu2jdcv3",
+    apiKey: "o4sn31rmei9va13fved4gklb1n",
     apiUrl: "http://localhost:8080",
-    defaultLanguage: "aaa",
-    inputPrefix: "??",
+    defaultLanguage: "en",
+    inputPrefix: "{{",
     inputPostfix: "}}"
 });
 pg.run().then(() => {
     pg.handleSubtree(document.body).then(() => {
         //polygloat is set! Lets remove loading indicator!
         document.getElementById("loading").style.display = "none";
+        document.getElementById("target").innerText = pg.instant("peter_has_n_dogs", {"dogsCount": "5"});
     });
 });
 </script>
 </body>
+
+
 </html>

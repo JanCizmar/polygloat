@@ -1,5 +1,4 @@
 // Select the node that will be observed for mutations
-import * as React from 'react';
 import {CoreHandler} from './handlers/CoreHandler';
 import {NodeHelper} from './helpers/NodeHelper';
 import {PolygloatService} from './services/polygloatService';
@@ -11,8 +10,6 @@ import {TranslationParams} from "./Types";
 
 // Start observing the target node for configured mutations
 export class Polygloat {
-    private static time = 0;
-    private static instance: Polygloat;
     public properties: Properties = container.resolve(Properties);
     private _service: PolygloatService = container.resolve(PolygloatService);
     private coreHandler: CoreHandler = container.resolve(CoreHandler);
@@ -25,7 +22,6 @@ export class Polygloat {
                         await this.coreHandler.onNewNodes([mutation.target.parentElement]);
                     }
                 }
-
                 if (mutation.type === 'childList') {
                     await this.handleSubtree(mutation.target);
                 }
@@ -36,13 +32,14 @@ export class Polygloat {
         });
 
     private async handleSubtree(target: Node) {
-        let nodes: XPathResult = document.evaluate(`.//*[contains(text(), \'${this.properties.config.inputPrefix}\')]`, target);
+        let nodes: XPathResult = document.evaluate(`./descendant-or-self::*[contains(text(), \'${this.properties.config.inputPrefix}\')]`, target);
         let inputNodes = (target as Element).getElementsByTagName("input");// document.evaluate('.//input', target);
         let polygloatInputs = Array.from(inputNodes)//NodeHelper.nodeListToArray(inputNodes)
             .filter(i => (i as HTMLInputElement).value.indexOf(this.properties.config.inputPrefix) > -1);
 
         const newNodes = NodeHelper.nodeListToArray(nodes).concat(polygloatInputs);
         if (newNodes.length) {
+            console.log(newNodes);
             await this.coreHandler.onNewNodes(newNodes);
         }
     }
@@ -96,9 +93,6 @@ export class Polygloat {
         this.observer.observe(document.body, {attributes: true, childList: true, subtree: true, characterData: true});
         await this.service.getTranslations(this.lang);
     };
-
-    replace = (text: string) => this.service.replace(text, this.lang);
-
 
     private wrap(inputText: string, params: TranslationParams = {}): string {
         let paramString = Object.entries(params).map(([name, value]) => `${this.escapeParam(name)}:${this.escapeParam(value)}`).join(",");

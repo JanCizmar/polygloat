@@ -3,8 +3,6 @@ import {FunctionComponent, ReactElement} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Box from '@material-ui/core/Box';
-import Typography from '@material-ui/core/Typography';
-import MaterialLink from '@material-ui/core/Link';
 import {MainMenu} from './MainMenu';
 import Grid from '@material-ui/core/Grid';
 import Container from '@material-ui/core/Container';
@@ -14,14 +12,13 @@ import {PolygloatLogo} from "../common/icons/PolygloatLogo";
 
 function Copyright() {
     return (
-        <Typography variant="body2" color="textSecondary" align="center">
-            {'Copyright © '}
-            <MaterialLink color="inherit" href="https://polygloat.com">
-                Polygloat
-            </MaterialLink>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
+        <>
+            <Box display="flex" p={2} alignItems="center" justifyContent="center" fontWeight="500">
+                <Link to={LINKS.ROOT.build()} style={{color: "inherit"}}>
+                    <PolygloatLogo opacity={0.2} style={{width: 40, height: 40, filter: "drop-shadow(0px 1px 1px rgba(0, 0, 0, 1))"}}/>
+                </Link>
+            </Box>
+        </>
     );
 }
 
@@ -65,12 +62,7 @@ export const DashboardPage: FunctionComponent<DashboardPageProps> = ({children, 
                             </Grid>
                         </Container>
                     </Box>
-                    <Box pt={2} pb={4}>
-                        <Box display="flex" p={2} alignItems="center" justifyContent="center" fontWeight="500">
-                            <Link to={LINKS.ROOT.build()} style={{color: "inherit"}}>
-                                <PolygloatLogo opacity={0.2} style={{width: 40, height: 40, filter: "drop-shadow(0px 1px 1px rgba(0, 0, 0, 1))"}}/>
-                            </Link>
-                        </Box>
+                    <Box pt={2}>
                         <Copyright/>
                     </Box>
                 </Box>
