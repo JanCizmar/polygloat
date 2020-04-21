@@ -3,6 +3,7 @@ package com.polygloat.model;
 import com.polygloat.dtos.request.LanguageDTO;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -17,6 +18,7 @@ import java.util.Set;
                 @Index(columnList = "abbreviation, repository_id", name = "index_abbreviation_source")
         }
 )
+@ToString(of = {"id", "abbreviation", "name"})
 public class Language extends AuditModel {
 
     @Id

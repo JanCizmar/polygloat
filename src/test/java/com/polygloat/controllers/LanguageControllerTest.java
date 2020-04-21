@@ -57,7 +57,8 @@ public class LanguageControllerTest extends SignedInControllerTest implements IT
     @Test
     void findAllLanguages() throws Exception {
         Repository test = dbPopulator.createBase(generateUniqueString());
-        commitTransaction();
+        flush();
+        logger.error(languageService.findAll(test.getId()));
         MvcResult mvcResult = performFindAll(test.getId()).andExpect(status().isOk()).andReturn();
         assertThat(decodeJson(mvcResult.getResponse().getContentAsString(), Set.class)).hasSize(2);
     }
@@ -68,12 +69,8 @@ public class LanguageControllerTest extends SignedInControllerTest implements IT
         Language en = test.getLanguage("en").orElseThrow(NotFoundException::new);
 
         performDelete(test.getId(), en.getId()).andExpect(status().isOk());
-
-        commitTransaction();
-
         assertThat(languageService.findById(en.getId())).isEmpty();
         repositoryService.deleteRepository(test.getId());
-        commitTransaction();
     }
 
     private void createLanguageCorrectRequest(Long repoId) throws Exception {

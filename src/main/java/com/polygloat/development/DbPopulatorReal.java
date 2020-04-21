@@ -1,8 +1,11 @@
 package com.polygloat.development;
 
+import com.polygloat.dtos.request.LanguageDTO;
 import com.polygloat.dtos.request.SignUpDto;
 import com.polygloat.model.*;
+import com.polygloat.repository.RepositoryRepository;
 import com.polygloat.repository.UserAccountRepository;
+import com.polygloat.service.LanguageService;
 import com.polygloat.service.PermissionService;
 import com.polygloat.service.SecurityService;
 import com.polygloat.service.UserAccountService;
@@ -22,7 +25,8 @@ public class DbPopulatorReal {
     private final UserAccountService userAccountService;
     private final SecurityService securityService;
     public static final String DEFAULT_USERNAME = "ben";
-
+    private final LanguageService languageService;
+    private final RepositoryRepository repositoryRepository;
 
     private Language de;
     private Language en;
@@ -59,7 +63,7 @@ public class DbPopulatorReal {
 
         permissionService.grantFullAccessToRepo(userAccount, repository);
 
-        entityManager.persist(repository);
+        repositoryRepository.save(repository);
 
         return repository;
     }
@@ -111,15 +115,7 @@ public class DbPopulatorReal {
 
 
     private Language createLanguage(String name, Repository repository) {
-        Language language = new Language();
-        language.setAbbreviation(name);
-        language.setRepository(repository);
-        language.setName(name);
-
-        repository.getLanguages().add(language);
-
-        entityManager.persist(language);
-        return language;
+        return languageService.createLanguage(LanguageDTO.builder().name(name).abbreviation(name).build(), repository);
     }
 
     private void createTranslation(Repository repository, String english,
@@ -150,7 +146,7 @@ public class DbPopulatorReal {
         entityManager.persist(translationDe);
 
         entityManager.persist(source);
-
+        entityManager.flush();
     }
 
 

@@ -6,8 +6,8 @@ import lombok.Value;
 
 @Value
 public class PaginationMeta {
-    int offset;
-    Long allCount;
+    private int offset;
+    private Long allCount;
 
     @JsonCreator
     public PaginationMeta(@JsonProperty("offset") int offset, @JsonProperty("allCount") Long allCount) {

@@ -4,10 +4,10 @@ import com.polygloat.constants.ApiScope;
 import com.polygloat.model.ApiKey;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 @Data
 @Builder
 @ApiModel
+@NoArgsConstructor
+@AllArgsConstructor
 public class ApiKeyDTO {
     private Long id;
 

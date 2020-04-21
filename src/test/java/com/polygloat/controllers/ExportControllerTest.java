@@ -31,6 +31,8 @@ public class ExportControllerTest extends SignedInControllerTest {
             assertThat(fileSizes).containsKey(name);
             //assertThat(fileSizes.get(name)).isGreaterThan(0);
         });
+        //cleanup
+        repositoryService.deleteRepository(repository.getId());
     }
 
 

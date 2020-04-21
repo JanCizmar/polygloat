@@ -8,6 +8,7 @@ import lombok.Setter;
 import javax.validation.constraints.NotNull;
 
 @RepositoryRequest
+@NoArgsConstructor
 public class EditRepositoryDTO extends AbstractRepositoryDTO {
     @Getter
     @Setter

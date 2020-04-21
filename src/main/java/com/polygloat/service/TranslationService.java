@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.util.*;
@@ -40,6 +41,7 @@ public class TranslationService {
     private RepositoryService repositoryService;
 
     @SuppressWarnings("unchecked")
+    @Transactional
     public Map<String, Object> getTranslations(Set<String> languageAbbreviations, Long repositoryId) {
         Set<Translation> allByLanguages = translationRepository.getTranslations(languageAbbreviations, repositoryId);
 

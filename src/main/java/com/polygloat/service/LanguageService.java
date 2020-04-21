@@ -33,7 +33,7 @@ public class LanguageService {
         Language language = Language.fromRequestDTO(dto);
         language.setRepository(repository);
         repository.getLanguages().add(language);
-        entityManager.persist(language);
+        languageRepository.save(language);
         return language;
     }
 
