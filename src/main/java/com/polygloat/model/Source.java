@@ -2,8 +2,6 @@ package com.polygloat.model;
 
 import com.polygloat.dtos.PathDTO;
 import lombok.*;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.IndexedEmbedded;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -24,16 +22,13 @@ public class Source extends AuditModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Field
     //@Analyzer(impl = Analyzer.class)
     private String name;
 
     @ManyToOne
-    @IndexedEmbedded(depth = 1)
     private Repository repository;
 
     @Builder.Default
-    @IndexedEmbedded(includePaths = {"text"})
     @OneToMany(mappedBy = "source")
     private Set<Translation> translations = new HashSet<>();
 

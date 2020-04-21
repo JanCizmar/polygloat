@@ -1,5 +1,6 @@
 package com.polygloat.security;
 
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.polygloat.configuration.AppConfiguration;
 import com.polygloat.constants.Message;
 import com.polygloat.dtos.request.ResetPassword;
@@ -19,7 +20,6 @@ import com.polygloat.service.UserAccountService;
 import com.unboundid.util.Base64;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.codehaus.jackson.node.TextNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

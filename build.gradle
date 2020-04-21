@@ -103,12 +103,10 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.10'
     compileOnly 'org.hibernate:hibernate-jpamodelgen'
     annotationProcessor('org.hibernate:hibernate-jpamodelgen')
-    compile 'org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.2.2.RELEASE'
     compile 'io.springfox:springfox-swagger2:2.9.2'
     compile 'io.springfox:springfox-swagger-ui:2.9.2'
     //compile 'io.springfox:springfox-data-rest:2.9.2'
     compile 'io.springfox:springfox-bean-validators:2.9.2'
-    compile 'org.hibernate:hibernate-search-orm:5.11.4.Final'
     testCompile group: 'org.testng', name: 'testng', version: '6.14.3'
 }
 

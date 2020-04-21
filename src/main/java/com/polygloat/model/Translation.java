@@ -1,7 +1,6 @@
 package com.polygloat.model;
 
 import lombok.*;
-import org.hibernate.search.annotations.Field;
 
 import javax.persistence.*;
 
@@ -20,7 +19,6 @@ public class Translation extends AuditModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Field
     @EqualsAndHashCode.Include
     @Column(columnDefinition = "text")
     private String text;
