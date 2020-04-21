@@ -1,7 +1,6 @@
 import {container, singleton} from 'tsyringe';
 
 import {languageService} from '../../service/languageService';
-import {LanguageDTO} from '../../service/response.types';
 import {AbstractLoadableActions, StateWithLoadables} from "../AbstractLoadableActions";
 import {useSelector} from "react-redux";
 import {AppState} from "../index";
@@ -9,7 +8,6 @@ import {ActionType} from "../Action";
 import {RepositoryActions} from "../repository/RepositoryActions";
 
 export class LanguagesState extends StateWithLoadables<LanguageActions> {
-    languages: LanguageDTO[] = undefined;
 }
 
 @singleton()
@@ -41,10 +39,8 @@ export class LanguageActions extends AbstractLoadableActions<LanguagesState> {
         return state;
     }
 
-    get prefix():
-        string {
+    get prefix(): string {
         return 'LANGUAGES';
     }
-
 }
 

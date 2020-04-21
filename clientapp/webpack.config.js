@@ -10,10 +10,10 @@ module.exports = env => {
         entry: {
             index: "./src/index.tsx",
         },
-        devtool: isDevelopment && 'inline-source-map',
+        devtool: isDevelopment && 'inline-source-map' || 'source-map',
         output: {
-            filename: "[name].bundle.js",
-            chunkFilename: '[name].bundle.js',
+            filename: !isDevelopment ? '[name].[chunkhash].js' : '[name].[hash].js',
+            chunkFilename: !isDevelopment ? '[name].[chunkhash].js' : '[name].[hash].js',
             path: path.resolve(__dirname, 'dist'),
             publicPath: '/',
         },

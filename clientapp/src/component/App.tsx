@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import {GlobalActions} from '../store/global/globalActions';
 import SnackBar from './common/SnackBar';
 import {BrowserRouter, Redirect, Route, Switch} from 'react-router-dom';
@@ -17,14 +17,14 @@ import FullPageLoadingView from "./common/FullPageLoadingView";
 import {ApiKeysView} from "./security/apiKeys/ApiKeysView";
 import {UserSettings} from "./views/UserSettings";
 
-const LoginRouter = React.lazy(() => import(/* webpackChunkName: "login-router" */'./security/LoginRouter'));
-const SignUpView = React.lazy(() => import(/* webpackChunkName: "login-router" */'./security/SignUpView'));
+const LoginRouter = React.lazy(() => import(/* webpackChunkName: "login" */'./security/LoginRouter'));
+const SignUpView = React.lazy(() => import(/* webpackChunkName: "sign-up-view" */'./security/SignUpView'));
 
 const PasswordResetSetView = React.lazy(() => import(/* webpackChunkName: "reset-password-set-view" */'./security/ResetPasswordSetView'));
 const PasswordResetView = React.lazy(() => import(/* webpackChunkName: "reset-password-view" */'./security/ResetPasswordView'));
-const ConfirmationDialog = React.lazy(() => import(/* webpackChunkName: "confirmation-dialog" */'./common/ConfirmationDialog'));
 const RepositoriesRouter = React.lazy(() => import(/* webpackChunkName: "repositories" */'./views/repositories/RepositoriesRouter'));
 const AcceptInvitationHandler = React.lazy(() => import(/* webpackChunkName: "accept-invitation-handler" */'./security/AcceptInvitationHandler'));
+const ConfirmationDialog = React.lazy(() => import(/* webpackChunkName: "confirmation-dialog" */'./common/ConfirmationDialog'));
 
 interface Props {
     remoteConfig: RemoteConfigurationDTO
@@ -63,7 +63,10 @@ const MandatoryDataProvider = (props) => {
 };
 
 const GlobalConfirmation = () => {
+
     let state = useSelector((state: AppState) => state.global.confirmationDialog);
+
+    const [wasDisplayed, setWasDisplayed] = useState(false);
 
     let actions = container.resolve(GlobalActions);
 
@@ -76,6 +79,13 @@ const GlobalConfirmation = () => {
         state.onConfirm();
     };
 
+    useEffect(() => {
+        setWasDisplayed(wasDisplayed || !!state)
+    }, [!state]);
+
+    if (!wasDisplayed) {
+        return null;
+    }
 
     return (<ConfirmationDialog open={!!state} {...state} onCancel={onCancel} onConfirm={onConfirm}/>);
 };

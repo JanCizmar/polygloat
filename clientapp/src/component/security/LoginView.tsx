@@ -38,8 +38,8 @@ export const LoginView: FunctionComponent<LoginProps> = (props) => {
     const gitHubUrl = githubBase + `?client_id=${clientId}&redirect_uri=${githubRedirectUri}&scope=user%3Aemail`;
 
     const history = useHistory();
-    if (history.location.state && history.location.state.from) {
-        securityServiceIns.saveAfterLoginLink(history.location.state.from);
+    if (history.location.state && (history.location.state as any).from) {
+        securityServiceIns.saveAfterLoginLink((history.location.state as any).from);
     }
 
     return (
