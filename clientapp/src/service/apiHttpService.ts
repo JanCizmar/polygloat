@@ -6,6 +6,7 @@ import {tokenService} from './tokenService';
 import {CONFIG} from '../config';
 import {GlobalError} from "../error/GlobalError";
 import {messageService} from "./messageService";
+import * as Sentry from '@sentry/browser';
 
 const errorActions = container.resolve(ErrorActions);
 const redirectionActions = container.resolve(RedirectionActions);
@@ -63,6 +64,7 @@ export class ApiHttpService {
                 if (r.status == 403) {
                     redirectionActions.redirect.dispatch(LINKS.AFTER_LOGIN.build());
                     this.messageService.error("Operation not permitted!");
+                    Sentry.captureException(new Error("Operation not permitted"));
                     ApiHttpService.getResObject(r).then(b => reject({...b, __handled: true}));
                     return;
                 }
@@ -70,10 +72,10 @@ export class ApiHttpService {
                     redirectionActions.redirect.dispatch(LINKS.AFTER_LOGIN.build());
                     this.messageService.error("Resource not found");
                 }
-                //use input error, result should contain json
                 if (r.status >= 400 && r.status <= 500) {
-                    //this.messageService.error("Bad request!");
-                    ApiHttpService.getResObject(r).then(b => reject(b));
+                    ApiHttpService.getResObject(r).then(b => {
+                        reject(b)
+                    });
                 } else {
                     resolve(r);
                 }

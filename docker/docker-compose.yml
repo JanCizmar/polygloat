@@ -15,3 +15,5 @@ services:
       - .env
     depends_on:
       - "db"
+  smtp:
+    image: namshi/smtp

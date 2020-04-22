@@ -7,6 +7,7 @@
   "scripts": {
     "start": "webpack-dev-server --env.mode=development --hot",
     "startProd": "webpack-dev-server --env.mode=production",
+    "startSentry": "webpack-dev-server --env.mode=production --env.sentry=true",
     "build": "webpack --env.mode=production",
     "watch": "webpack --watch",
     "test": "jest",
@@ -51,6 +52,7 @@
     "@material-ui/core": "^4.9.7",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.46",
+    "@sentry/types": "^5.15.5",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@types/jest": "^24.9.1",

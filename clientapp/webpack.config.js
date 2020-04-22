@@ -3,8 +3,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = env => {
-
     const isDevelopment = env.mode === "development";
+
+    process.env.sentry = env.sentry === "true" || (process.env.target === "appbundle" && env.sentry === undefined);
 
     return {
         entry: {
@@ -51,6 +52,10 @@ module.exports = env => {
                             }
                         }
                     ]
+                },
+                {
+                    test: /favicon\.svg/,
+                    loader: 'file-loader?name=[name].[ext]'  // <-- retain original file name
                 }
             ]
         },
@@ -64,6 +69,7 @@ module.exports = env => {
         mode: env.mode || 'production',
         plugins: [
             new HtmlWebpackPlugin({
+                favicon: "./src/favicon.svg",
                 template: './src/index.html'
             }),
             //new BundleAnalyzerPlugin()

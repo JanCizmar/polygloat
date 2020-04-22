@@ -26,8 +26,9 @@ const App = React.lazy(() => import(/* webpackChunkName: "app" */ "./component/A
 const SnackbarProvider = React.lazy(() => import(/* webpackChunkName: "notistack" */ 'notistack')
     .then(module => ({"default": module.SnackbarProvider})));
 
-// #if process.env.target==="appbundle"
+// #if process.env.sentry
 Sentry.init({dsn: 'https://371b68a5e0da4f86a5142af52ad38599@sentry.io/1853046'});
+console.info("Using Sentry!");
 // #endif
 
 container.resolve(dispatchService).store = store;
