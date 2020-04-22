@@ -3,6 +3,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = env => {
+
+    process.env.mode = env.mode;
     const isDevelopment = env.mode === "development";
 
     process.env.sentry = env.sentry === "true" || (process.env.target === "appbundle" && env.sentry === undefined);
