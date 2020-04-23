@@ -1,8 +1,9 @@
 package com.polygloat.constants;
 
 import com.polygloat.exceptions.NotFoundException;
-import io.swagger.annotations.Api;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 @AllArgsConstructor
 public enum ApiScope {

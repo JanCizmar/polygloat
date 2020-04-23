@@ -12,7 +12,7 @@ import com.polygloat.model.Permission;
 import com.polygloat.model.Repository;
 import com.polygloat.service.ApiKeyService;
 import com.polygloat.service.RepositoryService;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +33,7 @@ public class ApiKeyController extends PrivateController {
     private final ApiKeyService apiKeyService;
     private final RepositoryService repositoryService;
 
-    @ApiOperation("Get all user's api keys")
+    @Operation(summary = "Get all user's api keys")
     @GetMapping(path = "")
     public Set<ApiKeyDTO> allByUser() {
         return apiKeyService.getAllByUser(authenticationFacade.getUserAccount()).stream()
