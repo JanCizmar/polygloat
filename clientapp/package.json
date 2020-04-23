@@ -12,7 +12,8 @@
     "watch": "webpack --watch",
     "test": "jest",
     "test:watch": "jest --watch",
-    "check": "tsc"
+    "check": "tsc",
+    "cypress": "cypress run"
   },
   "author": "Jan Cizmar",
   "license": "ISC",
