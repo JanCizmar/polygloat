@@ -1,4 +1,4 @@
-name: Java CI
+name: Base workflow
 
 on: [push]
 
@@ -8,9 +8,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Set up JDK 1.8
+      - name: Set up JDK
         uses: actions/setup-java@v1
         with:
           java-version: 14
       - name: Build with Gradle
         run: ./gradlew build
+      - name: Build docker image
+        run: ./gradlew buildProdDocker
+      - name: Run the image
+        run: docker run -d -p8082:8080 --name app polygloat/polygloat
+      - name: Wait for running container
+        run: 'until docker logs --since 5m app | grep -m 1 "started on port(s): 8080"; do : ;done'
+      - name: Cypress tests
+        run: ./gradlew cypress
