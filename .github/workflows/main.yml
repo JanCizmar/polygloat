@@ -31,4 +31,4 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: test-report
-          path: clientapp/cypress/videos
+          path: build/clientapp/cypress/videos
