@@ -1,14 +1,21 @@
 language: java
 jdk: openjdk14
-
 services:
-  - docker
-
+- docker
 script:
-  - ./gradlew build
-  - ./gradlew buildProdDocker
+  - "./gradlew build"
+  - "./gradlew buildProdDocker"
   - docker run -d -p8082:8080 --name app polygloat/polygloat
   - cd clientapp
   - npm install
-  - 'until docker logs --since 5m app | grep -m 1 "started on port(s): 8080"; do : ; done'
+  - 'until docker logs --since 5m app | grep -m 1 "started on port(s): 8080"; do : ;
+  done'
   - npx cypress run --env host=http://localhost:8082 --spec cypress/integration/login.spec.js
+
+deploy:
+  provider: releases
+  api_key:
+    secure: ZLKCC8Jn1Kym0ANVHVRnjX6tbV26/LTbSPIdpBdUNG6Pl+Xv3GX8J17QRvTNFb52vjCSRVpJxpuoVp6LNQAjGC1Qklgo2MZjRzE7w92RoMgzHQzjdGz7VKq1FsLkLd5lvL/lTsuO/ZNtqNZWiJjM5VrcgvELXbA/MrJwTFfwc1EyDeGFqLEuJZc2pspR4D5DY1Q0QqQg5ZUQHBEAkda3Llqm3oGthENymfNteyz83miO9FFh+DRUIWbmARvdTnbG8x41Q7Qom19YFQ4OkB4g2QGq65zNcv1K/i5EqLoN6YZD1Gp7d2Z2s7t1IvJlRP6nX56cChPZItCy5PO96yVKLR8GFcj1ufWILz22Eb/O8Y79HDLB4RM/jNe1AdKPxfP82HrbbTS5eQcao0e/Sy3u0jKKvlC3JopKf/7f4JOsSsugWhlerl/zxGaO0AOfVvPLZOd3Th50vUuOiGVBth9UjyWj6d4klAbfS0/A/oA4bPgNZ1yKfRz7QVHWV1XNN3YexOvZMc/ksV33vKvKdO5pWuv96wk8ZP9GbytpTeGjsJHSMObL7Z1KzKuZ274H6tB8BxM/hx3rld96N33HAk5G0tDpORpuOstn2RZmqycqhRtpSBBG8Iw8FAJv4TBza8Pz24wlq39CAUvHCkgA0WA84Kjtwlw4VotrHZPuI5O6O98=
+  file: build/libs/polygloat-local.jar
+  on:
+    tags: true

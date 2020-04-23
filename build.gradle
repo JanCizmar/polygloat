@@ -19,7 +19,13 @@ plugins {
 
 
 group = 'com.polygloat'
-version = '0.0.1-SNAPSHOT'
+
+if (project.hasProperty('projVersion')) {
+    project.version = project.projVersion
+} else {
+    project.version = 'local'
+}
+
 sourceCompatibility = '12'
 
 configurations {
@@ -29,17 +35,12 @@ configurations {
     }
 }
 
-
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
-bootJar {
-    baseName = 'polygloat'
-    version = '0.1.0'
-}
 
 repositories {
     mavenCentral()
@@ -185,3 +186,4 @@ bootJar.mustRunAfter(copyDist)
 task buildProd(dependsOn: ['copyDist', 'bootJar'])
 
 task buildProdDocker(dependsOn: ['buildProd', 'docker'])
+
