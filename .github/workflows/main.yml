@@ -24,11 +24,11 @@ jobs:
         run: ./gradlew cypress
       - name: Upload test report artifacts
         uses: actions/upload-artifact@v1
-          with:
-            name: test-report
-            path: build/reports/tests/test/index.html
+        with:
+          name: test-report
+          path: build/reports/tests/test/index.html
       - name: Upload cypress videos
         uses: actions/upload-artifact@v1
-          with:
-            name: test-report
-            path: clientapp/cypress/videos
+        with:
+          name: test-report
+          path: clientapp/cypress/videos
