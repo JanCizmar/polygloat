@@ -12,7 +12,10 @@ script:
   done'
   - npx cypress run --env host=http://localhost:8082 --spec cypress/integration/login.spec.js
 
-before_deploy: "./gradlew buildProd"
+before_deploy:
+  - pws
+  - ls
+  - ./gradlew buildProd
 
 deploy:
   provider: releases
