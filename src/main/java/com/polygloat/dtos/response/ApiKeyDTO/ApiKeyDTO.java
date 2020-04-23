@@ -2,8 +2,7 @@ package com.polygloat.dtos.response.ApiKeyDTO;
 
 import com.polygloat.constants.ApiScope;
 import com.polygloat.model.ApiKey;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,13 +13,13 @@ import java.util.stream.Collectors;
 
 @Data
 @Builder
-@ApiModel
+@Schema
 @NoArgsConstructor
 @AllArgsConstructor
 public class ApiKeyDTO {
     private Long id;
 
-    @ApiModelProperty(value = "Resulting user's api key")
+    @Schema(name = "Resulting user's api key")
     private String key;
 
     private String userName;

@@ -1,11 +1,9 @@
 package com.polygloat.model;
 
 import com.polygloat.constants.ApiScope;
-import io.swagger.annotations.Api;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true, of = {"id"})
 @Entity
