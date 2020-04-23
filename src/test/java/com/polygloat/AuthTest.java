@@ -130,7 +130,7 @@ class AuthTest extends AbstractControllerTest {
         MockHttpServletResponse response = mvcResult.getResponse();
         assertThat(response.getStatus()).isEqualTo(401);
 
-        assertThat(response.getContentAsString()).contains(Message.THIRD_PARTY_UNKNOWN_ERROR.getCode());
+        assertThat(response.getContentAsString()).contains(Message.THIRD_PARTY_AUTH_UNKNOWN_ERROR.getCode());
 
         tokenResponse = new HashMap<>();
         tokenResponse.put("error", null);

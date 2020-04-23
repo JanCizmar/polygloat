@@ -116,14 +116,14 @@ public class GithubOAuthDelegate {
         }
 
         if (response == null) {
-            throw new AuthenticationException(Message.THIRD_PARTY_UNKNOWN_ERROR);
+            throw new AuthenticationException(Message.THIRD_PARTY_AUTH_UNKNOWN_ERROR);
         }
 
         if (response.containsKey("error")) {
             throw new AuthenticationException(Message.THIRD_PARTY_AUTH_ERROR_MESSAGE);
         }
 
-        throw new AuthenticationException(Message.THIRD_PARTY_UNKNOWN_ERROR);
+        throw new AuthenticationException(Message.THIRD_PARTY_AUTH_UNKNOWN_ERROR);
     }
 
     public static class GithubEmailResponse {
