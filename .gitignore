@@ -10,4 +10,4 @@ out/
 /polygloat.iml
 /polygloat.ipr
 /polygloat.iws
-/src/main/resources/application.properties
+/src/main/resources/debug.properties
