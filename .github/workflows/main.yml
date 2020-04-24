@@ -1,6 +1,10 @@
 name: Base workflow
 
-on: [push]
+on:
+  push:
+    barnches:
+      - '**'
+  pull_request
 
 jobs:
   build:
