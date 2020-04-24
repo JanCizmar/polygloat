@@ -45,8 +45,8 @@ jobs:
       - name: Build docker image
         run: ./gradlew buildProdDocker
       - name: Login to docker
-        run: docker -u ${{ secrets.dockerhubusername }} -p ${{ secrets.dockerhubpassword }}
+        run: docker login -u ${{ secrets.dockerhubusername }} -p "${{ secrets.dockerhubpassword }}"
       - name: Tag the image
-        run: docker tag polygloat/polygloat polygloat/polygloat\:${{ steps.get_version.outputs.VERSION }}
+        run: docker tag polygloat/polygloat polygloat/polygloat:${{ steps.get_version.outputs.VERSION }}
       - name: Publish docker image
-        run: docker push polygloat/polygloat\:${{ steps.get_version.outputs.VERSION }}
+        run: docker push polygloat/polygloat:${{ steps.get_version.outputs.VERSION }}
