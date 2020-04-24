@@ -132,6 +132,21 @@ test {
     useTestNG()
 }
 
+springBoot {
+    buildInfo {
+        properties {
+            version = project.version
+        }
+    }
+}
+
+
+bootJar {
+    manifest {
+        attributes('Implementation-Version': project.version)
+    }
+}
+
 node {
     download = true
 
@@ -190,6 +205,6 @@ task buildProdDocker(dependsOn: ['buildProd', 'docker'])
 task cypress(type: NpmTask) {
     description = "Runs cypress tests"
     workingDir = file(clientAppBuildDir)
-    args = ["run","cypress", "--", "--env", "host=http://localhost:8082", "--spec", "cypress/integration/login.spec.js"]
+    args = ["run", "cypress", "--", "--env", "host=http://localhost:8082", "--spec", "cypress/integration/login.spec.js"]
     dependsOn("appNpmInstall")
 }
