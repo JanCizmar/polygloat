@@ -10,7 +10,6 @@ import {LINKS} from '../constants/links';
 import {PrivateRoute} from './common/PrivateRoute';
 import {ErrorActions} from '../store/global/errorActions';
 import {RedirectionActions} from '../store/global/redirectionActions';
-import {RemoteConfigurationDTO} from "../service/response.types";
 import {useConfig} from "../hooks/useConfig";
 import {useUser} from "../hooks/useUser";
 import FullPageLoadingView from "./common/FullPageLoadingView";
@@ -25,10 +24,6 @@ const PasswordResetView = React.lazy(() => import(/* webpackChunkName: "reset-pa
 const RepositoriesRouter = React.lazy(() => import(/* webpackChunkName: "repositories" */'./views/repositories/RepositoriesRouter'));
 const AcceptInvitationHandler = React.lazy(() => import(/* webpackChunkName: "accept-invitation-handler" */'./security/AcceptInvitationHandler'));
 const ConfirmationDialog = React.lazy(() => import(/* webpackChunkName: "confirmation-dialog" */'./common/ConfirmationDialog'));
-
-interface Props {
-    remoteConfig: RemoteConfigurationDTO
-}
 
 const errorActions = container.resolve(ErrorActions);
 const redirectionActions = container.resolve(RedirectionActions);

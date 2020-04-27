@@ -30,7 +30,7 @@ const SnackbarProvider = React.lazy(() => import(/* webpackChunkName: "notistack
 /** !!!! DO NOT REMOVE THESE COMMENTS -- webpack-conditional-loader
  @link(https://github.com/caiogondim/webpack-conditional-loader#readme)
  **/
-// #if process.env.sentry
+// #if process.env.sentry === true
 Sentry.init({dsn: 'https://371b68a5e0da4f86a5142af52ad38599@sentry.io/1853046'});
 console.info("Using Sentry!");
 // #endif

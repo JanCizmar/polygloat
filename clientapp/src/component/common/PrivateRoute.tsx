@@ -11,7 +11,7 @@ interface PrivateRouteProps {
 }
 
 export const PrivateRoute: FunctionComponent<PrivateRouteProps & React.ComponentProps<typeof Route>> =
-    ({children, ...rest}) => {
+    (props) => {
 
         const allowPrivate = useSelector((state: AppState) => state.global.security.allowPrivate);
         const ss = container.resolve(securityService);
@@ -19,23 +19,22 @@ export const PrivateRoute: FunctionComponent<PrivateRouteProps & React.Component
 
         if (allowPrivate && afterLoginLink) {
             ss.removeAfterLoginLink();
-            children = <Redirect to={afterLoginLink}/>;
+            return <Redirect to={afterLoginLink}/>;
+        }
+
+        if (allowPrivate) {
+            return <Route {...props} />
         }
 
         return (
             <Route
-                {...rest}
                 render={({location}) =>
-                    allowPrivate ? (
-                        children
-                    ) : (
-                        <Redirect
-                            to={{
-                                pathname: LINKS.LOGIN.build(),
-                                state: {from: location}
-                            }}
-                        />
-                    )
+                    <Redirect
+                        to={{
+                            pathname: LINKS.LOGIN.build(),
+                            state: {from: location}
+                        }}
+                    />
                 }
             />
         );

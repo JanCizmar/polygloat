@@ -8,7 +8,7 @@ export const Pagination: FunctionComponent = (props) => {
     const listContext = useContext(TranslationListContext);
 
     const [perPage, setPerPage] = useState(listContext.perPage);
-    const [page, setPage] = useState(0);
+    const [page, setPage] = useState(Math.ceil(listContext.listLoadable.data.paginationMeta.offset / listContext.perPage));
 
     const onPerPageChange = (pp) => {
         setPerPage(pp);

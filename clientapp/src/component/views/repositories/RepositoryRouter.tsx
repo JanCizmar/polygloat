@@ -12,12 +12,12 @@ import {PrivateRoute} from "../../common/PrivateRoute";
 import {ImportView} from "./imprt_export/ImportView";
 import {ExportView} from "./imprt_export/ExportView";
 
-export const RepositoryRouter = () => {
-    let match = useRouteMatch();
-
-    const TranslationsView = React.lazy(() => import(/*
+const TranslationsView = React.lazy(() => import(/*
     webpackChunkName: "translationsView"
     */ './translations/TranslationsView'));
+
+export const RepositoryRouter = () => {
+    let match = useRouteMatch();
 
     return (
         <Switch>

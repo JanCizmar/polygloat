@@ -12,7 +12,7 @@ export default function GlobalError(props: { error: GlobalErrorError }) {
     /** !!!! DO NOT REMOVE THESE COMMENTS -- webpack-conditional-loader
      @link(https://github.com/caiogondim/webpack-conditional-loader#readme)
      **/
-        // noinspection JSUnusedAssignment
+    // noinspection JSUnusedAssignment
     let dev = false;
     // #if process.env.mode === "development"
     // @ts-ignore

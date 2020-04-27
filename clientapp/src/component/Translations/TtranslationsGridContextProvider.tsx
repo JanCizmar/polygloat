@@ -7,7 +7,6 @@ import {TranslationActions} from "../../store/repository/TranslationActions";
 import {useRepository} from "../../hooks/useRepository";
 import {Loadable} from "../../store/AbstractLoadableActions";
 import {RepositoryPermissionType, TranslationsDataResponse} from "../../service/response.types";
-import {useRouteMatch} from "react-router-dom";
 
 export const TranslationListContext = React.createContext<TranslationListContextType>(null);
 
@@ -39,13 +38,14 @@ export const TranslationGridContextProvider: FunctionComponent = (props) => {
     let selectedLanguages = actions.useSelector(s => s.selectedLanguages);
     let translationSaveLoadable = actions.useSelector(s => s.loadables.setTranslations);
 
-    const defaultPerPage = 20;
+    const [perPage, setPerPage] = useState(20);
 
     let messaging = container.resolve(messageService);
 
     const loadData = (search?: string, limit?: number, offset?: number) => {
+        setPerPage(limit || perPage);
         actions.loadableActions.translations.dispatch(
-            repositoryDTO.id, selectedLanguages.length ? selectedLanguages : null, search, limit || defaultPerPage, offset
+            repositoryDTO.id, selectedLanguages.length ? selectedLanguages : null, search, limit || perPage, offset
         );
     };
 
@@ -55,13 +55,9 @@ export const TranslationGridContextProvider: FunctionComponent = (props) => {
         }
     }, [selectedLanguages]);
 
-    const url = useRouteMatch().url;
-
-    // useEffect(() => () => actions.loadableReset.translations.dispatch(), []);
-
     const [checkedSources, setCheckedSources] = useState(new Set<number>());
 
-    //set state accepts also a function, thats why the funcin returns function - to handle the react call
+    //set state accepts also a function, thats why the funcion returns function - to handle the react call
     const [_resetEdit, setResetEdit] = useState(() => () => {
     });
 
@@ -148,7 +144,7 @@ export const TranslationGridContextProvider: FunctionComponent = (props) => {
         refreshList: () => actions.loadableActions.translations.dispatch(...listLoadable.dispatchParams),
         loadData,
         listLoadable,
-        perPage: listLoadable.data.paginationMeta.offset || defaultPerPage,
+        perPage: perPage,
         isSourceChecked: isSourceChecked,
         toggleSourceChecked: (id) => {
             let copy = new Set<number>(checkedSources);
