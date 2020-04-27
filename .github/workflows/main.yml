@@ -4,8 +4,6 @@ on:
   push:
     barnches:
       - '**'
-    tags-ignore:
-      - '**'
   pull_request:
 
 jobs:
