@@ -1,6 +1,6 @@
 on:
   push:
-    branches-igrnoe:
+    branches-ignore:
       '**'
     # Sequence of patterns matched against refs/tags
     tags:
