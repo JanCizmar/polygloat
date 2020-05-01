@@ -158,8 +158,6 @@ public class RepositoryControllerTest extends SignedInControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        commitTransaction();
-
         Optional<Repository> repository = repositoryService.findById(test.getId());
 
         assertThat(repository).isEmpty();

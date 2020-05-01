@@ -63,7 +63,9 @@ public class DbPopulatorReal {
 
         permissionService.grantFullAccessToRepo(userAccount, repository);
 
-        repositoryRepository.save(repository);
+        repositoryRepository.saveAndFlush(repository);
+        entityManager.flush();
+        entityManager.clear();
 
         return repository;
     }

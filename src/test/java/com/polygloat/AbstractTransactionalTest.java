@@ -18,22 +18,9 @@ public abstract class AbstractTransactionalTest extends AbstractTransactionalTes
 
     protected void commitTransaction() {
         TestTransaction.flagForCommit();
-        TestTransaction.end();
-        //entityManager.clear();
-        TestTransaction.start();
-    }
-
-
-    protected void rollbackTransaction() {
-        TestTransaction.flagForRollback();
-        TestTransaction.end();
-        //entityManager.clear();
-        TestTransaction.start();
-    }
-
-    protected void flush() {
-        languageRepository.flush();
         entityManager.flush();
+        TestTransaction.end();
+        TestTransaction.start();
         entityManager.clear();
     }
 

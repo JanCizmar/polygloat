@@ -10,6 +10,7 @@ import com.polygloat.model.Repository;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.testng.annotations.Test;
@@ -24,18 +25,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class TranslationControllerTest extends SignedInControllerTest {
+
     @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     void getViewDataSearch() throws Exception {
         Repository app = dbPopulator.populate(generateUniqueString());
 
         String searchString = "This";
 
         ViewDataResponse<LinkedHashSet<SourceResponseDTO>, ResponseParams> response = performValidViewRequest(app, "?search=" + searchString);
-
+        assertThat(response.getData().size()).isGreaterThan(0);
         assertSearch(response, searchString);
     }
 
     @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     void getViewDataQueryLanguages() throws Exception {
         Repository repository = dbPopulator.populate(generateUniqueString());
 
@@ -48,9 +52,7 @@ public class TranslationControllerTest extends SignedInControllerTest {
         }
 
         performGetDataForView(repository.getId(), "?languages=langNotExists").andExpect(status().isNotFound());
-
-        flush();
-
+        
         //with starting emtpy string
         ViewDataResponse<LinkedHashSet<SourceResponseDTO>, ResponseParams> response2 = performValidViewRequest(repository, "?languages=,en,de");
 
@@ -102,7 +104,6 @@ public class TranslationControllerTest extends SignedInControllerTest {
     void getViewDataMetadata() throws Exception {
         Repository repository = dbPopulator.populate(generateUniqueString());
         int limit = 5;
-        flush();
         ViewDataResponse<LinkedHashSet<SourceResponseDTO>, ResponseParams> response = performValidViewRequest(repository, String.format("?limit=%d", limit));
 
         assertThat(response.getParams().getLanguages()).contains("en", "de");
