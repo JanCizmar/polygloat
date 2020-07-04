@@ -4,7 +4,7 @@ import {PolygloatService} from '../services/polygloatService';
 import {Properties} from '../Properties';
 import {container, injectable} from 'tsyringe';
 import {TranslationHighlighter} from '../TranslationHighlighter';
-import {Utils} from "tslint";
+import {PluginManager} from "../toolsManager/PluginManager";
 
 @injectable()
 export class BasicTextHandler {
@@ -12,7 +12,7 @@ export class BasicTextHandler {
     private service: PolygloatService = container.resolve(PolygloatService);
     private highlighter: TranslationHighlighter = container.resolve(TranslationHighlighter);
 
-    constructor() {
+    constructor(private pluginManager: PluginManager) {
     }
 
     async refresh(node: Element) {
@@ -47,6 +47,7 @@ export class BasicTextHandler {
         span.innerHTML = this.service.replaceParams(translation, data.params);
 
         this.highlighter.listen(span);
+        this.pluginManager.registerSpan(span);
         return span;
     };
 

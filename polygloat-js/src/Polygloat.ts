@@ -7,6 +7,7 @@ import {Properties} from './Properties';
 import {container} from 'tsyringe';
 import {EventService, EventType} from './services/EventService';
 import {TranslationParams} from "./Types";
+import {PluginManager} from "./toolsManager/PluginManager";
 
 // Start observing the target node for configured mutations
 export class Polygloat {
@@ -14,6 +15,8 @@ export class Polygloat {
     private _service: PolygloatService = container.resolve(PolygloatService);
     private coreHandler: CoreHandler = container.resolve(CoreHandler);
     private eventService: EventService = container.resolve(EventService);
+    private pluginManager = container.resolve(PluginManager);
+
     private observer = new MutationObserver(
         async (mutationsList: MutationRecord[]) => {
             for (let mutation of mutationsList) {
@@ -65,6 +68,7 @@ export class Polygloat {
     }
 
     public async run(): Promise<void> {
+        this.pluginManager.run();
         if (this.properties.config.mode === "development") {
             this.properties.scopes = await this.service.getScopes();
             return await this.manage();

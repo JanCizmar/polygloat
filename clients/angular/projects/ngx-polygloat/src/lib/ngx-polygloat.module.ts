@@ -11,10 +11,6 @@ import {PolygloatConfig} from "./polygloatConfig";
     TranslatePipe,
     STranslatePipe
   ],
-  imports: [
-    //CommonModule,
-    //HttpClientModule
-  ],
   exports: [
     TranslatePipe,
     STranslatePipe
@@ -22,8 +18,6 @@ import {PolygloatConfig} from "./polygloatConfig";
   providers: []
 })
 export class NgxPolygloatModule {
-
-  // @dynamic
   // @dynamic
   static forRoot(options: PolygloatConfig): ModuleWithProviders<NgxPolygloatModule> {
     options = {...new PolygloatConfig(), filesUrlPrefix: "/assets/i18n/", ...options};

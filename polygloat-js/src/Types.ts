@@ -35,3 +35,9 @@ export interface PolygloatSimpleSpanElement extends HTMLSpanElement {
     __polygloat: SimpleSpanElementData;
 }
 
+export interface PolygloatInWindow {
+    registered?: Element[];
+    pluginReady?: () => void;
+}
+
+export type PgDocument = Document & { __polygloat?: PolygloatInWindow, __polygloatPlugin: { registerToPlugin?: () => void } }
