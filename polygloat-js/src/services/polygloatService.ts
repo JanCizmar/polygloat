@@ -101,6 +101,12 @@ export class PolygloatService {
     getFromCache(name: string, lang: string = this.properties.currentLanguage): string {
         const path = name.split('.');
         let root: string | Translations = this.translationsCache.get(lang);
+
+        //if lang is not downloaded or does not exist at all
+        if (root === undefined) {
+            return undefined;
+        }
+
         for (const item of path) {
             if (root[item] === undefined) {
                 return undefined;

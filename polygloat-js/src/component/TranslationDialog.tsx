@@ -4,7 +4,7 @@ import {TranslationData} from "../DTOs/TranslationData";
 import {container} from "tsyringe";
 import {PolygloatService} from "../services/polygloatService";
 import {Properties} from "../Properties";
-import {EventService, EventType} from "../services/EventService";
+import {EventService} from "../services/EventService";
 import TranslationDialogInner from "./TranslatonDialogInner";
 
 type DialogProps = {
@@ -68,7 +68,7 @@ export const TranslationDialog: FunctionComponent<DialogProps> = (props) => {
         setSaving(true);
         try {
             await service.setTranslations(translations);
-            container.resolve(EventService).publish(EventType.TRANSLATION_CHANGED, translations);
+            container.resolve(EventService).TRANSLATION_CHANGED.emit(translations);
             setSuccess(true);
             setError(null);
             props.onClose();

@@ -9,7 +9,7 @@ services:
     ports:
       - "5432:5432"
 #  app:
-#    image: polygloat
+#    image: polygloat/polygloat
 #    ports:
 #      - "8090:8080"
 volumes:

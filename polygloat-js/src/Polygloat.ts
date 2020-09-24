@@ -5,7 +5,7 @@ import {PolygloatService} from './services/polygloatService';
 import {PolygloatConfig} from './PolygloatConfig';
 import {Properties} from './Properties';
 import {container} from 'tsyringe';
-import {EventService, EventType} from './services/EventService';
+import {EventService} from './services/EventService';
 import {TranslationParams} from "./Types";
 import {PluginManager} from "./toolsManager/PluginManager";
 
@@ -60,7 +60,7 @@ export class Polygloat {
 
     public set lang(value) {
         this.properties.currentLanguage = value;
-        this.eventService.publish(EventType.TRANSLATION_CHANGED, {lang: value});
+        this.eventService.LANGUAGE_CHANGED.emit({lang: value});
     }
 
     public get service() {
@@ -105,6 +105,10 @@ export class Polygloat {
     }
 
     private readonly escapeParam = (string: string) => string.replace(",", "\\,").replace(":", "\\:");
+
+    public get onLangChange() {
+        return this.eventService.LANGUAGE_CHANGED;
+    }
 }
 
 export default Polygloat;

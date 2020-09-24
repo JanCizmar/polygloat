@@ -3,7 +3,7 @@ import {PolygloatService} from '../services/polygloatService';
 import {BasicTextHandler} from './BasicTextHandler';
 import {TextAreaHandler} from './TextAreaHandler';
 import {injectable} from 'tsyringe';
-import {EventService, EventType} from '../services/EventService';
+import {EventService} from '../services/EventService';
 import {Properties} from '../Properties';
 import {InputHandler} from './InputHandler';
 
@@ -15,8 +15,15 @@ export class CoreHandler {
                 private inputHandler: InputHandler,
                 private eventService: EventService,
                 private properties: Properties) {
-        eventService.subscribe(EventType.TRANSLATION_CHANGED, () => {
-            this.refresh();
+
+        eventService.LANGUAGE_CHANGED.subscribe(() => {
+            this.refresh().then(() => {
+            });
+        });
+
+        eventService.TRANSLATION_CHANGED.subscribe(() => {
+            this.refresh().then(() => {
+            });
         });
     }
 
