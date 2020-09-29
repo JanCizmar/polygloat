@@ -1,15 +1,15 @@
 import * as React from 'react';
-import {FunctionComponent, useContext, useEffect, useState} from 'react';
-import {PolygloatProviderContext} from "./PolygloatProvider";
+import {FunctionComponent, useEffect, useState} from 'react';
+import {usePolygloatContext} from "./usePolygloatContext";
+import {TranslationParameters} from "./types";
 
-type TProps = { parameters: { [key: string]: string }, children: string }
+type TProps = { parameters?: TranslationParameters, children: string, noWrap?: boolean }
 
-export const T: FunctionComponent = (props: TProps) => {
-    const context = useContext(PolygloatProviderContext);
+export const T: FunctionComponent<TProps> = (props: TProps) => {
+    const context = usePolygloatContext();
 
-    const [translated, setTranslated] = useState(context.polygloat.instant(props.children));
-
-    const translate = () => context.polygloat.translate(props.children, props.parameters).then(t => {
+    const [translated, setTranslated] = useState(context.polygloat.instant(props.children, props.parameters));
+    const translate = () => context.polygloat.translate(props.children, props.parameters, props.noWrap).then(t => {
         setTranslated(t);
     });
 
@@ -25,5 +25,5 @@ export const T: FunctionComponent = (props: TProps) => {
         }
     }, [])
 
-    return <>{translated}</>;
+    return <span>{translated}</span>;
 }

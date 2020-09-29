@@ -3,6 +3,7 @@ import {render} from '@testing-library/react';
 import App from './App';
 import 'mutationobserver-shim';
 
+//@ts-ignore
 global.fetch = jest.fn(() => {
     return Promise.resolve({
         json: () => {
@@ -21,5 +22,6 @@ test('renders learn react link', async () => {
     const app = render(<App/>);
     await app.findAllByDisplayValue("En");
     expect(fetch).toBeCalled();
-    app.findByText("Hello world!");
+    const h1 = await app.findAllByText("Hello world!");
+    expect(h1[0]).not.toBeNull();
 });

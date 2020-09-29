@@ -13,8 +13,13 @@ export class PluginManager {
     }
 
     readonly run = () => {
-        this.messages.startListening();
-        this.handshake();
+        try {
+            this.messages.startListening();
+            this.handshake();
+        } catch (e) {
+            console.warn(e);
+            console.warn("Can not start communication with browser plugin. Check waning above.")
+        }
     };
 
     readonly handshake = () => {

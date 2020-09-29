@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import {PolygloatProvider, T, useSetLanguage} from "polygloat-react";
+import {PolygloatProvider, T, useSetLanguage, useTranslate} from "polygloat-react";
 
 const ChooseLanguage = () => {
     const setLanguage = useSetLanguage();
@@ -13,22 +13,36 @@ const ChooseLanguage = () => {
     </div>);
 };
 
-const App = () => (
-    <PolygloatProvider
-        filesUrlPrefix="i18n/"
-        //   apiUrl="http://localhost:8080"
-        //  apiKey="ga9amv7ut8slf6av0rfjdjcvqo"
-    >
+const ComponentWithUseTranslation = () => {
+    const t = useTranslate();
 
-        <ChooseLanguage/>
+    return (
+        <>
+            <h1>{t("hello", {name: "Jan"})}</h1>
+            <h1>{t("test")}</h1>
+        </>
+    );
+}
 
-        <div className="App">
-            <h1><T>hello</T></h1>
-            <h1><T>hello</T></h1>
-            <h1><T>test</T></h1>
-        </div>
+const App = () => {
+    return (
+        <PolygloatProvider
+            //filesUrlPrefix="i18n/"
+            apiUrl="http://localhost:8080"
+            apiKey="ga9amv7ut8slf6av0rfjdjcvqo"
+        >
 
-    </PolygloatProvider>
-);
+            <ChooseLanguage/>
+
+            <div className="App">
+                <h1><T parameters={{name: "Jan", surname: "Cizmar"}}>hello</T></h1>
+                <h1><T noWrap>test</T></h1>
+                <ComponentWithUseTranslation/>
+            </div>
+
+
+        </PolygloatProvider>
+    )
+};
 
 export default App;

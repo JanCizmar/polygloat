@@ -56,6 +56,10 @@ export class Messages {
     };
 
     readonly send = (type: string, data?: any) => {
-        window.postMessage({type, data}, window.origin);
+        try {
+            window.postMessage({type, data}, window.origin);
+        } catch (e) {
+            console.warn("Can not send message.", e);
+        }
     };
 }

@@ -42,7 +42,6 @@ export class Polygloat {
 
         const newNodes = NodeHelper.nodeListToArray(nodes).concat(polygloatInputs);
         if (newNodes.length) {
-            console.log(newNodes);
             await this.coreHandler.onNewNodes(newNodes);
         }
     }
