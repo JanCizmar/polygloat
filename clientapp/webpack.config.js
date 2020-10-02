@@ -13,7 +13,7 @@ module.exports = env => {
         entry: {
             index: "./src/index.tsx",
         },
-        devtool: isDevelopment && 'inline-source-map' || 'source-map',
+        devtool: isDevelopment ? 'inline-source-map' : 'source-map',
         output: {
             filename: !isDevelopment ? '[name].[chunkhash].js' : '[name].[hash].js',
             chunkFilename: !isDevelopment ? '[name].[chunkhash].js' : '[name].[hash].js',
@@ -21,28 +21,34 @@ module.exports = env => {
             publicPath: '/',
         },
         resolve: {
-            extensions: [".webpack.js", ".web.js", ".ts", ".js", ".tsx"]
+            extensions: [".webpack.js", ".web.js", ".ts", ".js", ".tsx"],
+            symlinks: false
         },
         module: {
-            rules: [{
-                test: /\.tsx?$/,
-                //use: ["babel-loader", 'webpack-conditional-loader'],
-                use: [isDevelopment && "ts-loader" || "babel-loader", 'webpack-conditional-loader'],
-                exclude: [/node_modules/, /lib/],
-            }, {
-                test: /\.svg$/,
-                use: [
-                    {
-                        loader: "babel-loader"
-                    },
-                    {
-                        loader: "react-svg-loader",
-                        options: {
-                            jsx: true // true outputs JSX tags
+            rules: [
+                {
+                    test: /\.jsx?$/,
+                    enforce: 'pre',
+                    use: ['source-map-loader']
+                },
+                {
+                    test: /\.tsx?$/,
+                    use: [isDevelopment && "ts-loader" || "babel-loader", 'webpack-conditional-loader'],
+                    exclude: [/node_modules/, /lib/],
+                }, {
+                    test: /\.svg$/,
+                    use: [
+                        {
+                            loader: "babel-loader"
+                        },
+                        {
+                            loader: "react-svg-loader",
+                            options: {
+                                jsx: true // true outputs JSX tags
+                            }
                         }
-                    }
-                ]
-            },
+                    ]
+                },
                 {
                     test: /\.(woff(2)?|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/,
                     use: [
@@ -58,7 +64,7 @@ module.exports = env => {
                 {
                     test: /favicon\.svg/,
                     loader: 'file-loader?name=[name].[ext]'  // <-- retain original file name
-                }
+                },
             ]
         },
         optimization: {
@@ -80,4 +86,5 @@ module.exports = env => {
             historyApiFallback: true,
         }
     }
-};
+}
+;

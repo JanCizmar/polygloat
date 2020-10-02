@@ -15,6 +15,7 @@ import {ResourceErrorComponent} from "../common/form/ResourceErrorComponent";
 import {messageService} from "../../service/messageService";
 import {Validation} from "../../constants/GlobalValidationSchema";
 import {TranslationListContext} from "./TtranslationsGridContextProvider";
+import {useTranslate} from "polygloat-react";
 
 export type TranslationCreationValue = {
     source: string;
@@ -29,6 +30,8 @@ export function TranslationCreationDialog() {
 
     const repositoryDTO = useRepository();
 
+    const t = useTranslate();
+
     let selectedLanguages = translationActions.useSelector(s => s.selectedLanguages);
 
     let saveLoadable = translationActions.useSelector(s => s.loadables.createSource);
@@ -42,7 +45,7 @@ export function TranslationCreationDialog() {
 
     useEffect(() => {
         if (saveLoadable.loaded && !saveLoadable.error) {
-            messaging.success("Translation created");
+            messaging.success(t("translation_grid_translation_created"));
             listContext.loadData();
             onClose();
         }
@@ -62,7 +65,7 @@ export function TranslationCreationDialog() {
             aria-describedby="alert-dialog-description"
             fullWidth
         >
-            <DialogTitle id="alert-dialog-title">Add translation</DialogTitle>
+            <DialogTitle id="alert-dialog-title">{t('add_translation_dialog_title')}</DialogTitle>
             <DialogContent>
                 {saveLoadable && saveLoadable.error && <ResourceErrorComponent error={saveLoadable.error}/>}
 
@@ -71,7 +74,7 @@ export function TranslationCreationDialog() {
                               initialValues={{source: "", translations: initialTranslations}}
                               validationSchema={Validation.SOURCE_TRANSLATION_CREATION(selectedLanguages)}
                               onCancel={() => onClose()}>
-                    <TextField multiline name="source" label="Source text" fullWidth/>
+                    <TextField multiline name="source" label={t("translation_grid_source_text")} fullWidth/>
 
                     {selectedLanguages.map(s => (
                         <TextField multiline key={s} name={"translations." + s} label={s}/>

@@ -17,6 +17,7 @@ import {Link} from 'react-router-dom';
 import {BaseView} from '../BaseView';
 import {EmptyListMessage} from "../../common/EmptyListMessage";
 import {PossibleRepositoryPage} from "../PossibleRepositoryPage";
+import {useTranslate} from "polygloat-react";
 
 const actions = container.resolve(RepositoryActions);
 
@@ -33,9 +34,11 @@ export const RepositoryListView = connect((state: AppState) =>
             actions.loadRepositories.dispatch();
         }, []);
 
+        const t = useTranslate();
+
         return (
             <PossibleRepositoryPage>
-                <BaseView title="Repositories" lg={5} md={7} loading={loading}>
+                <BaseView title={t("repositories_title")} lg={5} md={7} loading={loading}>
                     {() => (
                         <>
                             {repositories.length && <List>

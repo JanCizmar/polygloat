@@ -1,28 +1,32 @@
 import * as React from 'react';
 import {FunctionComponent, useContext} from 'react';
-import {CircularProgress} from "@material-ui/core";
 import {TranslationDialogContext} from "./TranslationDialog";
-import TextField from "@material-ui/core/TextField";
+import {CircularLoading} from "./CircularLoading";
 
 export const TranslationFields: FunctionComponent = () => {
     let context = useContext(TranslationDialogContext);
 
+    const style: React.CSSProperties = {
+        margin: "10px 0 0 0",
+        padding: "5px",
+        border: "1px solid #ccc",
+        width: "100%",
+        borderRadius: "5px",
+        fontStyle: "inherit",
+        fontFamily: "inherit"
+    };
+
     return <>
-        {context.loading ? <div style={{textAlign: 'center'}}><CircularProgress/></div> :
+        {context.loading ? <div style={{textAlign: 'center'}}><CircularLoading/></div> :
             Object.keys(context.translations.translations).map(key =>
-                <TextField
+                <textarea
+                    style={style}
                     disabled={context.editDisabled}
                     key={key}
                     id="filled-multiline-flexible"
-                    label={key}
-                    multiline
+                    placeholder={key}
                     value={context.translations.translations[key]}
                     onChange={context.onTranslationInputChange(key)}
-                    style={{width: '100%'}}
-                    variant="outlined"
-                    margin="normal"
-                    error={!!context.error}
-                    helperText={context.error}
                 />)
         }
     </>

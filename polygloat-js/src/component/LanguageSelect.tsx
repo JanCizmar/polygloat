@@ -1,40 +1,36 @@
 import * as React from 'react';
-import {FunctionComponent, useContext, useEffect, useState} from 'react';
-import {Box, Checkbox, CircularProgress, FormControl, InputLabel, ListItemText, MenuItem, OutlinedInput, Select} from "@material-ui/core";
+import {FunctionComponent, useContext} from 'react';
 import {TranslationDialogContext} from "./TranslationDialog";
+import MultiSelect from "react-multi-select-component";
+import {CircularLoading} from "./CircularLoading";
 
 export const LanguageSelect: FunctionComponent = () => {
-    let context = useContext(TranslationDialogContext);
+    const context = useContext(TranslationDialogContext);
 
-    const [labelWidth, setLabelWidth] = useState(0);
+    if (context.availableLanguages === undefined) {
+        return <CircularLoading/>;
+    }
 
-    const inputRef = React.createRef<HTMLLabelElement>();
-
-    useEffect(() => setLabelWidth(inputRef.current ? inputRef.current.clientWidth : 0), [inputRef]);
+    const options = [...context.availableLanguages].map((name) => ({label: name, value: name}));
+    const selected = options.filter(o => context.selectedLanguages.has(o.value));
+    const onChange = (values: { value: string, label: string }[]) => {
+        context.onSelectedLanguagesChange(new Set(values.map(o => o.value)));
+    };
 
     return <>
-        {context.availableLanguages && <Box pb={2}>
-            <FormControl fullWidth variant="outlined">
-
-                <InputLabel id="demo-mutiple-checkbox-label" ref={inputRef}>Select languages</InputLabel>
-                <Select labelId="demo-mutiple-checkbox-label"
-                        id="demo-mutiple-checkbox"
-                        multiple
-                        value={[...context.selectedLanguages]}
-                        onChange={(e) => context.onSelectedLanguagesChange(new Set(e.target.value as string[]))}
-                        variant="outlined"
-                        input={<OutlinedInput labelWidth={labelWidth}/>}
-                        renderValue={(selected: string[]) => selected.join(', ')}
-                >
-                    {[...context.availableLanguages].map(name => (
-                        <MenuItem key={name} value={name}>
-                            <Checkbox checked={context.selectedLanguages.has(name)}/>
-                            <ListItemText primary={name}/>
-                        </MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
-        </Box> || <CircularProgress size="small"/>}
-
+        {context.availableLanguages &&
+        <MultiSelect
+            disableSearch={context.availableLanguages.size < 10}
+            options={options}
+            value={selected}
+            onChange={onChange}
+            labelledBy={"Choose languages"}
+            hasSelectAll={false}
+            valueRenderer={(o) => {
+                return o.map(o => o.value).join(", ");
+            }
+            }
+        />
+        }
     </>
 };

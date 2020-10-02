@@ -1,0 +1,43 @@
+import * as React from 'react';
+import {FunctionComponent} from 'react';
+
+interface DialogProps {
+    open: boolean,
+    onClose: () => void,
+    style: React.CSSProperties
+}
+
+const containerStyle: React.CSSProperties = {
+    position: "absolute",
+    width: "100vw",
+    height: "100vh",
+    top: 0,
+    left: 0,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    zIndex: 9999,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center"
+}
+
+const dialogStyle: React.CSSProperties = {
+    backgroundColor: "white",
+    padding: "20px"
+}
+
+export const Dialog: FunctionComponent<DialogProps> = (props) => {
+    return (
+        <>
+            {
+                props.open &&
+                <div style={containerStyle} onClick={props.onClose}>
+                    <div style={{...dialogStyle, ...props.style}} onClick={(e) => {
+                        e.stopPropagation();
+                    }}>
+                        {props.children}
+                    </div>
+                </div>
+            }
+        </>
+    );
+}

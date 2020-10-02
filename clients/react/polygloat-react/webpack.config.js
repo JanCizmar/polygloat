@@ -8,7 +8,7 @@ module.exports = env => {
 
     const makeTarget = (target) => ({
         entry: "./src/index.ts",
-        devtool: isDevelopment && 'inline-source-map',
+        devtool: isDevelopment ? 'inline-source-map' : 'source-map',
         output: {
             filename: "polygloat-react." + target + ".js",
             path: path.resolve(__dirname, 'dist'),
@@ -17,19 +17,22 @@ module.exports = env => {
         },
         resolve: {
             extensions: [".webpack.js", ".web.js", ".ts", ".js", ".tsx"],
-            alias: {
-                react: path.resolve('../../../polygloat-js/node_modules/react')
-            }
         },
         module: {
-            rules: [{
-                test: /\.tsx?$/,
-                use: [isDevelopment && "ts-loader" || "babel-loader"],
-                exclude: [/node_modules/, /lib/],
-            },
+            rules: [
+                {
+                    test: /\.jsx?$/,
+                    enforce: 'pre',
+                    use: ['source-map-loader']
+                },
+                {
+                    test: /\.tsx?$/,
+                    use: [isDevelopment && "ts-loader" || "babel-loader"],
+                    exclude: [/node_modules/, /lib/],
+                },
             ]
         },
-        mode: env.mode,
+        mode: isDevelopment ? "development" : "production",
         plugins: [
             //new WebpackBundleAnalyzer()
         ],

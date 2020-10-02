@@ -1,0 +1,29 @@
+def reactLibDir = "${project.projectDir}/clients/react/polygloat-react"
+def polygloatJsDir = "${project.projectDir}/polygloat-js"
+def clientAppDir = "${project.projectDir}/clientapp"
+
+
+def npmTask(taskName, workingDir, commandArgs, group) {
+    task(taskName, type: NpmTask, group: group) {
+        doFirst {
+            this.project.node.nodeModulesDir = file(workingDir)
+        }
+        description = "Installs all dependencies from package.json"
+        workingDir = file(workingDir)
+        args = commandArgs
+        inputs.files("${workingDir}/package.json", "${workingDir}/package-lock.json")
+        outputs.dir("${workingDir}/node_modules")
+    }
+}
+
+npmTask("reactLibNpmInstall", reactLibDir, ["install"], "JS - React library")
+
+npmTask("reactLibDevelop", reactLibDir, ["run", "develop", "--watch"], "JS - React library")
+
+npmTask("polygloatJsNpmInstall", polygloatJsDir, ["install"], "JS - Polygloat")
+
+npmTask("polygloatJsDevelop", polygloatJsDir, ["run", "develop", "--watch"], "JS - Polygloat")
+
+npmTask("clientAppNpmInstall", clientAppDir, ["install"], "JS - Client App")
+
+npmTask("clientAppDevelop", clientAppDir, ["run", "start"], "JS - Client App")

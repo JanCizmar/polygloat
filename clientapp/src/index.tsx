@@ -18,6 +18,7 @@ import FullPageLoading from "./component/common/FullPageLoadingView";
 import RubikTTf from './fonts/Rubik/Rubik-Regular.woff2';
 import {blue, red} from "@material-ui/core/colors";
 import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
+import {PolygloatProvider} from "polygloat-react";
 
 const store = configureStore();
 
@@ -81,15 +82,21 @@ const theme = createMuiTheme({
 
 ReactDOM.render(
     <React.Suspense fallback={<FullPageLoading/>}>
-        <ThemeProvider theme={theme}>
-            <Provider store={store}>
-                <ErrorBoundary>
-                    <SnackbarProvider>
-                        <App/>
-                    </SnackbarProvider>
-                </ErrorBoundary>
-            </Provider>
-        </ThemeProvider>
+        <PolygloatProvider
+            apiKey="43t0klcdpnjp1elqrf4fuco676"
+            apiUrl="http://chlupac.com:8080"
+        >
+            <ThemeProvider theme={theme}>
+                <Provider store={store}>
+                    {/*@ts-ignore --  Type '{ children: Element; }' has no properties ... */}
+                    <ErrorBoundary>
+                        <SnackbarProvider>
+                            <App/>
+                        </SnackbarProvider>
+                    </ErrorBoundary>
+                </Provider>
+            </ThemeProvider>
+        </PolygloatProvider>
     </React.Suspense>,
     document.getElementById('root')
 );

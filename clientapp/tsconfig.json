@@ -3,7 +3,7 @@
     "target": "es5",
     "module": "esnext",
     "moduleResolution": "node",
-    "sourceMap": true,
+    "inlineSourceMap": true,
     "declaration": true,
     "outDir": "./lib",
     "removeComments": false,

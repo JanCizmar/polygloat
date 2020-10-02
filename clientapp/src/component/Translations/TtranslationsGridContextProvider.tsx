@@ -7,6 +7,7 @@ import {TranslationActions} from "../../store/repository/TranslationActions";
 import {useRepository} from "../../hooks/useRepository";
 import {Loadable} from "../../store/AbstractLoadableActions";
 import {RepositoryPermissionType, TranslationsDataResponse} from "../../service/response.types";
+import {useTranslate} from "polygloat-react";
 
 export const TranslationListContext = React.createContext<TranslationListContextType>(null);
 
@@ -37,6 +38,8 @@ export const TranslationGridContextProvider: FunctionComponent = (props) => {
     let listLoadable = actions.useSelector(s => s.loadables.translations);
     let selectedLanguages = actions.useSelector(s => s.selectedLanguages);
     let translationSaveLoadable = actions.useSelector(s => s.loadables.setTranslations);
+
+    const t = useTranslate();
 
     const [perPage, setPerPage] = useState(20);
 
@@ -115,7 +118,7 @@ export const TranslationGridContextProvider: FunctionComponent = (props) => {
         return <FullPageLoadingView/>
     }
 
-    const headerCells = ["Source text", ...listLoadable.data.params.languages].map((h, index) => <b key={index}>{h}</b>);
+    const headerCells = [t("translation_grid_source_text"), ...listLoadable.data.params.languages].map((h, index) => <b key={index}>{h}</b>);
 
     const isSourceChecked = (name) => checkedSources.has(name);
 

@@ -4,6 +4,7 @@ buildscript {
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:2.1.6.RELEASE")
+        classpath "com.github.paralleltasks:parallel-tasks-gradle-plugin:1.0.1"
     }
 }
 
@@ -40,7 +41,7 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
-
+apply plugin: 'com.github.paralleltasks'
 
 repositories {
     mavenCentral()
@@ -178,6 +179,16 @@ task appNpmBuild(type: NpmTask) {
     ]
 }
 
+task appNpmRun(type: NpmTask) {
+    description = "Runs the polygloat frontend app"
+    workingDir = file("$project.projectDir/clientapp")
+    args = ["run", "start"]
+    environment = [
+            'target': 'appbundle'
+    ]
+}
+
+
 task copyToBuild(type: Copy) {
     from "${project.projectDir}/clientapp"
     into clientAppBuildDir
@@ -208,3 +219,5 @@ task cypress(type: NpmTask) {
     args = ["run", "cypress", "--", "--env", "host=http://localhost:8082", "--spec", "cypress/integration/login.spec.js"]
     dependsOn("appNpmInstall")
 }
+
+apply from: "${project.projectDir}/gradle/development.gradle"

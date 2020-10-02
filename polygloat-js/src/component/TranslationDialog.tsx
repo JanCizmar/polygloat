@@ -13,7 +13,7 @@ type DialogProps = {
     onClose: () => void
 }
 
-export  type DialogContextType = {
+export type DialogContextType = {
         loading: boolean,
         saving: boolean,
         error: string
@@ -22,7 +22,7 @@ export  type DialogContextType = {
         selectedLanguages: Set<string>,
         onSelectedLanguagesChange: (val: Set<string>) => void,
         editDisabled: boolean,
-        onTranslationInputChange: (abbr) => (event: React.ChangeEvent<HTMLInputElement>) => void,
+        onTranslationInputChange: (abbr) => (event: React.ChangeEvent<HTMLTextAreaElement>) => void,
         translations: TranslationData,
         onSave: () => void
     }
@@ -39,16 +39,18 @@ export const TranslationDialog: FunctionComponent<DialogProps> = (props) => {
     const service = container.resolve(PolygloatService);
     const properties = container.resolve(Properties);
 
-    const onTranslationInputChange = (abbr) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    const onTranslationInputChange = (abbr) => (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         setSuccess(false);
         translations.translations[abbr] = event.target.value;
         setTranslations({...translations});
     };
 
-    const loadTranslations = (languages?: Set<string>) => service.getSourceTranslations(props.input, languages).then(result => {
-        setTranslations(result);
-        setLoading(false);
-    });
+    const loadTranslations = (languages?: Set<string>) => {
+        service.getSourceTranslations(props.input, languages).then(result => {
+            setTranslations(result);
+            setLoading(false);
+        });
+    }
 
     useEffect(() => {
         if (props.open) {
@@ -67,13 +69,15 @@ export const TranslationDialog: FunctionComponent<DialogProps> = (props) => {
     const onSave = async () => {
         setSaving(true);
         try {
+            setSaving(true);
             await service.setTranslations(translations);
             container.resolve(EventService).TRANSLATION_CHANGED.emit(translations);
             setSuccess(true);
+            await new Promise((resolve => setTimeout(resolve, 500)));
             setError(null);
             props.onClose();
         } catch (e) {
-            setError("error");
+            setError("Unexpected error occurred :(");
             throw e;
         } finally {
             setSaving(false);
@@ -90,7 +94,7 @@ export const TranslationDialog: FunctionComponent<DialogProps> = (props) => {
         if (value.size) {
             setSelectedLanguages(value);
             service.preferredLanguages = value;
-            loadTranslations(value)
+            loadTranslations(value);
         }
     };
 
@@ -102,7 +106,9 @@ export const TranslationDialog: FunctionComponent<DialogProps> = (props) => {
 
     return (
         <TranslationDialogContext.Provider value={contextValue}>
-            <TranslationDialogInner/>
+            <div style={{fontFamily: "Rubik, Roboto, Arial"}}>
+                <TranslationDialogInner/>
+            </div>
         </TranslationDialogContext.Provider>
     )
 };

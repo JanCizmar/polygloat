@@ -1,12 +1,6 @@
 import {usePolygloatContext} from "./usePolygloatContext";
-import {TranslationParameters} from "./types";
+import {TranslationParameters, TranslationsStateKey} from "./types";
 import {useEffect, useState} from "react";
-
-type TranslationsStateKey = {
-    source: string,
-    parameters: TranslationParameters;
-    noWrap: boolean
-}
 
 export const useTranslate = () => {
     const context = usePolygloatContext();
