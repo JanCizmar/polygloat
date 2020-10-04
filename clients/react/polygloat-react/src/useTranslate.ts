@@ -4,9 +4,8 @@ import {useEffect, useState} from "react";
 
 export const useTranslate = () => {
     const context = usePolygloatContext();
-
     const [translated, setTranslated] = useState({});
-
+    const [wasInstant, setWasInstant] = useState(false);
 
     const parseJsonKey = (jsonKey): TranslationsStateKey => {
         return JSON.parse(jsonKey);
@@ -18,14 +17,25 @@ export const useTranslate = () => {
 
     const translationFromState = (source: string, parameters: TranslationParameters, noWrap: boolean) => {
         let jsonKey = getJsonKey(source, parameters, noWrap);
+
         if (translated[jsonKey] === undefined) {
-            translated[jsonKey] = context.polygloat.instant(source, parameters, noWrap);
+            translated[jsonKey] = context.polygloat.instant(source, parameters, noWrap, true)
+            setTranslated({...translated});
+            setWasInstant(true);
         }
 
         return translated[jsonKey];
     }
 
-    function translateAll() {
+    useEffect(() => {
+        if (wasInstant) {
+            translateAll();
+        }
+        setWasInstant(false);
+    }, [wasInstant])
+
+
+    const translateAll = () => {
         const transactionPremises = Object.entries(translated).map(([jsonKey, _]) => {
             const params = parseJsonKey(jsonKey);
             return new Promise(resolve => {
@@ -46,13 +56,10 @@ export const useTranslate = () => {
     useEffect(() => {
         translateAll();
 
-        const subscription = context.polygloat.onLangChange.subscribe(() => {
-            translateAll();
-        });
+        const subscription = context.polygloat.onLangChange.subscribe(() => translateAll());
 
-        return () => {
-            subscription.unsubscribe();
-        }
+        return () => subscription.unsubscribe();
+
     }, [])
 
     return (source: string, parameters?: TranslationParameters, noWrap?: boolean) => translationFromState(source, parameters, noWrap);

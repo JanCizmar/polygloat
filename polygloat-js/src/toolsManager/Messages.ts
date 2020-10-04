@@ -18,6 +18,7 @@ type PgEvent = {
 export class Messages {
     private listeners: Listener[] = [];
     private listenersPopup: Listener[] = [];
+    private _stopListening: () => void;
 
     readonly startListening = () => {
         const receiveMessage = (event: PgEvent) => {
@@ -32,9 +33,17 @@ export class Messages {
         };
 
         window.addEventListener("message", receiveMessage, false);
+
+        this._stopListening = () => {
+            window.removeEventListener("message", receiveMessage, false);
+        }
+
         this.startPopupListening();
     };
 
+    public stopListening() {
+        this._stopListening();
+    }
 
     readonly startPopupListening = () => {
         this.listen("POPUP_TO_LIB", (data: Message) => {

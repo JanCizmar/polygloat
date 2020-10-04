@@ -1,13 +1,9 @@
-import {default as React, FunctionComponent} from 'react';
+import {default as React, FunctionComponent, ReactNode} from 'react';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import createStyles from "@material-ui/core/styles/createStyles";
 import {Theme, Typography} from "@material-ui/core";
 import Box from "@material-ui/core/Box";
 import SadGoat from '../../svgs/sadGoat.svg'
-
-interface SadGoatMessageProps {
-    text: string;
-}
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -21,7 +17,7 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-export const SadGoatMessage: FunctionComponent<SadGoatMessageProps> = (props) => {
+export const SadGoatMessage: FunctionComponent<{ children: ReactNode }> = (props) => {
     const classes = useStyles({});
 
     return (
@@ -30,9 +26,9 @@ export const SadGoatMessage: FunctionComponent<SadGoatMessageProps> = (props) =>
                 <Box className={classes.goat}>
                     <SadGoat width={200}/>
                 </Box>
-                {props.text &&
+                {props.children &&
                 <Box p={4} className={classes.text}>
-                    <Typography>{props.text}</Typography>
+                    <Typography>{props.children}</Typography>
                 </Box>}
             </Box>
         </>

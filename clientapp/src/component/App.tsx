@@ -12,16 +12,16 @@ import {ErrorActions} from '../store/global/errorActions';
 import {RedirectionActions} from '../store/global/redirectionActions';
 import {useConfig} from "../hooks/useConfig";
 import {useUser} from "../hooks/useUser";
-import FullPageLoadingView from "./common/FullPageLoadingView";
 import {ApiKeysView} from "./security/apiKeys/ApiKeysView";
 import {UserSettings} from "./views/UserSettings";
+import {RepositoriesRouter} from "./views/repositories/RepositoriesRouter";
+import {FullPageLoading} from "./common/FullPageLoading";
 
 const LoginRouter = React.lazy(() => import(/* webpackChunkName: "login" */'./security/LoginRouter'));
 const SignUpView = React.lazy(() => import(/* webpackChunkName: "sign-up-view" */'./security/SignUpView'));
 
 const PasswordResetSetView = React.lazy(() => import(/* webpackChunkName: "reset-password-set-view" */'./security/ResetPasswordSetView'));
 const PasswordResetView = React.lazy(() => import(/* webpackChunkName: "reset-password-view" */'./security/ResetPasswordView'));
-const RepositoriesRouter = React.lazy(() => import(/* webpackChunkName: "repositories" */'./views/repositories/RepositoriesRouter'));
 const AcceptInvitationHandler = React.lazy(() => import(/* webpackChunkName: "accept-invitation-handler" */'./security/AcceptInvitationHandler'));
 const ConfirmationDialog = React.lazy(() => import(/* webpackChunkName: "confirmation-dialog" */'./common/ConfirmationDialog'));
 
@@ -51,7 +51,7 @@ const MandatoryDataProvider = (props) => {
     let allowPrivate = useSelector((state: AppState) => state.global.security.allowPrivate);
 
     if (!config || (!userData && allowPrivate) && config.authentication) {
-        return <FullPageLoadingView/>
+        return <FullPageLoading/>
     } else {
         return props.children;
     }
@@ -85,7 +85,7 @@ const GlobalConfirmation = () => {
     return (<ConfirmationDialog open={!!state} {...state} onCancel={onCancel} onConfirm={onConfirm}/>);
 };
 
-export default class App extends React.Component {
+export class App extends React.Component {
     componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
         errorActions.globalError.dispatch(error);
         throw error;
@@ -131,4 +131,4 @@ export default class App extends React.Component {
             </BrowserRouter>
         );
     }
-};
+}

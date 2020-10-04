@@ -2,12 +2,12 @@ import {default as React, FunctionComponent, ReactNode, useEffect, useState} fro
 import {parseError} from "../common/form/ResourceErrorComponent";
 import {container} from "tsyringe";
 import {messageService} from "../../service/messageService";
-import FullPageLoadingView from "../common/FullPageLoadingView";
 import {TranslationActions} from "../../store/repository/TranslationActions";
 import {useRepository} from "../../hooks/useRepository";
 import {Loadable} from "../../store/AbstractLoadableActions";
 import {RepositoryPermissionType, TranslationsDataResponse} from "../../service/response.types";
 import {useTranslate} from "polygloat-react";
+import {FullPageLoading} from "../common/FullPageLoading";
 
 export const TranslationListContext = React.createContext<TranslationListContextType>(null);
 
@@ -115,7 +115,7 @@ export const TranslationGridContextProvider: FunctionComponent = (props) => {
     }, [translationSaveLoadable, sourceSaveLoadable, deleteLoadable]);
 
     if (!listLoadable.touched || (listLoadable.loading && !listLoadable.data)) {
-        return <FullPageLoadingView/>
+        return <FullPageLoading/>
     }
 
     const headerCells = [t("translation_grid_source_text"), ...listLoadable.data.params.languages].map((h, index) => <b key={index}>{h}</b>);

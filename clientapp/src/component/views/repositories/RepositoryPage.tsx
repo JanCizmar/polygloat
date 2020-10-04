@@ -11,8 +11,10 @@ interface Props {
 
 
 export const RepositoryPage: FunctionComponent<Props> = (props) => {
+    const repository = useRepository();
+
     return (
-        <DashboardPage fullWidth={props.fullWidth} repositoryName={useRepository().name} sideMenuItems={<RepositoryMenu id={useRepository().id}/>}>
+        <DashboardPage fullWidth={props.fullWidth} repositoryName={repository.name} sideMenuItems={<RepositoryMenu id={repository.id}/>}>
             {props.children}
         </DashboardPage>
     );

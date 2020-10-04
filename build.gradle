@@ -220,4 +220,12 @@ task cypress(type: NpmTask) {
     dependsOn("appNpmInstall")
 }
 
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java', 'build/generated/sources/annotationProcessor/java/main']
+        }
+    }
+}
+
 apply from: "${project.projectDir}/gradle/development.gradle"

@@ -14,16 +14,16 @@ import {dispatchService} from './service/dispatchService';
 import * as Sentry from '@sentry/browser';
 
 import ErrorBoundary from "./component/ErrorBoundary";
-import FullPageLoading from "./component/common/FullPageLoadingView";
 import RubikTTf from './fonts/Rubik/Rubik-Regular.woff2';
 import {blue, red} from "@material-ui/core/colors";
 import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
 import {PolygloatProvider} from "polygloat-react";
+import {App} from "./component/App";
+import {FullPageLoading} from "./component/common/FullPageLoading";
 
 const store = configureStore();
 
 
-const App = React.lazy(() => import(/* webpackChunkName: "app" */ "./component/App"));
 const SnackbarProvider = React.lazy(() => import(/* webpackChunkName: "notistack" */ 'notistack')
     .then(module => ({"default": module.SnackbarProvider})));
 
@@ -85,6 +85,8 @@ ReactDOM.render(
         <PolygloatProvider
             apiKey="43t0klcdpnjp1elqrf4fuco676"
             apiUrl="http://chlupac.com:8080"
+            filesUrlPrefix="/i18n/"
+            loadingFallback={<FullPageLoading/>}
         >
             <ThemeProvider theme={theme}>
                 <Provider store={store}>

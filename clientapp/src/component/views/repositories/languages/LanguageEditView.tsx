@@ -4,7 +4,6 @@ import {container} from 'tsyringe';
 import {LINKS, PARAMS} from '../../../../constants/links';
 import {useRouteMatch} from 'react-router-dom';
 import {TextField} from '../../../common/form/fields/TextField';
-import {RepositoryPage} from '../RepositoryPage';
 import {BaseFormView} from '../../BaseFormView';
 import {LanguageActions} from '../../../../store/languages/LanguageActions';
 import {Button} from "@material-ui/core";
@@ -12,6 +11,7 @@ import {useConfirmation} from "../../../../hooks/useConfirmation";
 import {LanguageDTO} from "../../../../service/response.types";
 import {Validation} from "../../../../constants/GlobalValidationSchema";
 import {useRedirect} from "../../../../hooks/useRedirect";
+import {T} from "polygloat-react";
 
 const actions = container.resolve(LanguageActions);
 
@@ -55,10 +55,9 @@ export const LanguageEditView = () => {
     };
 
     return (
-        <RepositoryPage>
             <BaseFormView
                 lg={6} md={8} xs={10}
-                title={'Language settings'}
+                title={<T>language_settings_title</T>}
                 initialValues={languageLoadable.data}
                 onSubmit={onSubmit}
                 saveActionLoadable={editLoadable}
@@ -67,23 +66,22 @@ export const LanguageEditView = () => {
                 customActions={
                     <Button variant="outlined" color="secondary"
                             onClick={() => confirmation({
-                                message: "Are you sure you want to delete languageLoadable " + languageLoadable.data.name + "?",
+                                message: <T parameters={{name: languageLoadable.data.name}}>delete_language_confirmation</T>,
                                 hardModeText: languageLoadable.data.name.toUpperCase(),
-                                confirmButtonText: "Delete",
+                                confirmButtonText: <T>global_delete_button</T>,
                                 confirmButtonColor: "secondary",
                                 onConfirm: () => {
                                     actions.loadableActions.delete.dispatch(repositoryId, languageId)
                                 }
                             })}
                     >
-                        Delete language
+                        <T>delete_language_button</T>
                     </Button>}
             >
                 {() => <>
-                    <TextField label="Name" name="name" required={true}/>
-                    <TextField label="Abbreviation" name="abbreviation" required={true}/>
+                    <TextField label={<T>edit_language_languge_name_label</T>} name="name" required={true}/>
+                    <TextField label={<T>abbreviation</T>} name="abbreviation" required={true}/>
                 </>}
             </BaseFormView>
-        </RepositoryPage>
     );
 };

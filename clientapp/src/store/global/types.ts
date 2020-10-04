@@ -1,4 +1,4 @@
-import {ReactElement} from 'react';
+import {ReactNode} from 'react';
 import {VariantType} from "notistack";
 
 export type SecurityDTO = {
@@ -9,6 +9,6 @@ export type SecurityDTO = {
 }
 
 export class Message {
-    constructor(public text: ReactElement | string, public variant: VariantType) {
+    constructor(public text: ReactNode | string, public variant: VariantType) {
     };
 }

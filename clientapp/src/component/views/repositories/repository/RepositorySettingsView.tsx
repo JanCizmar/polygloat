@@ -10,9 +10,9 @@ import * as Yup from 'yup';
 import {TextField} from '../../../common/form/fields/TextField';
 import {BaseFormView} from '../../BaseFormView';
 import {useRepository} from "../../../../hooks/useRepository";
-import {RepositoryPage} from "../RepositoryPage";
 import {Button} from "@material-ui/core";
 import {useConfirmation} from "../../../../hooks/useConfirmation";
+import {T} from "polygloat-react";
 
 const actions = container.resolve(RepositoryActions);
 
@@ -28,18 +28,18 @@ export const RepositorySettingsView: FunctionComponent = () => {
 
     let repository = useRepository();
 
-    let confirmation = useConfirmation({title: "Delete repository"});
+    let confirmation = useConfirmation({title: <T>delete_repository_dialog_title</T>});
 
     const onSubmit = (values) => {
         actions.loadableActions.editRepository.dispatch(repository.id, values);
     };
 
     useEffect(() => {
-        if (saveLoadable.loaded) {
+        if (saveLoadable.touched) {
             actions.loadableReset.repository.dispatch();
         }
         return () => actions.loadableReset.editRepository.dispatch();
-    }, [saveLoadable.loaded]);
+    }, [saveLoadable.touched]);
 
 
     useEffect(() => {
@@ -57,26 +57,24 @@ export const RepositorySettingsView: FunctionComponent = () => {
     }
 
     return (
-        <RepositoryPage>
-            <BaseFormView lg={6} md={8} title={"Repository settings"} initialValues={initialValues} onSubmit={onSubmit}
-                          onCancel={() => setCancelled(true)}
-                          saveActionLoadable={loadable}
-                          validationSchema={Yup.object().shape(
-                              {
-                                  name: Yup.string().required().min(3).max(100)
-                              })}
-                          customActions={
-                              <Button color="secondary" variant="outlined" onClick={() => {
-                                  confirmation({
-                                      message: "Are you sure you want to delete repository: " + repository.name + "?",
-                                      onConfirm: () => actions.loadableActions.deleteRepository.dispatch(repository.id),
-                                      hardModeText: repository.name.toUpperCase()
-                                  })
-                              }}>Delete repository</Button>
+        <BaseFormView lg={6} md={8} title={<T>repository_settings_title</T>} initialValues={initialValues} onSubmit={onSubmit}
+                      onCancel={() => setCancelled(true)}
+                      saveActionLoadable={loadable}
+                      validationSchema={Yup.object().shape(
+                          {
+                              name: Yup.string().required().min(3).max(100)
+                          })}
+                      customActions={
+                          <Button color="secondary" variant="outlined" onClick={() => {
+                              confirmation({
+                                  message: <T parameters={{name: repository.name}}>delete_repository_confirmation_message</T>,
+                                  onConfirm: () => actions.loadableActions.deleteRepository.dispatch(repository.id),
+                                  hardModeText: repository.name.toUpperCase()
+                              })
+                          }}><T>delete_repository_button</T></Button>
                           }
             >
-                <TextField label="Name" name="name" required={true}/>
+            <TextField label={<T>repository_settings_name_label</T>} name="name" required={true}/>
             </BaseFormView>
-        </RepositoryPage>
     );
 };

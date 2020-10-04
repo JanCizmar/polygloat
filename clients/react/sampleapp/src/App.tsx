@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import './App.css';
 import {PolygloatProvider, T, useSetLanguage, useTranslate} from "polygloat-react";
 
@@ -15,11 +15,16 @@ const ChooseLanguage = () => {
 
 const ComponentWithUseTranslation = () => {
     const t = useTranslate();
+    const [bool, setBool] = useState(false);
+
+    useEffect(() => {
+        setTimeout(() => setBool(true), 2000);
+    })
 
     return (
         <>
             <h1>{t("hello", {name: "Jan"})}</h1>
-            <h1>{t("test")}</h1>
+            <h1>{bool ? t("test") : t("hello")}</h1>
         </>
     );
 }

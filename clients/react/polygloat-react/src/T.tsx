@@ -8,7 +8,7 @@ type TProps = { parameters?: TranslationParameters, children: string, noWrap?: b
 export const T: FunctionComponent<TProps> = (props: TProps) => {
     const context = usePolygloatContext();
 
-    const [translated, setTranslated] = useState(context.polygloat.instant(props.children, props.parameters));
+    const [translated, setTranslated] = useState(context.polygloat.instant(props.children, props.parameters, props.noWrap, true));
     const translate = () => context.polygloat.translate(props.children, props.parameters, props.noWrap).then(t => {
         setTranslated(t);
     });
@@ -23,7 +23,7 @@ export const T: FunctionComponent<TProps> = (props: TProps) => {
         return () => {
             subscription.unsubscribe();
         }
-    }, [])
+    }, [props])
 
     return <span>{translated}</span>;
 }

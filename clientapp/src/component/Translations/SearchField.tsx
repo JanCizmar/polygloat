@@ -2,6 +2,7 @@ import * as React from 'react';
 import {FunctionComponent, useContext, useEffect, useState} from 'react';
 import {Box, TextField} from "@material-ui/core";
 import {TranslationListContext} from "./TtranslationsGridContextProvider";
+import {T} from "polygloat-react";
 
 export const SearchField: FunctionComponent = (props) => {
     const listContext = useContext(TranslationListContext);
@@ -23,7 +24,7 @@ export const SearchField: FunctionComponent = (props) => {
     return (
         <Box flexGrow={1}>
             <TextField id="standard-search"
-                       label="Search"
+                       label={<T>translations_search_field_label</T>}
                        type="search"
                        value={search}
                        onChange={(e) => setSearch(e.target.value)}/>

@@ -1,7 +1,6 @@
 import {ChangeEvent, default as React, FunctionComponent, useEffect, useState} from 'react';
 import {useRouteMatch} from 'react-router-dom';
 import {PARAMS} from '../../../../constants/links';
-import {RepositoryPage} from '../RepositoryPage';
 import {Box, Button, FormHelperText, Input, LinearProgress} from '@material-ui/core';
 import {BaseView} from '../../BaseView';
 import {useSelector} from 'react-redux';
@@ -12,6 +11,7 @@ import {TextField} from "../../../common/form/fields/TextField";
 import {object, string} from "yup";
 import {ImportExportActions} from "../../../../store/repository/ImportExportActions";
 import {container} from "tsyringe";
+import {T} from 'polygloat-react';
 
 type SubtreeType = { [key: string]: string | object };
 const actions = container.resolve(ImportExportActions);
@@ -79,26 +79,21 @@ export const ImportView: FunctionComponent = () => {
         };
 
         return (
-            <React.Fragment>
-                <Box color="text.disabled">
-                    {expanded
-                        ?
+            <Box color="text.disabled">
+                {expanded ? <> {entries.map(Line)} </>
+                    :
+                    <>
+                        {entries.slice(0, 10).map(Line)}
+                        {entries.length > 10 &&
                         <>
-                            {entries.map(Line)}
-                        </>
-                        :
-                        <>
-                            {entries.slice(0, 10).map(Line)}
-                            {entries.length > 10 &&
-                            <>
-                                <Box justifyItems="center"><Button onClick={() => expand()}>...</Button></Box>
-                                {
-                                    //render last item
-                                    entries.slice(entries.length - 1).map(Line)}
-                            </>}
+                            <Box justifyItems="center"><Button onClick={() => expand()}>...</Button></Box>
+                            {
+                                //render last item
+                                entries.slice(entries.length - 1).map(Line)}
                         </>}
-                </Box>
-            </React.Fragment>)
+                    </>}
+            </Box>
+        )
     };
 
     useEffect(() => {
@@ -112,44 +107,43 @@ export const ImportView: FunctionComponent = () => {
     };
 
     return (
-        <RepositoryPage>
-            <BaseView title="Import translations" xs={12} md={10} lg={8}>
-                <Box mt={2}>
-                    {
-                        (data &&
-                            <>
-                                <Preview/>
-                                <Box color="success.main" fontSize={21} fontWeight="400" mt={1}>Successfully loaded {entries.length} items.
-                                    Click "DO IMPORT" to continue.</Box>
-                                {!state.loaded &&
-                                <>
-                                    <StandardForm initialValues={{languageAbbreviation: suggestedName}}
-                                                  validationSchema={object().shape({
-                                                      languageAbbreviation: string().required()
-                                                  })}
-                                                  onSubmit={onImportSubmit}
-                                                  onCancel={() => setData(null)}
-                                                  loading={state.loading}
-                                                  submitButtonInner="Do import!">
-                                        <TextField label="Language abbreviation" name={"languageAbbreviation"}/>
-                                    </StandardForm>
-                                    {state.loading &&
-                                    <>
-                                        <Box justifyContent="center" display="flex" fontSize={20} color="text.secondary">Importing</Box>
-                                        <LinearProgress/>
-                                    </>}
-                                </>
-                                }
-                            </>
-                        )
-                        ||
+        <BaseView title={<T>import_translations_title</T>} xs={12} md={10} lg={8}>
+            <Box mt={2}>
+                {
+                    (data &&
                         <>
-                            <FormHelperText>To import translations select json file.</FormHelperText>
-                            <Input type="file" onChange={fileSelected}/>
+                            <Preview/>
+                            <Box color="success.main" fontSize={21} fontWeight="400" mt={1}>
+                                <T parameters={{length: entries.length + ""}}>import_translations_loaded_message</T>
+                            </Box>
+                            {!state.loaded &&
+                            <>
+                                <StandardForm initialValues={{languageAbbreviation: suggestedName}}
+                                              validationSchema={object().shape({
+                                                  languageAbbreviation: string().required()
+                                              })}
+                                              onSubmit={onImportSubmit}
+                                              onCancel={() => setData(null)}
+                                              loading={state.loading}
+                                              submitButtonInner={<T>import_do_import_button</T>}>
+                                    <TextField label={<T>import_language_abbreviation</T>} name={"languageAbbreviation"}/>
+                                </StandardForm>
+                                {state.loading &&
+                                <>
+                                    <Box justifyContent="center" display="flex" fontSize={20} color="text.secondary"><T>import_importing_text</T></Box>
+                                    <LinearProgress/>
+                                </>}
+                            </>
+                            }
                         </>
-                    }
-                </Box>
-            </BaseView>
-        </RepositoryPage>
+                    )
+                    ||
+                    <>
+                        <FormHelperText><T>import_select_file</T></FormHelperText>
+                        <Input type="file" onChange={fileSelected}/>
+                    </>
+                }
+            </Box>
+        </BaseView>
     );
 };

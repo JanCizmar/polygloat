@@ -18,11 +18,15 @@ export const PolygloatProvider: FunctionComponent<PolygloatProviderProps> = (pro
 
     useEffect(() => {
         polygloat.run().then(() => setLoading(false));
-    }, [])
+
+        return () => {
+            polygloat.stop();
+        }
+    }, []);
 
     return (
         <PolygloatProviderContext.Provider value={{...props, polygloat}}>
-            {!loading && props.children || props.loadingFallback}
+            {!loading ? props.children : props.loadingFallback}
         </PolygloatProviderContext.Provider>
     );
 }

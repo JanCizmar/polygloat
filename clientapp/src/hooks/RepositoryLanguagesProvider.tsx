@@ -1,13 +1,12 @@
 import * as React from "react";
 import {FunctionComponent} from "react";
 import {container} from "tsyringe";
-import {RepositoryActions} from "../store/repository/RepositoryActions";
 import {useSelector} from "react-redux";
 import {AppState} from "../store";
 import {GlobalError} from "../error/GlobalError";
-import FullPageLoadingView from "../component/common/FullPageLoadingView";
 import {LanguageActions} from "../store/languages/LanguageActions";
 import {useRepository} from "./useRepository";
+import {FullPageLoading} from "../component/common/FullPageLoading";
 
 const languageActions = container.resolve(LanguageActions);
 
@@ -24,11 +23,11 @@ export const RepositoryLanguageProvider: FunctionComponent = (props) => {
 
     if (init || idChanged) {
         languageActions.loadableActions.list.dispatch(repositoryDTO.id);
-        return <FullPageLoadingView/>
+        return <FullPageLoading/>
     }
 
     if (languagesLoadable.loading) {
-        return <FullPageLoadingView/>
+        return <FullPageLoading/>
     }
 
     if (languagesLoadable.data) {

@@ -15,6 +15,7 @@ import {GlobalActions} from '../../store/global/globalActions';
 import {Alert} from '../common/Alert';
 import {securityService} from '../../service/securityService';
 import {useConfig} from "../../hooks/useConfig";
+import {T} from "polygloat-react";
 
 interface LoginProps {
 
@@ -44,7 +45,7 @@ export const LoginView: FunctionComponent<LoginProps> = (props) => {
 
     return (
         <DashboardPage>
-            <BaseView title="Login" lg={6} md={8} xs={12}>
+            <BaseView title={<T>login_title</T>} lg={6} md={8} xs={12}>
                 {security.loginErrorCode &&
                 <Box mt={1}>
                     <Alert severity="error">{security.loginErrorCode}</Alert>
@@ -57,12 +58,14 @@ export const LoginView: FunctionComponent<LoginProps> = (props) => {
                                           <Box>
                                               {security.allowRegistration &&
                                               <Button size="large" component={Link} to={LINKS.SIGN_UP.build()}>
-                                                  Sign up
+                                                  <T>login_sign_up</T>
                                               </Button>
                                               }
                                           </Box>
                                           {remoteConfig.passwordResettable &&
-                                          <Button component={Link} to={LINKS.RESET_PASSWORD_REQUEST.build()}>Reset password</Button>
+                                          <Button component={Link} to={LINKS.RESET_PASSWORD_REQUEST.build()}>
+                                              <T>login_reset_password_button</T>
+                                          </Button>
                                           }
                                       </Box>
                                       <Box display="flex">
@@ -70,20 +73,20 @@ export const LoginView: FunctionComponent<LoginProps> = (props) => {
                                               {remoteConfig.authMethods.github !== null && remoteConfig.authMethods.github.enabled &&
                                               (
                                                   <Button component="a" href={gitHubUrl} size="large" endIcon={<GitHubIcon/>}>
-                                                      Github login
+                                                      <T>login_github_login_button</T>
                                                   </Button>
                                               )}
                                           </Box>
                                           <Box display="flex" flexGrow={0}>
-                                              <Button color="primary" type="submit">Login</Button>
+                                              <Button color="primary" type="submit"><T>login_login_button</T></Button>
                                           </Box>
                                       </Box>
                                   </>}
                               onSubmit={(v) => {
                                   globalActions.login.dispatch(v);
                               }}>
-                    <TextField name="username" label="Username"/>
-                    <TextField name="password" type="password" label="Password"/>
+                    <TextField name="username" label={<T>login_username_label</T>}/>
+                    <TextField name="password" type="password" label={<T>login_password_label</T>}/>
                 </StandardForm>
             </BaseView>
         </DashboardPage>

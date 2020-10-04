@@ -26,13 +26,21 @@ const dialogStyle: React.CSSProperties = {
 }
 
 export const Dialog: FunctionComponent<DialogProps> = (props) => {
+
+    function onKeyDown(key: string) {
+        if (key === "Escape") {
+            props.onClose();
+        }
+    }
+
     return (
         <>
             {
                 props.open &&
-                <div style={containerStyle} onClick={props.onClose}>
+                <div style={containerStyle} onClick={props.onClose} onKeyDown={(e) => onKeyDown(e.key)}>
                     <div style={{...dialogStyle, ...props.style}} onClick={(e) => {
                         e.stopPropagation();
+                        e.preventDefault();
                     }}>
                         {props.children}
                     </div>

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {FunctionComponent, useState} from "react";
+import {FunctionComponent, useState} from 'react';
 import {Box, Checkbox, ListItemText, MenuItem, Select, Theme} from "@material-ui/core";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
@@ -9,6 +9,7 @@ import {TranslationActions} from "../../../store/repository/TranslationActions";
 import Input from "@material-ui/core/Input";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {messageService} from "../../../service/messageService";
+import {T} from "polygloat-react";
 
 export interface LanguagesMenuProps {
     // context: 'creation' | 'view'
@@ -60,7 +61,7 @@ export const LanguagesMenu: FunctionComponent<LanguagesMenuProps> = (props) => {
     return (
         <Box display="flex" alignItems="right">
             <FormControl>
-                <InputLabel id="languages">Languages</InputLabel>
+                <InputLabel id="languages"><T>translations_language_select_label</T></InputLabel>
                 <Select
                     labelId="languages"
                     id="languages-select"
@@ -68,13 +69,15 @@ export const LanguagesMenu: FunctionComponent<LanguagesMenuProps> = (props) => {
                     value={localSelected}
                     onChange={e => langsChange(e)}
                     input={<Input className={classes.input}/>}
-                    renderValue={selected => (selected as string[]).join(', ')}
+                    renderValue={selected => (selected as string[])
+                        .map(val => languageDTOS.find(languageDTO => languageDTO.abbreviation === val).name)
+                        .join(', ')}
                     MenuProps={menuProps}
                 >
                     {languageDTOS.map(lang => (
                         <MenuItem key={lang.abbreviation} value={lang.abbreviation}>
                             <Checkbox checked={localSelected.indexOf(lang.abbreviation) > -1}/>
-                            <ListItemText primary={lang.abbreviation}/>
+                            <ListItemText primary={lang.name}/>
                         </MenuItem>
                     ))}
                 </Select>

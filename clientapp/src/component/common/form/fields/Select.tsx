@@ -1,12 +1,12 @@
 import {default as React, FunctionComponent, ReactNode} from 'react';
-import {makeStyles, createStyles} from '@material-ui/core/styles';
+import {createStyles, makeStyles} from '@material-ui/core/styles';
 import {FormControl, FormControlProps, FormHelperText, InputLabel, Select as MUISelect, Theme} from '@material-ui/core';
 import {useField} from 'formik';
 
 
 interface PGSelectProps {
     name: string;
-    label?: string;
+    label?: ReactNode;
     renderValue?: (v: any) => ReactNode;
 }
 
@@ -28,16 +28,17 @@ export const Select: FunctionComponent<Props> = (props) => {
 
     const [field, meta, helpers] = useField(props.name);
 
+    const {renderValue, ...formControlProps} = props;
 
     return (
-        <FormControl className={classes.select} error={!!meta.error} {...props} >
+        <FormControl className={classes.select} error={!!meta.error} {...formControlProps} >
             {props.label && <InputLabel id={'select_' + field.name + '_label'}>{props.label}</InputLabel>}
             <MUISelect
                 name={field.name}
                 labelId={'select_' + field.name + '_label'}
                 value={field.value}
                 onChange={e => helpers.setValue(e.target.value)}
-                renderValue={typeof props.renderValue === 'function' ? props.renderValue : value => value}
+                renderValue={typeof renderValue === 'function' ? renderValue : value => value}
             >
                 {props.children}
             </MUISelect>

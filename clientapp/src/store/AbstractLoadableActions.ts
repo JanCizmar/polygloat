@@ -2,10 +2,11 @@ import {Action, ActionType, PromiseAction, StateModifier} from "./Action";
 import {ErrorResponseDTO} from "../service/response.types";
 import {Link} from "../constants/links";
 import {AbstractActions} from "./AbstractActions";
+import {ReactNode} from "react";
 
 export class LoadableDefinition<StateType extends StateWithLoadables<any>, PayloadType> {
     constructor(public payloadProvider: (...params: any[]) => Promise<any>, public then?: StateModifier<StateType, PayloadType>,
-                public successMessage?: string, public redirectAfter?: Link) {
+                public successMessage?: ReactNode, public redirectAfter?: Link) {
     }
 }
 
@@ -31,7 +32,7 @@ export abstract class AbstractLoadableActions<StateType extends StateWithLoadabl
 
     createLoadableDefinition<PayloadType>(payloadProvider: (...params: any[]) => Promise<PayloadType>,
                                           then?: StateModifier<StateType, PayloadType>,
-                                          successMessage?: string,
+                                          successMessage?: ReactNode,
                                           redirectAfter?: Link) {
         return new LoadableDefinition<StateType, PayloadType>(payloadProvider, then, successMessage, redirectAfter);
     }
@@ -39,7 +40,7 @@ export abstract class AbstractLoadableActions<StateType extends StateWithLoadabl
 
     private createLoadableAction<PayloadType>(loadableName,
                                               payloadProvider: (...params: any[]) => Promise<any>,
-                                              then?: StateModifier<StateType, PayloadType>, successMessage?: string, redirectAfter?: Link):
+                                              then?: StateModifier<StateType, PayloadType>, successMessage?: ReactNode, redirectAfter?: Link):
         PromiseAction<PayloadType, ErrorResponseDTO, StateType> {
         return this.createPromiseAction(loadableName.toUpperCase(), payloadProvider, successMessage, redirectAfter)
             .build.onPending((state, action) => {
@@ -74,7 +75,7 @@ export abstract class AbstractLoadableActions<StateType extends StateWithLoadabl
                 return typeof then === 'function' ? then(newState, action) : newState;
             })
             .build.onRejected((state, action) => {
-                //some error already handled by service layer
+                //some errors already handled by service layer
                 return {
                     ...state,
                     loadables: {

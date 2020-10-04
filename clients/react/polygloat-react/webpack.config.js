@@ -8,7 +8,7 @@ module.exports = env => {
 
     const makeTarget = (target) => ({
         entry: "./src/index.ts",
-        devtool: isDevelopment ? 'inline-source-map' : 'source-map',
+        devtool: 'source-map',
         output: {
             filename: "polygloat-react." + target + ".js",
             path: path.resolve(__dirname, 'dist'),

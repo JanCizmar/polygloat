@@ -6,12 +6,11 @@ import {LINKS} from '../../../constants/links';
 import {PrivateRoute} from "../../common/PrivateRoute";
 import {RepositoryRouter} from "./RepositoryRouter";
 
-export default () => {
+export const RepositoriesRouter = () => {
     let match = useRouteMatch();
 
     return (
         <Switch>
-
             <PrivateRoute exact path={`${match.path}`}>
                 <RepositoryListView/>
             </PrivateRoute>

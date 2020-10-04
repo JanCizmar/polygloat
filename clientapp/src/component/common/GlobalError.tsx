@@ -31,7 +31,7 @@ export default function GlobalError(props: { error: GlobalErrorError }) {
 
                             {!dev &&
                             <Box>
-                                <SadGoatMessage text={null}/>
+                                <SadGoatMessage>{null}</SadGoatMessage>
                             </Box>}
 
                             {props.error.publicInfo &&

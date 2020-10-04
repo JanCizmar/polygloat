@@ -1,6 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = env => {
 
@@ -13,7 +14,7 @@ module.exports = env => {
         entry: {
             index: "./src/index.tsx",
         },
-        devtool: isDevelopment ? 'inline-source-map' : 'source-map',
+        devtool: 'source-map',
         output: {
             filename: !isDevelopment ? '[name].[chunkhash].js' : '[name].[hash].js',
             chunkFilename: !isDevelopment ? '[name].[chunkhash].js' : '[name].[hash].js',
@@ -78,12 +79,18 @@ module.exports = env => {
         plugins: [
             new HtmlWebpackPlugin({
                 favicon: "./src/favicon.svg",
-                template: './src/index.html'
+                template: './src/index.html',
             }),
+            new CopyPlugin({
+                patterns: [
+                    {from: 'public', to: '.'}
+                ]
+            })
             //new BundleAnalyzerPlugin()
         ],
         devServer: {
             historyApiFallback: true,
+            overlay: true
         }
     }
 }

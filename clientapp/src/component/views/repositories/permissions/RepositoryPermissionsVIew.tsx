@@ -1,14 +1,11 @@
 import {default as React, FunctionComponent, useEffect, useState} from 'react';
 import {useRouteMatch} from 'react-router-dom';
 import {PARAMS} from '../../../../constants/links';
-import {RepositoryPage} from '../RepositoryPage';
 import {Button} from '@material-ui/core';
 import {BaseView} from '../../BaseView';
 import {useSelector} from 'react-redux';
 import {AppState} from '../../../../store';
 import {container} from 'tsyringe';
-import {Select} from '../../../common/form/fields/Select';
-import MenuItem from '@material-ui/core/MenuItem';
 import {repositoryPermissionTypes} from '../../../../constants/repositoryPermissionTypes';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -22,13 +19,8 @@ import CheckIcon from '@material-ui/icons/Check';
 import {useConfirmation} from '../../../../hooks/useConfirmation';
 import {useUser} from "../../../../hooks/useUser";
 import {PermissionEditDTO} from "../../../../service/response.types";
-
-const PermissionSelect = () => (
-    <Select name="type" className={null}>
-        {Object.keys(repositoryPermissionTypes).map(k =>
-            <MenuItem key={k} value={k}>{repositoryPermissionTypes[k]}</MenuItem>)}
-    </Select>
-);
+import {T} from "polygloat-react";
+import {PermissionSelect} from "../../../security/PermissionSelect";
 
 export const RepositoryPermissionsView: FunctionComponent = () => {
 
@@ -52,54 +44,52 @@ export const RepositoryPermissionsView: FunctionComponent = () => {
     const [editingId, setEditingId] = useState(null);
 
     return (
-        <RepositoryPage>
-            <BaseView title="Edit repository permissions" xs={12} md={10} lg={8}
-                      loading={state.loadables.list.loading}>
-                {() => (
-                    <List>
-                        {state.loadables.list.data && state.loadables.list.data.map(p => (
-                            <ListItem key={p.id}>
-                                <MicroForm initialValues={{type: p.type}} onSubmit={(v) => {
-                                    actions.loadableActions.edit.dispatch({permissionId: p.id, type: v.type} as PermissionEditDTO);
-                                    setEditingId(null);
-                                }}>
-                                    <ListItemText>
-                                        {p.userFullName} | {p.username}
-                                        &nbsp;[ <i>permission: {p.id === editingId &&
-                                    <PermissionSelect/> || p.type}</i> ]
-                                    </ListItemText>
-                                    {userData && userData.id !== p.userId &&
-                                    <ListItemSecondaryAction>
-                                        {p.id === editingId &&
-                                        <>
-                                            <Button color="primary" type="submit">
-                                                <CheckIcon/>
-                                            </Button>
-                                            <Button onClick={() => setEditingId(null)}><CloseIcon/></Button>
-                                        </>
-                                        ||
-                                        <>
-                                            <Button color="primary" onClick={(e) => {
-                                                e.preventDefault();
-                                                setEditingId(p.id)
-                                            }}>
-                                                <EditIcon/>
-                                            </Button>
-                                            <Button color="secondary" onClick={
-                                                () => confirmation({
-                                                    message: `Do you really want to revoke access for user ${p.userFullName}?`,
-                                                    onConfirm: () => actions.loadableActions.delete.dispatch(p.id)
-                                                })
-                                            }>Revoke</Button>
-                                        </>
-                                        }
-                                    </ListItemSecondaryAction>}
-                                </MicroForm>
-                            </ListItem>
-                        ))}
-                    </List>
-                )}
-            </BaseView>
-        </RepositoryPage>
+        <BaseView title={<T>edit_repository_permissions_title</T>} xs={12} md={10} lg={8}
+                  loading={state.loadables.list.loading}>
+            {() => (
+                <List>
+                    {state.loadables.list.data && state.loadables.list.data.map(p => (
+                        <ListItem key={p.id}>
+                            <MicroForm initialValues={{type: p.type}} onSubmit={(v) => {
+                                actions.loadableActions.edit.dispatch({permissionId: p.id, type: v.type} as PermissionEditDTO);
+                                setEditingId(null);
+                            }}>
+                                <ListItemText>
+                                    {p.userFullName} | {p.username}
+                                    &nbsp;[ <i><T>repository_permission_label</T> {p.id === editingId &&
+                                <PermissionSelect name="type" className={null}/> || <T>{`permission_type_${repositoryPermissionTypes[p.type]}`}</T>}</i> ]
+                                </ListItemText>
+                                {userData && userData.id !== p.userId &&
+                                <ListItemSecondaryAction>
+                                    {p.id === editingId &&
+                                    <>
+                                        <Button color="primary" type="submit">
+                                            <CheckIcon/>
+                                        </Button>
+                                        <Button onClick={() => setEditingId(null)}><CloseIcon/></Button>
+                                    </>
+                                    ||
+                                    <>
+                                        <Button color="primary" onClick={(e) => {
+                                            e.preventDefault();
+                                            setEditingId(p.id)
+                                        }}>
+                                            <EditIcon/>
+                                        </Button>
+                                        <Button color="secondary" onClick={
+                                            () => confirmation({
+                                                message: `Do you really want to revoke access for user ${p.userFullName}?`,
+                                                onConfirm: () => actions.loadableActions.delete.dispatch(p.id)
+                                            })
+                                        }>Revoke</Button>
+                                    </>
+                                    }
+                                </ListItemSecondaryAction>}
+                            </MicroForm>
+                        </ListItem>
+                    ))}
+                </List>
+            )}
+        </BaseView>
     );
 };

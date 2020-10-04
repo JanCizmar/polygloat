@@ -26,7 +26,7 @@ export const MenuBar: FunctionComponent = () => {
                     <Box flexGrow={1} display="flex">
                         <Slide in={listContext.isSomeChecked()} direction="right" mountOnEnter unmountOnExit>
                             <Box pr={2}>
-                                <Tooltip title="Delete selected">
+                                <Tooltip title={<T>translations_delete_selected</T>}>
                                     <IconButton color="secondary"
                                                 onClick={() =>
                                                     useConfirmation()({

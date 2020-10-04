@@ -10,9 +10,9 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import {SettingsIconButton} from '../../../common/buttons/SettingsIconButton';
 import {Link, useRouteMatch} from 'react-router-dom';
-import {RepositoryPage} from '../RepositoryPage';
 import {LanguageActions} from '../../../../store/languages/LanguageActions';
 import {BaseView} from '../../BaseView';
+import {T} from "polygloat-react";
 
 const actions = container.resolve(LanguageActions);
 
@@ -27,18 +27,17 @@ export const LanguageListView = () => {
     }, []);
 
     return (
-        <RepositoryPage>
-            <BaseView title="Languages" loading={loadable.loading || !loadable.touched} lg={5} md={7}>
-                {() => (
-                    <>
-                        <List>
-                            {loadable.data.map(l => (
-                                <ListItem key={l.id}>
-                                    <ListItemText>
-                                        {l.name} [{l.abbreviation}]
-                                    </ListItemText>
-                                    <ListItemSecondaryAction>
-                                        <Link to={LINKS.REPOSITORY_LANGUAGE_EDIT.build(
+        <BaseView title={<T>languages_title</T>} loading={loadable.loading || !loadable.touched} lg={5} md={7}>
+            {() => (
+                <>
+                    <List>
+                        {loadable.data.map(l => (
+                            <ListItem key={l.id}>
+                                <ListItemText>
+                                    {l.name} [{l.abbreviation}]
+                                </ListItemText>
+                                <ListItemSecondaryAction>
+                                    <Link to={LINKS.REPOSITORY_LANGUAGE_EDIT.build(
                                             {
                                                 [PARAMS.REPOSITORY_ID]: repositoryId,
                                                 [PARAMS.LANGUAGE_ID]: l.id
@@ -56,6 +55,5 @@ export const LanguageListView = () => {
                     </>
                 )}
             </BaseView>
-        </RepositoryPage>
     );
 };

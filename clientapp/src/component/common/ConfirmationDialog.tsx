@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useEffect, useState} from 'react';
+import {ReactNode, useEffect, useState} from 'react';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -11,9 +11,9 @@ import Box from "@material-ui/core/Box";
 
 export class ConfirmationDialogProps {
     open?: boolean = true;
-    message?: string = 'Are you sure?';
-    confirmButtonText?: string = 'Confirm';
-    title?: string = 'Confirmation';
+    message?: ReactNode = 'Are you sure?';
+    confirmButtonText?: ReactNode = 'Confirm';
+    title?: ReactNode = 'Confirmation';
     hardModeText?: string = null;
     confirmButtonColor?: PropTypes.Color = "primary";
 

@@ -12,7 +12,7 @@ import {CheckBoxGroupMultiSelect} from "../../common/form/fields/CheckBoxGroupMu
 import {ApiKeyDTO} from "../../../service/response.types";
 import {EditApiKeyDTO} from "../../../service/request.types";
 import {Validation} from "../../../constants/GlobalValidationSchema";
-import FullPageLoadingView from "../../common/FullPageLoadingView";
+import {FullPageLoading} from "../../common/FullPageLoading";
 
 interface Value {
     scopes: string[],
@@ -85,7 +85,7 @@ export const FormDialog: FunctionComponent<Props> = (props) => {
     };
 
     if (repositories.loading || scopes.loading) {
-        return <FullPageLoadingView/>
+        return <FullPageLoading/>
     }
 
     return (

@@ -4,6 +4,8 @@ import {repositoryService} from '../../service/repositoryService';
 import {RepositoryDTO} from '../../service/response.types';
 import {LINKS} from "../../constants/links";
 import {AbstractLoadableActions, createLoadable, Loadable, StateWithLoadables} from "../AbstractLoadableActions";
+import React from "react";
+import {T} from "polygloat-react";
 
 export class RepositoriesState extends StateWithLoadables<RepositoryActions> {
     repositoriesLoading: boolean = true;
@@ -28,14 +30,14 @@ export class RepositoryActions extends AbstractLoadableActions<RepositoriesState
 
     loadableDefinitions = {
         editRepository: this.createLoadableDefinition<null>((id, values) => this.service.editRepository(id, values), null,
-            "Successfully edited!", LINKS.REPOSITORIES),
+            <T>repository_successfully_edited_message</T>, LINKS.REPOSITORIES),
         createRepository: this.createLoadableDefinition((values) => this.service.createRepository(values),
-            null, "Repository created", LINKS.REPOSITORIES),
+            null, <T>repository_created_message</T>, LINKS.REPOSITORIES),
         repository: this.createLoadableDefinition(this.service.loadRepository),
         deleteRepository: this.createLoadableDefinition(this.service.deleteRepository, (state, action): RepositoriesState =>
             (
                 {...state, loadables: {...state.loadables, repository: {...createLoadable()} as Loadable<RepositoryDTO>}}
-            ), "Repository deleted!")
+            ), <T>repository_deleted_message</T>)
     };
 
 

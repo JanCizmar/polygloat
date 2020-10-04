@@ -4,7 +4,6 @@ import {container} from 'tsyringe';
 import {LINKS, PARAMS} from '../../../../constants/links';
 import {Route, Switch, useRouteMatch} from 'react-router-dom';
 import {TextField} from '../../../common/form/fields/TextField';
-import {RepositoryPage} from '../RepositoryPage';
 import {BaseFormView} from '../../BaseFormView';
 import {LanguageActions} from '../../../../store/languages/LanguageActions';
 import {LanguageDTO} from "../../../../service/response.types";
@@ -36,7 +35,7 @@ export const LanguageCreateView = () => {
     }
 
     return (
-        <RepositoryPage>
+        <>
             <BaseFormView
                 lg={6} md={8} xs={12}
                 title={'Add language'}
@@ -55,6 +54,6 @@ export const LanguageCreateView = () => {
                 <Route exact path={LINKS.REPOSITORY_TRANSLATIONS_ADD.template}>
                 </Route>
             </Switch>
-        </RepositoryPage>
+        </>
     );
 };

@@ -48,4 +48,8 @@ export class PluginManager {
             this.spans[num].style.backgroundColor = null;
         });
     }
+
+    stop() {
+        this.messages.stopListening();
+    }
 }

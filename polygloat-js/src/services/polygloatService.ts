@@ -29,7 +29,7 @@ export class PolygloatService {
             this.languagePromise = (await fetch(this.getUrl(`languages`))).json();
         }
 
-        const languages = new Set(await this.languagePromise as string[]);
+        const languages = new Set(await this.languagePromise);
         this.preferredLanguages = new Set<string>(Array.from(this.preferredLanguages).filter(l => languages.has(l)));
         return languages;
     }
@@ -94,8 +94,8 @@ export class PolygloatService {
         }
     };
 
-    instant(name: string, lang: string = this.properties.currentLanguage): string {
-        return this.getFromCache(name, lang) || this.getFromCache(name, this.properties.config.defaultLanguage) || name;
+    instant(name: string, lang: string = this.properties.currentLanguage, orEmpty: boolean = false): string {
+        return this.getFromCache(name, lang) || this.getFromCache(name, this.properties.config.defaultLanguage) || (orEmpty ? "" : name);
     }
 
     getFromCache(name: string, lang: string = this.properties.currentLanguage): string {

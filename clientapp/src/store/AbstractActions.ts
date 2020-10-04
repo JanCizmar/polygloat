@@ -1,6 +1,7 @@
 import {AbstractAction, Action, ActionType, PromiseAction} from './Action';
 import {ErrorResponseDTO} from '../service/response.types';
 import {Link} from "../constants/links";
+import {ReactNode} from "react";
 
 export abstract class AbstractActions<StateType> {
     private actions = new Map<string, AbstractAction>();
@@ -26,7 +27,7 @@ export abstract class AbstractActions<StateType> {
 
     createPromiseAction<PayloadType, ErrorType = ErrorResponseDTO>(type: string,
                                                                    payloadProvider: (...params: any[]) => Promise<PayloadType>,
-                                                                   successMessage?: string,
+                                                                   successMessage?: ReactNode,
                                                                    redirectAfter?: Link):
         PromiseAction<PayloadType, ErrorType, StateType> {
         let promiseAction = new PromiseAction<PayloadType, ErrorType, StateType>(`${this.prefix}_${type}`,

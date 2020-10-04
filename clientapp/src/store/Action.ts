@@ -4,8 +4,6 @@ import {dispatchService} from '../service/dispatchService';
 export type ActionType<PayloadType> = { type: string, payload: PayloadType, meta?: any, params?: any[] };
 export type StateModifier<StateType, PayloadType> = (state: StateType, action: ActionType<PayloadType>) => StateType;
 
-export type PayloadProvider<PayloadType, F extends Function> = F extends (...params: infer A) => PayloadType ? A : never;
-
 export abstract class AbstractAction<PayloadType = any, StateType = any> {
     protected constructor(public type: string,
                           public payloadProvider?: (...params: any[]) => PayloadType, public meta?: object) {

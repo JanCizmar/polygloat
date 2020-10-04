@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-const FullPageLoadingView: FunctionComponent<FullPageLoadingProps> = (props) => {
+export const FullPageLoading: FunctionComponent<FullPageLoadingProps> = (props) => {
     const classes = useStyles({});
 
     return (
@@ -27,5 +27,3 @@ const FullPageLoadingView: FunctionComponent<FullPageLoadingProps> = (props) => 
         </Backdrop>
     );
 };
-
-export default FullPageLoadingView;
