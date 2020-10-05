@@ -16,6 +16,8 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 14
+      - name: Clen build data
+          run: ./gradlew clean
       - name: Build with Gradle
         run: ./gradlew build
       - name: Build docker image
