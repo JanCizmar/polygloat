@@ -86,7 +86,7 @@ public class AppConfiguration {
     @Value("${polygloat.mail.properties.mail.smtp.starttls.required:false}")
     private Boolean mailTtlsRequired;
 
-    @Value("${polygloat.mail.from:no-reply@polygloat.com}")
+    @Value("${polygloat.mail.from:no-reply@example.com}")
     private String mailFrom;
 
     public void checkAllowedRegistrations() {

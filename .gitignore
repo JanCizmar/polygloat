@@ -13,3 +13,5 @@ out/
 /src/main/resources/debug.properties
 /clients/react/polygloat-react/dist/
 /clients/react/polygloat-react/lib/
+.vscode
+.settings
