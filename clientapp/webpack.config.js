@@ -12,7 +12,7 @@ module.exports = env => {
 
     return {
         entry: {
-            index: "./src/index.tsx",
+            index: isDevelopment ? "./src/index.dev.ts" : "./src/index.tsx",
         },
         devtool: 'source-map',
         output: {

@@ -83,8 +83,8 @@ const theme = createMuiTheme({
 ReactDOM.render(
     <React.Suspense fallback={<FullPageLoading/>}>
         <PolygloatProvider
-            apiKey="43t0klcdpnjp1elqrf4fuco676"
-            apiUrl="http://chlupac.com:8080"
+            /* @ts-ignore */
+            {...(global.polygloatDevProps || {})}
             filesUrlPrefix="/i18n/"
             loadingFallback={<FullPageLoading/>}
         >
