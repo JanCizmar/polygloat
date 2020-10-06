@@ -38,7 +38,8 @@ module.exports = env => {
         ],
         externals: {
             react: "react",
-            "react-dom": "react-dom"
+            "react-dom": "react-dom",
+            polygloat: "polygloat"
         }
     });
 
