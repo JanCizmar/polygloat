@@ -14,7 +14,7 @@ export const login = (username = defaultUsername, password = defaultPassword) =>
         .type(username).should('have.value', username);
     cy.xpath('//input[@name="password"]')
         .type(password).should('have.value', password);
-    cy.xpath("//button//*[contains(text(), 'Login')]").click();
+    cy.xpath("//button//*[text() = 'Login']").click();
     cy.xpath(getAnyContainingText("Login")).should("not.be.visible");
 };
 
