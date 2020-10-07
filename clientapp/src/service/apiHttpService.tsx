@@ -3,15 +3,16 @@ import {ErrorActions} from '../store/global/errorActions';
 import {RedirectionActions} from '../store/global/redirectionActions';
 import {LINKS} from '../constants/links';
 import {tokenService} from './tokenService';
-import {CONFIG} from '../config';
 import {GlobalError} from "../error/GlobalError";
 import {messageService} from "./messageService";
 import * as Sentry from '@sentry/browser';
+import React from "react";
+import {T} from "polygloat-react";
 
 const errorActions = container.resolve(ErrorActions);
 const redirectionActions = container.resolve(RedirectionActions);
 
-const API_URL = CONFIG.API_URL;
+const API_URL = environment.apiUrl;
 
 let timer;
 let requests: { [address: string]: number } = {};
@@ -63,7 +64,7 @@ export class ApiHttpService {
                 }
                 if (r.status == 403) {
                     redirectionActions.redirect.dispatch(LINKS.AFTER_LOGIN.build());
-                    this.messageService.error("Operation not permitted!");
+                    this.messageService.error(<T>"operation_not_permitted_error"</T>);
                     Sentry.captureException(new Error("Operation not permitted"));
                     ApiHttpService.getResObject(r).then(b => reject({...b, __handled: true}));
                     return;

@@ -2,17 +2,19 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CopyPlugin = require('copy-webpack-plugin');
+const webpack = require("webpack");
+
 
 module.exports = env => {
-
-    process.env.mode = env.mode;
     const isDevelopment = env.mode === "development";
+    const mode = env.mode || 'production';
 
-    process.env.sentry = env.sentry === "true" || (process.env.target === "appbundle" && env.sentry === undefined);
+    const dotenv = require('dotenv').config({path: ".env." + (isDevelopment ? "dev" : "prod")});
+    env = {...dotenv.parsed, ...env};
 
     return {
         entry: {
-            index: isDevelopment ? "./src/index.dev.ts" : "./src/index.tsx",
+            index: "./src/index.tsx",
         },
         devtool: 'source-map',
         output: {
@@ -34,7 +36,7 @@ module.exports = env => {
                 },
                 {
                     test: /\.tsx?$/,
-                    use: [isDevelopment && "ts-loader" || "babel-loader", 'webpack-conditional-loader'],
+                    use: [isDevelopment && "ts-loader" || "babel-loader"],
                     exclude: [/node_modules/, /lib/],
                 }, {
                     test: /\.svg$/,
@@ -75,7 +77,7 @@ module.exports = env => {
             },
             namedModules: true
         },
-        mode: env.mode || 'production',
+        mode,
         plugins: [
             new HtmlWebpackPlugin({
                 favicon: "./src/favicon.svg",
@@ -85,6 +87,15 @@ module.exports = env => {
                 patterns: [
                     {from: 'public', to: '.'}
                 ]
+            }),
+            new webpack.DefinePlugin({
+                "environment": JSON.stringify({
+                    mode: env.mode,
+                    sentryDsn: env.sentryDsn,
+                    apiUrl: env.apiUrl,
+                    polygloatApiKey: env.polygloatApiKey,
+                    polygloatApiUrl: env.polygloatApiUrl
+                })
             })
             //new BundleAnalyzerPlugin()
         ],
@@ -93,5 +104,4 @@ module.exports = env => {
             overlay: true
         }
     }
-}
-;
+};

@@ -20,21 +20,17 @@ import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
 import {PolygloatProvider} from "polygloat-react";
 import {App} from "./component/App";
 import {FullPageLoading} from "./component/common/FullPageLoading";
+import './yupLocalization';
 
 const store = configureStore();
-
 
 const SnackbarProvider = React.lazy(() => import(/* webpackChunkName: "notistack" */ 'notistack')
     .then(module => ({"default": module.SnackbarProvider})));
 
-
-/** !!!! DO NOT REMOVE THESE COMMENTS -- webpack-conditional-loader
- @link(https://github.com/caiogondim/webpack-conditional-loader#readme)
- **/
-// #if process.env.sentry === true
-Sentry.init({dsn: 'https://371b68a5e0da4f86a5142af52ad38599@sentry.io/1853046'});
-console.info("Using Sentry!");
-// #endif
+if (environment.sentryDsn) {
+    Sentry.init({dsn: environment.sentryDsn});
+    console.info("Using Sentry!");
+}
 
 container.resolve(dispatchService).store = store;
 
@@ -80,11 +76,14 @@ const theme = createMuiTheme({
     },
 });
 
+/* @ts-ignore */
+console.log({...(global.polygloatDevProps || {})});
+
 ReactDOM.render(
     <React.Suspense fallback={<FullPageLoading/>}>
         <PolygloatProvider
-            /* @ts-ignore */
-            {...(global.polygloatDevProps || {})}
+            apiUrl={environment.polygloatApiUrl}
+            apiKey={environment.polygloatApiKey}
             filesUrlPrefix="/i18n/"
             loadingFallback={<FullPageLoading/>}
         >

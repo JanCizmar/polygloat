@@ -9,15 +9,7 @@ import {GlobalActions} from "../../store/global/globalActions";
 import {container} from "tsyringe";
 
 export default function GlobalError(props: { error: GlobalErrorError }) {
-    /** !!!! DO NOT REMOVE THESE COMMENTS -- webpack-conditional-loader
-     @link(https://github.com/caiogondim/webpack-conditional-loader#readme)
-     **/
-    // noinspection JSUnusedAssignment
-    let dev = false;
-    // #if process.env.mode === "development"
-    // @ts-ignore
-    dev = true;
-    // #endif
+    let dev = environment.mode === "development";
 
     return (
         <Container maxWidth={dev ? 'lg' : 'sm'}>
