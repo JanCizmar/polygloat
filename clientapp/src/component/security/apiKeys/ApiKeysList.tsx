@@ -1,6 +1,6 @@
-import {default as React, FunctionComponent, useEffect} from "react";
+import {default as React, FunctionComponent} from "react";
 import {ApiKeyDTO} from "../../../service/response.types";
-import {Box, Paper, Typography} from "@material-ui/core";
+import {Box, Paper} from "@material-ui/core";
 import {EditIconButton} from "../../common/buttons/EditIconButton";
 import {DeleteIconButton} from "../../common/buttons/DeleteIconButton";
 import {Link} from "react-router-dom";
@@ -8,6 +8,7 @@ import {LINKS, PARAMS} from "../../../constants/links";
 import {container} from "tsyringe";
 import {UserApiKeysActions} from "../../../store/api_keys/UserApiKeysActions";
 import {useConfirmation} from "../../../hooks/useConfirmation";
+import {T} from "polygloat-react";
 
 interface ApiKeysListProps {
     data: ApiKeyDTO[]
@@ -27,15 +28,15 @@ const Item: FunctionComponent<{ keyDTO: ApiKeyDTO }> = (props) => {
                 <Box p={2}>
                     <Box display="flex">
                         <Box flexGrow={1}>
-                            <b>Api Key: {props.keyDTO.key}</b>
+                            <b><T>Api key list label - Api Key</T> {props.keyDTO.key}</b>
                         </Box>
                         <Box>
-                            Repository: {props.keyDTO.repositoryName}
+                            <T>Api key list label - Repository</T> {props.keyDTO.repositoryName}
                         </Box>
                     </Box>
                     <Box display="flex">
                         <Box flexGrow={1} display="flex" alignItems="center">
-                            Scopes: {props.keyDTO.scopes.join(", ")}
+                            <T>Api key list label - Scopes</T>&nbsp;{props.keyDTO.scopes.join(", ")}
                         </Box>
                         <Box>
                             <EditIconButton component={Link} to={LINKS.USER_API_KEYS_EDIT.build({[PARAMS.API_KEY_ID]: props.keyDTO.id})} size="small"/>

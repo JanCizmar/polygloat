@@ -1,6 +1,5 @@
 import {singleton} from 'tsyringe';
 import {ApiHttpService} from './apiHttpService';
-import {CONFIG} from '../config';
 import {ErrorResponseDTO, TokenDTO} from './response.types';
 import {tokenService} from './tokenService';
 import {API_LINKS} from '../constants/apiLinks';
@@ -9,8 +8,10 @@ import {messageService} from './messageService';
 import {RedirectionActions} from '../store/global/redirectionActions';
 import {invitationCodeService} from "./invitationCodeService";
 import {invitationService} from "./invitationService";
+import React from "react";
+import {T} from "polygloat-react";
 
-const API_URL = CONFIG.API_URL;
+const API_URL = environment.apiUrl;
 
 interface ResetPasswordPostRequest {
     email: string,
@@ -63,10 +64,10 @@ export class securityService {
 
     public resetPasswordSet = async (email: string, code: string, password: string): Promise<void> => {
         const url = `${API_LINKS.RESET_PASSWORD_SET}`;
-        const res = await this.http.post<never>(url, <ResetPasswordPostRequest>{
+        const res = await this.http.post<never>(url, {
             email, code, password
-        });
-        this.messageService.success('Password successfully reset');
+        } as ResetPasswordPostRequest);
+        this.messageService.success(<T>Password successfully reset</T>);
         return res;
     };
 
@@ -103,7 +104,7 @@ export class securityService {
 
     private async handleLoginResponse(response): Promise<TokenDTO> {
         if (response.status >= 400) {
-            throw <ErrorResponseDTO>await response.json();
+            throw await response.json() as ErrorResponseDTO;
         }
 
         const tokenDTO: TokenDTO = await response.json();

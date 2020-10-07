@@ -2,6 +2,8 @@ import {singleton} from 'tsyringe';
 import {ApiHttpService} from './apiHttpService';
 import {UserDTO, UserUpdateDTO} from './response.types';
 import {messageService} from './messageService';
+import {T} from "polygloat-react";
+import React from "react";
 
 
 @singleton()
@@ -13,7 +15,6 @@ export class userService {
 
     public updateUserData = async (data: UserUpdateDTO): Promise<void> => {
         await this.http.post("user", data);
-        this.messagesService.success("Successfully updated!");
+        this.messagesService.success(<T>User data - Successfully updated!</T>);
     };
-
 }

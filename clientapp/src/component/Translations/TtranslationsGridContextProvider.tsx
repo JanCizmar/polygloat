@@ -6,7 +6,7 @@ import {TranslationActions} from "../../store/repository/TranslationActions";
 import {useRepository} from "../../hooks/useRepository";
 import {Loadable} from "../../store/AbstractLoadableActions";
 import {RepositoryPermissionType, TranslationsDataResponse} from "../../service/response.types";
-import {useTranslate} from "polygloat-react";
+import {T, useTranslate} from "polygloat-react";
 import {FullPageLoading} from "../common/FullPageLoading";
 
 export const TranslationListContext = React.createContext<TranslationListContextType>(null);
@@ -77,38 +77,41 @@ export const TranslationGridContextProvider: FunctionComponent = (props) => {
 
     useEffect(() => {
         if (translationSaveLoadable.error) {
+            actions.loadableReset.setTranslations.dispatch();
             for (const error of parseError(translationSaveLoadable.error)) {
-                messaging.error(error);
+                messaging.error(<T>{error}</T>);
             }
         }
 
         if (translationSaveLoadable.loaded) {
-            messaging.success("Translation saved");
+            messaging.success(<T>Translation grid - translation saved</T>);
             contextValue.refreshList();
             actions.loadableReset.setTranslations.dispatch();
         }
 
         if (sourceSaveLoadable.error) {
             for (const error of parseError(sourceSaveLoadable.error)) {
-                messaging.error(error);
+                messaging.error(<T>{error}</T>);
             }
+            actions.loadableReset.editSource.dispatch();
         }
 
         if (sourceSaveLoadable.loaded) {
             actions.loadableReset.editSource.dispatch();
-            messaging.success("Successfully edited!");
+            messaging.success(<T>Translation grid - Successfully edited!</T>);
             contextValue.refreshList();
         }
 
         if (deleteLoadable.error) {
+            actions.loadableReset.delete.dispatch();
             for (const error of parseError(deleteLoadable.error)) {
-                messaging.error(error);
+                messaging.error(<T>{error}</T>);
             }
         }
 
         if (deleteLoadable.loaded) {
             actions.loadableReset.delete.dispatch();
-            messaging.success("Successfully deleted!");
+            messaging.success(<T>Translation grid - Successfully deleted!</T>);
             contextValue.refreshList();
         }
 

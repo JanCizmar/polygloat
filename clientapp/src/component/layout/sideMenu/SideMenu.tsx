@@ -6,8 +6,7 @@ import Drawer from '@material-ui/core/Drawer';
 import IconButton from '@material-ui/core/IconButton';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import {MenuItem, Select} from "@material-ui/core";
-import {T, useCurrentLanguage, useSetLanguage} from "polygloat-react";
+import {LocaleMenu} from "../../LocaleMenu";
 
 
 const drawerWidth = 240;
@@ -17,6 +16,7 @@ const useStyles = makeStyles(theme => ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
+        flexDirection: 'row-reverse',
         padding: '0 8px',
         ...theme.mixins.toolbar,
     },
@@ -50,9 +50,6 @@ interface SideMenuProps {
 export const SideMenu: FunctionComponent<SideMenuProps> = ({onSideMenuToggle, open, children}) => {
     const classes = useStyles({});
 
-    const setLanguage = useSetLanguage();
-    const getCurrentLanguage = useCurrentLanguage();
-
     return (
         <Drawer
             variant="permanent"
@@ -63,18 +60,12 @@ export const SideMenu: FunctionComponent<SideMenuProps> = ({onSideMenuToggle, op
             color="secondary"
         >
             <div className={classes.toolbarIcon}>
-                <Select label={<T>language_select_label</T>}
-                        onChange={e => setLanguage(e.target.value as string)}
-                        value={getCurrentLanguage()}
-                        renderValue={() => getCurrentLanguage()}
-                >
-                    <MenuItem value="cz">Česky</MenuItem>
-                    <MenuItem value="en">English</MenuItem>
-                </Select>
                 <IconButton onClick={onSideMenuToggle}>
                     {open ? <ChevronLeftIcon/> : <ChevronRightIcon/>}
                 </IconButton>
+                {open && <LocaleMenu/>}
             </div>
+            {!open && <LocaleMenu/>}
             {children}
         </Drawer>
     );

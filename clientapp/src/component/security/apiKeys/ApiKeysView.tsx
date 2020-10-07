@@ -9,6 +9,7 @@ import {FormDialog} from "./FormDialog";
 import {ApiKeysList} from "./ApiKeysList";
 import {EmptyListMessage} from "../../common/EmptyListMessage";
 import {PossibleRepositoryPage} from "../../views/PossibleRepositoryPage";
+import {T} from "polygloat-react";
 
 export const ApiKeysView: FunctionComponent = () => {
 
@@ -43,13 +44,13 @@ export const ApiKeysView: FunctionComponent = () => {
 
     return (
         <PossibleRepositoryPage>
-            <BaseView title="My api keys" xs={12} md={10} lg={8}
+            <BaseView title={<T>Api keys title</T>} xs={12} md={10} lg={8}
                       loading={list.loading}>
                 {() => (
                     <>
                         {
                             list.loaded && (!list.data.length ?
-                                <EmptyListMessage>No api keys yet!</EmptyListMessage> :
+                                <EmptyListMessage><T>No api keys yet!</T></EmptyListMessage> :
                                 <ApiKeysList data={list.data}/>)
                         }
                         <FabAddButtonLink to={LINKS.USER_API_KEYS_GENERATE.build()}/>

@@ -7,6 +7,8 @@ import {messageService} from './messageService';
 import {tokenService} from "./tokenService";
 import {invitationCodeService} from "./invitationCodeService";
 import {GlobalActions} from "../store/global/globalActions";
+import React from "react";
+import {T} from "polygloat-react";
 
 
 const http = container.resolve(ApiHttpService);
@@ -33,11 +35,11 @@ export class invitationService {
 
         try {
             await http.get('invitation/accept/' + code);
-            this.messaging.success('Invitation successfully accepted');
+            this.messaging.success(<T>Invitation successfully accepted</T>);
 
         } catch (e) {
-            if ((<ErrorResponseDTO>e).code) {
-                this.messaging.error(e.code);
+            if ((e as ErrorResponseDTO).code) {
+                this.messaging.error(<T>e.code</T>);
             }
         }
         this.redirectActions.redirect.dispatch(LINKS.REPOSITORIES.build());

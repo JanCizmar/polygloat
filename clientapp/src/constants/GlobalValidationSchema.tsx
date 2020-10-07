@@ -1,6 +1,23 @@
 import * as Yup from 'yup';
 import {container} from "tsyringe";
 import {signUpService} from "../service/signUpService";
+import React from "react";
+import {T} from "polygloat-react";
+
+Yup.setLocale({
+    // use constant translation keys for messages without values
+    mixed: {
+        default: 'field_invalid',
+        required: ({path}) => {
+            return <T>{"Validation - required field"}</T>
+        },
+    },
+    string: {
+        email: () => <T>Validation - email is not valid</T>,
+        min: ({min}) => <T parameters={{min: min.toString()}}>Field should have at least n chars</T>,
+        max: ({max}) => <T parameters={{max: max.toString()}}>Field should have maximum of n chars</T>,
+    },
+});
 
 export class Validation {
 
@@ -100,8 +117,8 @@ export class Validation {
         {
             name: Yup.string().required().min(3).max(500),
             languages: Yup.array().required().of(Yup.object().shape({
-                name: Validation.LANGUAGE_NAME.label("name").required("This field is required"),
-                abbreviation: Validation.LANGUAGE_ABBREVIATION.label("name").required("This field is required")
+                name: Validation.LANGUAGE_NAME.label("name").required(),
+                abbreviation: Validation.LANGUAGE_ABBREVIATION.label("name").required()
             }))
         });
 

@@ -3,6 +3,8 @@ import {ApiHttpService} from './apiHttpService';
 import {ApiKeyDTO} from "./response.types";
 import {messageService} from "./messageService";
 import {EditApiKeyDTO} from "./request.types";
+import {T} from "polygloat-react";
+import React from "react";
 
 const BASE = "apiKeys";
 
@@ -20,17 +22,17 @@ export class apiKeysService {
 
     generateApiKey = async (val: { repositoryId: number, scopes: string[] }): Promise<ApiKeyDTO> => {
         const res: ApiKeyDTO = await this.http.post(`${BASE}`, val);
-        this.messages.success("Api key successfully generated!");
+        this.messages.success(<T>Api key successfully generated!</T>);
         return res;
     };
 
     edit = async (dto: EditApiKeyDTO): Promise<void> => {
         await this.http.post(`${BASE}/edit`, dto);
-        this.messages.success("Api key successfully edited!");
+        this.messages.success(<T>Api key successfully edited!</T>);
     }
 
     delete = async (key: string): Promise<void> => {
         await this.http.delete(`${BASE}/${key}`);
-        this.messages.success("Api key successfully deleted!");
+        this.messages.success(<T>Api key successfully edited!</T>);
     }
 }

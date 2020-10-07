@@ -48,7 +48,7 @@ export const LoginView: FunctionComponent<LoginProps> = (props) => {
             <BaseView title={<T>login_title</T>} lg={6} md={8} xs={12}>
                 {security.loginErrorCode &&
                 <Box mt={1}>
-                    <Alert severity="error">{security.loginErrorCode}</Alert>
+                    <Alert severity="error"><T>{security.loginErrorCode}</T></Alert>
                 </Box>
                 }
                 <StandardForm initialValues={{username: '', password: ''}}

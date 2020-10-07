@@ -11,6 +11,7 @@ import {AppState} from "../../store";
 import {RedirectionActions} from "../../store/global/redirectionActions";
 import {useHistory} from 'react-router-dom';
 import {PossibleRepositoryPage} from "./PossibleRepositoryPage";
+import {T} from "polygloat-react";
 
 const actions = container.resolve(UserActions);
 const userActions = container.resolve(UserActions);
@@ -31,7 +32,7 @@ export const UserSettings: FunctionComponent = () => {
 
     return (
         <PossibleRepositoryPage>
-            <BaseFormView title="User settings" lg={6} md={8} xs={12} saveActionLoadable={saveLoadable} resourceLoadable={resourceLoadable}
+            <BaseFormView title={<T>User settings title</T>} lg={6} md={8} xs={12} saveActionLoadable={saveLoadable} resourceLoadable={resourceLoadable}
                           initialValues={{password: '', passwordRepeat: '', name: resourceLoadable.data.name, email: resourceLoadable.data.username}}
                           validationSchema={Validation.USER_SETTINGS}
                           submitButtonInner={"Save"}
@@ -42,8 +43,8 @@ export const UserSettings: FunctionComponent = () => {
                               }
                               actions.loadableActions.updateUser.dispatch(v as UserUpdateDTO);
                           }}>
-                <TextField name="name" label="Full name"/>
-                <TextField name="email" label="E-mail"/>
+                <TextField name="name" label={<T>User settings - Full name</T>}/>
+                <TextField name="email" label={<T>User settings - E-mail</T>}/>
                 <SetPasswordFields/>
             </BaseFormView>
         </PossibleRepositoryPage>

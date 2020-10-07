@@ -37,7 +37,7 @@ export const LanguagesMenu: FunctionComponent<LanguagesMenuProps> = (props) => {
 
     const langsChange = (e) => {
         if (e.target.value < 1) {
-            messaging.error("Set at least one language!");
+            messaging.error(<T>set_at_least_one_language_error</T>);
             return;
         }
         setLocalSelected(e.target.value);

@@ -13,11 +13,11 @@ export class messageService {
         this.actions.showMessage.dispatch(new Message(message, variant));
     }
 
-    success(message: string) {
+    success(message: ReactNode) {
         this.yell(message, "success");
     }
 
-    error(message: string) {
+    error(message: ReactNode) {
         this.yell(message, "error");
     }
 }

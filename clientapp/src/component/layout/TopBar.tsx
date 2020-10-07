@@ -8,6 +8,7 @@ import {Link} from "react-router-dom";
 import {PolygloatLogo} from "../common/icons/PolygloatLogo";
 import {Box} from "@material-ui/core";
 import {UserMenu} from "../security/UserMenu";
+import {LocaleMenu} from "../LocaleMenu";
 
 const drawerWidth = 240;
 
@@ -48,7 +49,6 @@ interface TopBarProps {
 export function TopBar(props: TopBarProps) {
     const classes = useStyles({});
 
-
     return (
         <AppBar position="absolute" className={clsx(classes.appBar)}>
             <Toolbar className={classes.toolbar}>
@@ -65,6 +65,9 @@ export function TopBar(props: TopBarProps) {
                             </Box>
                         </Link>
                     </Box>
+                </Box>
+                <Box display="inline" marginRight={1}>
+                    <LocaleMenu/>
                 </Box>
                 <UserMenu variant="expanded"/>
             </Toolbar>
