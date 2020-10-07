@@ -3,7 +3,10 @@ on:
     branches-ignore:
       - '**'
     tags:
-      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+      - v0.*
+      - v1.*
+      - latest
+      - production
 
 name: Upload Release Asset
 

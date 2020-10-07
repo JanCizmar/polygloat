@@ -4,8 +4,12 @@ on:
   push:
     barnches:
       - '**'
+    tags-ignore:
+      - v0.*
+      - v1.*
+      - latest
+      - production
   pull_request:
-
 jobs:
   build:
     runs-on: ubuntu-latest
