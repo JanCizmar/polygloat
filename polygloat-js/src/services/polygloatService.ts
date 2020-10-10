@@ -211,9 +211,11 @@ export class PolygloatService {
     };
 
     get unWrapRegex() {
-        return new RegExp(
-            `${this.escapeRegExp(this.properties.config.inputPrefix)}(.*?)${this.escapeRegExp(this.properties.config.inputPostfix)}`,
-            'gm');
+        return new RegExp(this.rawUnWrapRegex, 'gm');
+    }
+
+    get rawUnWrapRegex(): string {
+        return `${this.escapeRegExp(this.properties.config.inputPrefix)}(.*?)${this.escapeRegExp(this.properties.config.inputPostfix)}`;
     }
 
     isKeyAllowed(...scopes: Scope[]) {

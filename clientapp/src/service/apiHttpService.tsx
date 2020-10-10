@@ -64,7 +64,7 @@ export class ApiHttpService {
                 }
                 if (r.status == 403) {
                     redirectionActions.redirect.dispatch(LINKS.AFTER_LOGIN.build());
-                    this.messageService.error(<T>"operation_not_permitted_error"</T>);
+                    this.messageService.error(<T>operation_not_permitted_error</T>);
                     Sentry.captureException(new Error("Operation not permitted"));
                     ApiHttpService.getResObject(r).then(b => reject({...b, __handled: true}));
                     return;

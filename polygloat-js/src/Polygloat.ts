@@ -18,6 +18,7 @@ export class Polygloat {
         this.properties.config = {...(new PolygloatConfig()), ...config};
         this.properties.config.mode = this.properties.config.mode || this.properties.config.apiKey ? "development" : "production";
         this.properties.currentLanguage = this.properties.config.defaultLanguage;
+        this.properties.config.watch = this.properties.config.watch === undefined ? this.properties.config.mode === "development" : false;
     }
 
     public get lang() {
@@ -38,9 +39,16 @@ export class Polygloat {
         if (this.properties.config.mode === "development") {
             this.properties.scopes = await this.service.getScopes();
             this.observer = container.resolve(Observer);
-            this.observer.observe();
             await this.service.getTranslations(this.lang);
         }
+        if (this.properties.config.watch) {
+            this.observer.observe();
+        }
+        await this.refresh();
+    }
+
+    public async refresh() {
+        return this.observer.handleSubtree(this.properties.config.targetElement);
     }
 
     public get defaultLanguage() {

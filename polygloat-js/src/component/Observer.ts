@@ -26,20 +26,22 @@ export class Observer {
             }
         });
 
-    private async handleSubtree(target: Node) {
-        let nodes: XPathResult = document.evaluate(`./descendant-or-self::*[contains(text(), \'${this.properties.config.inputPrefix}\')]`, target);
+    public async handleSubtree(target: Node) {
+        let xPath = `./descendant-or-self::*[text()[contains(., '${this.properties.config.inputPrefix}') and contains(., '${this.properties.config.inputPostfix}')]]`;
+        let nodes: XPathResult = document.evaluate(xPath, target);
         let inputNodes = (target as Element).getElementsByTagName("input");// document.evaluate('.//input', target);
         let polygloatInputs = Array.from(inputNodes)//NodeHelper.nodeListToArray(inputNodes)
             .filter(i => i.value.indexOf(this.properties.config.inputPrefix) > -1);
 
-        const newNodes = NodeHelper.nodeListToArray(nodes).concat(polygloatInputs);
+        const newNodes = NodeHelper.nodeListToArray(nodes).concat(polygloatInputs)
+            .filter(n => this.properties.config.restrictedElements.indexOf(n.tagName.toLowerCase()) === -1);
         if (newNodes.length) {
             await this.coreHandler.onNewNodes(newNodes);
         }
     }
 
     public observe() {
-        this.observer.observe(document.body, {attributes: true, childList: true, subtree: true, characterData: true});
+        this.observer.observe(this.properties.config.targetElement, {attributes: true, childList: true, subtree: true, characterData: true});
     }
 
     public stopObserving() {

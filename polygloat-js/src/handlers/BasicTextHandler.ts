@@ -24,15 +24,26 @@ export class BasicTextHandler {
         let xPathResult = document.evaluate(`./text()[contains(.,'${this.properties.config.inputPrefix}')]`, node);
 
         for (const element of NodeHelper.nodeListToArray(xPathResult)) {
-            //create virtual element to replace multiple text siblings in it
-            const spanPromises: Promise<PolygloatSimpleSpanElement>[] = [];
 
-            element.textContent.replace(this.service.unWrapRegex, (_, g1) => {
-                spanPromises.push(this.createSpan(this.service.parseUnwrapped(g1)));
-                return null;
+            //create virtual element to replace multiple text siblings in it
+            const nodePromises: Promise<PolygloatSimpleSpanElement | Text>[] = [];
+
+            const matchRegexp = new RegExp("(.*?)" + this.service.rawUnWrapRegex, "gs");
+
+            let matched = false;
+            const rest = element.textContent.replace(matchRegexp, (_, g0, g1) => {
+                if (g0 !== "") {
+                    nodePromises.push(new Promise(resolve => resolve(document.createTextNode(g0))));
+                }
+                nodePromises.push(this.createSpan(this.service.parseUnwrapped(g1)));
+                matched = true;
+                return "";
             });
 
-            element.replaceWith(...await Promise.all(spanPromises));
+            //do not replace, when nothing is found
+            if (matched) {
+                element.replaceWith(...await Promise.all(nodePromises), rest);
+            }
         }
     }
 

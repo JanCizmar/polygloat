@@ -33,16 +33,15 @@ export class CoreHandler {
             let textInputParent = NodeHelper.nodeListToArray(
                 document.evaluate('./ancestor-or-self::*[name() = \'textarea\' or name() = \'input\']', node));
             if (textInputParent.length < 1) {
-
                 await this.basicTextHandler.handleNewNode(node);
                 continue;
             }
             if (node instanceof HTMLTextAreaElement) {
-                await this.textAreaHandler.handleNewNode(node as HTMLTextAreaElement);
+                await this.textAreaHandler.handleNewNode(node);
                 continue;
             }
             if (node instanceof HTMLInputElement) {
-                await this.inputHandler.handleNewNode(node as HTMLInputElement);
+                await this.inputHandler.handleNewNode(node);
             }
         }
     };

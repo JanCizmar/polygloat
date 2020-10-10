@@ -5,6 +5,7 @@ export class PolygloatConfig {
         'textarea': ['placeholder'],
         'input': ['value', 'placeholder']
     };
+    restrictedElements?: string[] = ['script', 'style'];
     defaultLanguage?: string = 'en';
     inputPrefix?: string = '%-%polygloat:';
     inputPostfix?: string = '%-%';
@@ -12,4 +13,6 @@ export class PolygloatConfig {
     apiKey?: string;
     filesUrlPrefix?: string;
     mode?: Mode;
+    targetElement: Node = document.body;
+    watch?: boolean;
 }

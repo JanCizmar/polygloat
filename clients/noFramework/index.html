@@ -17,21 +17,38 @@
 
 <h1 id="target"></h1>
 
+<h1 id="target2"></h1>
+
+}} slkajs {{
+
 <script src="../../polygloat-js/dist/polygloat.window.js"></script>
 <script>const pg = new polygloat.Polygloat({
-    apiKey: "ga9amv7ut8slf6av0rfjdjcvqo",
+    apiKey: "vc0i8ct6u71ruvk9qisa5jdnrb",
     apiUrl: "http://localhost:8080",
     defaultLanguage: "en",
     inputPrefix: "{{",
     inputPostfix: "}}"
 });
+
+document.getElementById("target2").append(pg.instant("peter_has_n_dogs", {"dogsCount": "4"}));
+document.getElementById("target2").append(pg.instant("peter_has_n_dogs", {"dogsCount": "4"}));
+document.getElementById("target2").append(pg.instant("peter_has_n_dogs", {"dogsCount": "4"}));
+
 pg.run().then(() => {
-    pg.handleSubtree(document.body).then(() => {
-        //polygloat is set! Lets remove loading indicator!
-        document.getElementById("loading").style.display = "none";
-        document.getElementById("target").innerText = pg.instant("peter_has_n_dogs", {"dogsCount": "5"});
-        document.getElementById("target").innerText = pg.instant("peter_has_n_dogs", {"dogsCount": "4"});
-    });
+    //polygloat is set! Lets remove loading indicator!
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("target").innerText = pg.instant("peter_has_n_dogs", {"dogsCount": "5"});
+    document.getElementById("target").innerText = pg.instant("peter_has_n_dogs", {"dogsCount": "4"});
+    document.getElementById("target").append(pg.instant("peter_has_n_dogs", {"dogsCount": "4"}));
+    setTimeout(() => {
+        document.getElementById("target").append(pg.instant("peter_has_n_dogs", {"dogsCount": "4"}));
+        document.getElementById("target2").append("->");
+        document.getElementById("target2").append(pg.instant("peter_has_n_dogs", {"dogsCount": "4"}));
+        document.getElementById("target").append(pg.instant("peter_has_n_dogs", {"dogsCount": "4"}));
+        document.getElementById("target2").append(pg.instant("peter_has_n_dogs", {"dogsCount": "4"}));
+        document.getElementById("target")
+            .append(" aaaaa " + pg.instant("peter_has_n_dogs", {"dogsCount": "4"}) + " aaaaaa");
+    }, 1000);
 });
 </script>
 </body>
