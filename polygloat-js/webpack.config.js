@@ -1,7 +1,6 @@
 const path = require('path');
 
-const WebpackBundleAnalyzer = require("webpack-bundle-analyzer")
-    .BundleAnalyzerPlugin;
+const WebpackBundleAnalyzer = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 
 module.exports = env => {
     const isDevelopment = env.mode === "development";
@@ -29,7 +28,7 @@ module.exports = env => {
         },
         mode: env.mode,
         plugins: [
-            // new WebpackBundleAnalyzer()
+            //new WebpackBundleAnalyzer()
         ]
     });
 

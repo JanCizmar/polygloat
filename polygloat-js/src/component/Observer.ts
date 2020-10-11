@@ -28,9 +28,9 @@ export class Observer {
 
     public async handleSubtree(target: Node) {
         let xPath = `./descendant-or-self::*[text()[contains(., '${this.properties.config.inputPrefix}') and contains(., '${this.properties.config.inputPostfix}')]]`;
-        let nodes: XPathResult = document.evaluate(xPath, target);
-        let inputNodes = (target as Element).getElementsByTagName("input");// document.evaluate('.//input', target);
-        let polygloatInputs = Array.from(inputNodes)//NodeHelper.nodeListToArray(inputNodes)
+        let nodes: XPathResult = document.evaluate(xPath, target, null, XPathResult.ANY_TYPE);
+        let inputNodes = (target as Element).getElementsByTagName("input");
+        let polygloatInputs = Array.from(inputNodes)
             .filter(i => i.value.indexOf(this.properties.config.inputPrefix) > -1);
 
         const newNodes = NodeHelper.nodeListToArray(nodes).concat(polygloatInputs)

@@ -21,7 +21,7 @@ export class BasicTextHandler {
     }
 
     async handleNewNode(node: Element): Promise<void> {
-        let xPathResult = document.evaluate(`./text()[contains(.,'${this.properties.config.inputPrefix}')]`, node);
+        let xPathResult = document.evaluate(`./text()[contains(.,'${this.properties.config.inputPrefix}')]`, node, null, XPathResult.ANY_TYPE);
 
         for (const element of NodeHelper.nodeListToArray(xPathResult)) {
 

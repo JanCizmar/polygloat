@@ -1,9 +1,9 @@
 import {TranslationData} from '../DTOs/TranslationData';
 import {Properties, Scope} from '../Properties';
-import {singleton} from 'tsyringe';
+import {injectable} from 'tsyringe';
 import {PolygloatData, TranslationParams, Translations} from "../Types";
 
-@singleton()
+@injectable()
 export class PolygloatService {
 
     private translationsCache: Map<string, Translations> = new Map<string, Translations>();
@@ -11,7 +11,7 @@ export class PolygloatService {
     private languagePromise: Promise<string[]>;
 
     constructor(private properties: Properties) {
-    };
+    }
 
     async getTranslations(lang: string) {
         if (this.translationsCache.get(lang) == undefined) {

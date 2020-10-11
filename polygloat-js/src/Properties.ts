@@ -1,7 +1,7 @@
 import {PolygloatConfig} from './PolygloatConfig';
-import {singleton} from 'tsyringe';
+import {injectable} from 'tsyringe';
 
-@singleton()
+@injectable()
 export class Properties {
     config: PolygloatConfig = new PolygloatConfig();
     currentLanguage: string = this.config.defaultLanguage;

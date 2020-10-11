@@ -32,9 +32,9 @@ const ComponentWithUseTranslation = () => {
 const App = () => {
     return (
         <PolygloatProvider
-            //filesUrlPrefix="i18n/"
-            apiUrl="http://localhost:8080"
-            apiKey="ga9amv7ut8slf6av0rfjdjcvqo"
+            filesUrlPrefix="i18n/"
+            //apiUrl="http://localhost:8080"
+            //apiKey="ga9amv7ut8slf6av0rfjdjcvqo"
         >
 
             <ChooseLanguage/>

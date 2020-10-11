@@ -7,7 +7,7 @@ interface DialogProps {
     style: React.CSSProperties
 }
 
-const containerStyle: React.CSSProperties = {
+const backdropStyle: React.CSSProperties = {
     position: "absolute",
     width: "100vw",
     height: "100vh",
@@ -37,7 +37,7 @@ export const Dialog: FunctionComponent<DialogProps> = (props) => {
         <>
             {
                 props.open &&
-                <div style={containerStyle} onClick={props.onClose} onKeyDown={(e) => onKeyDown(e.key)}>
+                <div style={backdropStyle} onClick={props.onClose} onKeyDown={(e) => onKeyDown(e.key)}>
                     <div style={{...dialogStyle, ...props.style}} onClick={(e) => {
                         e.stopPropagation();
                         e.preventDefault();

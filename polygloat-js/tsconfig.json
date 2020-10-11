@@ -6,13 +6,15 @@
     "declaration": true,
     "outDir": "./lib",
     "lib": [
+      "es2015",
       "es2018",
       "dom"
     ],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "jsx": "react",
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "resolveJsonModule": true
   },
   "include": [
     "src"

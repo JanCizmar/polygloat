@@ -29,19 +29,19 @@ export class CoreHandler {
 
     onNewNodes = async (nodes: Element[]): Promise<void> => {
         for (const node of nodes) {
+            const hasAncestor = node.parentNode !== null;
             //texts inside newValue areas can not be replaced with spans, because it is not going to be rendered properly
-            let textInputParent = NodeHelper.nodeListToArray(
-                document.evaluate('./ancestor-or-self::*[name() = \'textarea\' or name() = \'input\']', node));
-            if (textInputParent.length < 1) {
+            let textInputParent = node.closest("textarea, input")
+            if (textInputParent === null) {
                 await this.basicTextHandler.handleNewNode(node);
                 continue;
             }
-            if (node instanceof HTMLTextAreaElement) {
-                await this.textAreaHandler.handleNewNode(node);
+            if (textInputParent instanceof HTMLTextAreaElement) {
+                await this.textAreaHandler.handleNewNode(textInputParent);
                 continue;
             }
-            if (node instanceof HTMLInputElement) {
-                await this.inputHandler.handleNewNode(node);
+            if (textInputParent instanceof HTMLInputElement) {
+                await this.inputHandler.handleNewNode(textInputParent);
             }
         }
     };
@@ -58,7 +58,7 @@ export class CoreHandler {
     }
 
     async refresh() {
-        let nodeList = document.evaluate(`//*[@_polygloat]`, document.body);
+        let nodeList = document.evaluate(`//*[@_polygloat]`, this.properties.config.targetElement, null, XPathResult.ANY_TYPE);
         for (const node of NodeHelper.nodeListToArray(nodeList)) {
             if (node instanceof HTMLSpanElement) {
                 await this.basicTextHandler.refresh(node);
